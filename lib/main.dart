@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SupabaseClientManager.initialize();
+
   runApp(const MyApp());
 }
 
@@ -18,9 +23,8 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFFD93B63),
         scaffoldBackgroundColor: const Color(0xFFF7F8FC),
       ),
-      initialRoute: '/',
       onGenerateRoute: AppRouter.generateRoute,
-      home: const MainTabScreen(), 
+      home: const MainTabScreen(),
     );
   }
 }
