@@ -3,6 +3,7 @@ import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart'; // ✅ Import your sleep page
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart'; // ✅ Import your growth page
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class FoodPage extends StatefulWidget {
   const FoodPage({super.key});
@@ -17,27 +18,7 @@ class _FoodPageState extends State<FoodPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAF5),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          'Add Trackers',
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/parent_placeholder.jpg'),
-            ),
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Food Tracker'),
 
       // --- Body ---
       body: SafeArea(

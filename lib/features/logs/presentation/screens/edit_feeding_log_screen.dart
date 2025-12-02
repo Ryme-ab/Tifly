@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class EditLogForm extends StatefulWidget {
   final Map<String, dynamic> log;
@@ -24,10 +25,7 @@ class _EditLogFormState extends State<EditLogForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Log"),
-        backgroundColor: const Color(0xffb03a57),
-      ),
+      appBar: const CustomAppBar(title: 'Edit Log'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

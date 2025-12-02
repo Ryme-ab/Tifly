@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class SleepingLogsScreen extends StatefulWidget {
   const SleepingLogsScreen({super.key});
@@ -66,15 +67,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          "Sleeping Tracker",
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: false,
-      ),
+      appBar: const CustomAppBar(title: 'Sleeping Tracker'),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

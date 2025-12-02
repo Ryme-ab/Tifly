@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class MyBabiesScreen extends StatelessWidget {
   const MyBabiesScreen({super.key});
@@ -6,7 +7,7 @@ class MyBabiesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Babies')),
+      appBar: const CustomAppBar(title: 'My Babies'),
       body: const Center(
         child: Text('My Babies Screen - Coming Soon'),
       ),
