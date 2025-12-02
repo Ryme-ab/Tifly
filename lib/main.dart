@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 import 'package:tifli/features/navigation/app_router.dart';
+
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 
 void main() {
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: AppRouter.generateRoute,
-      home: const MainTabScreen(), 
+      home: const MainTabScreen(),
     );
   }
 }

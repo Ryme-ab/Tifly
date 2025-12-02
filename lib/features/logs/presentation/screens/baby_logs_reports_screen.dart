@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
+import 'feeding_logs_screen.dart';
+import 'sleeping_logs_screen.dart';
 
 class BabyLogsReportsPage extends StatelessWidget {
   const BabyLogsReportsPage({super.key});
@@ -8,136 +12,112 @@ class BabyLogsReportsPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF9F6FA),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          "Logs & Reports",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
-        ),
-        actions: [
-          Icon(Icons.notifications_outlined,
-              color: isDark ? Colors.white70 : Colors.black54),
-          const SizedBox(width: 10),
-          CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage(
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuCoTMZtpS6LgGWi2SnFhz7SX5I90Bmp-7mrJ_me7uj5uuFrQuCMowyZV-TP0xud8PrjCpuGMbmhV3E3ysYd-bT904RciiKRYyVnbXjK1I4Hy3TS61_Ma04i6BNBLmRKs_6XL_tQLOdW5vHcKp0Po6QCbRbWCvVGlYJonhZDelwQf7_RHO3nJcskJnWsjpbc8p_WMF9EA3UVWTaerYhkXCfaogQqb2pLDnsEA39R3hWzU48pWfZUD2qWeCX7LiL8sT9GuZr21sIjzTY",
-            ),
-          ),
-          const SizedBox(width: 12),
-        ],
-      ),
+      backgroundColor: isDark
+          ? const Color(0xFF1C1C1E)
+          : const Color(0xFFF9F6FA),
+      appBar: const CustomAppBar(title: 'Logs & Reports'),
+
       body: Column(
         children: [
-          // ---- Navigation Bar ----
-          // ---- Navigation Bar removed (redundant) ----
-
           const SizedBox(height: 12),
 
-          // ---- Top Buttons and Date ----
+          // ---------------------------------------------------------------
+          // BABY DROPDOWN
+          // ---------------------------------------------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 6,
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF56587),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                        ),
-                        onPressed: () {},
-                        child: const Text("Daily"),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("Weekly"),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: const [
-                      Icon(Icons.calendar_month,
-                          color: Color(0xFFF56587), size: 20),
-                      SizedBox(width: 4),
-                      Text("October 26, 2024",
-                          style: TextStyle(fontWeight: FontWeight.w500)),
-                    ],
-                  ),
-                ],
+              child: DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Select Baby",
+                ),
+                value: "Baby 1",
+                items: ["Baby 1", "Baby 2", "Baby 3"]
+                    .map(
+                      (baby) =>
+                          DropdownMenuItem(value: baby, child: Text(baby)),
+                    )
+                    .toList(),
+                onChanged: (value) {},
               ),
             ),
           ),
+
           const SizedBox(height: 16),
 
-          // ---- Scrollable content ----
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // ---- Summary Cards ----
-                  Row(
-                    children: const [
-                      Expanded(
-                        child: InfoCard(
-                          icon: Icons.local_drink,
-                          title: "Feedings today",
-                          value: "4",
-                          subtitle: "sessions",
+                  // -------------------------------------------------------
+                  // NAVIGATION BUTTONS (FEED / SLEEP / MEDS)
+                  // -------------------------------------------------------
+                  _LogButton(
+                    icon: Icons.local_drink,
+                    title: "Feeding Logs",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const FeedingLogsScreen(),
                         ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: InfoCard(
-                          icon: Icons.bedtime,
-                          title: "Total Sleep",
-                          value: "10h 30m",
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  const InfoCard(
-                    icon: Icons.medication_liquid,
-                    title: "Medication Doses",
-                    value: "2",
-                    subtitle: "doses",
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-                  // ---- Activity Logs ----
+                  _LogButton(
+                    icon: Icons.bedtime,
+                    title: "Sleeping Logs",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SleepingLogsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  _LogButton(
+                    icon: Icons.medication_liquid,
+                    title: "Medication Logs",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MedicationLogsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // -------------------------------------------------------
+                  // ACTIVITY LOG TABLE
+                  // -------------------------------------------------------
                   Container(
                     decoration: BoxDecoration(
-                      color:
-                          isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                      color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: Colors.black.withOpacity(0.05),
                           blurRadius: 6,
                         ),
                       ],
@@ -145,18 +125,21 @@ class BabyLogsReportsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
+                      children: const [
+                        Text(
                           "Activity Logs",
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         LogTable(),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 100),
+
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
@@ -164,16 +147,16 @@ class BabyLogsReportsPage extends StatelessWidget {
         ],
       ),
 
-      // ---- Bottom Buttons ----
+      // ---------------------------------------------------------------
+      // BOTTOM BUTTONS
+      // ---------------------------------------------------------------
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF9F6FA),
           border: Border(
             top: BorderSide(
-              color: isDark
-                  ? const Color(0xFF48484A)
-                  : const Color(0xFFE5E5EA),
+              color: isDark ? const Color(0xFF48484A) : const Color(0xFFE5E5EA),
             ),
           ),
         ),
@@ -188,11 +171,14 @@ class BabyLogsReportsPage extends StatelessWidget {
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () {},
             ),
+
             const SizedBox(height: 12),
+
             OutlinedButton.icon(
               icon: const Icon(Icons.bar_chart, color: Color(0xFFF56587)),
               label: const Text(
@@ -202,7 +188,8 @@ class BabyLogsReportsPage extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () {},
             ),
@@ -213,111 +200,57 @@ class BabyLogsReportsPage extends StatelessWidget {
   }
 }
 
-class NavItem extends StatelessWidget {
-  final String label;
-  final bool selected;
-
-  const NavItem({super.key, required this.label, this.selected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected
-        ? Colors.black
-        : Theme.of(context).textTheme.bodySmall!.color?.withValues(alpha: 0.6);
-    return Column(
-      children: [
-        Text(label,
-            style:
-                TextStyle(fontSize: 13, fontWeight: selected ? FontWeight.w600 : FontWeight.w400, color: color)),
-        if (selected)
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            height: 3,
-            width: 20,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF56587),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          )
-      ],
-    );
-  }
-}
-
-class InfoCard extends StatelessWidget {
+// =======================================================================================
+// CUSTOM LOG NAVIGATION BUTTON
+// =======================================================================================
+class _LogButton extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String value;
-  final String? subtitle;
+  final VoidCallback onTap;
 
-  const InfoCard({
-    super.key,
+  const _LogButton({
     required this.icon,
     required this.title,
-    required this.value,
-    this.subtitle,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFFFF3F5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          Container(
-            height: 42,
-            width: 42,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF56587).withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.local_drink, color: Color(0xFFF56587)),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isDark
-                          ? Colors.grey[400]
-                          : Colors.grey[700])),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(value,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black)),
-                  if (subtitle != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4),
-                      child: Text(subtitle!,
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey[700])),
-                    )
-                ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 28, color: const Color(0xFFF56587)),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
               ),
-            ],
-          )
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+// =======================================================================================
+// TABLE OF ACTIVITY LOGS
+// =======================================================================================
 class LogTable extends StatelessWidget {
   final logs = const [
     ["10:30 AM", "Feeding", "Completed\nBreast milk (right side)\n15 min"],
@@ -354,16 +287,16 @@ class LogTable extends StatelessWidget {
 
     return Table(
       columnWidths: const {
-        0: FixedColumnWidth(90), // time
-        1: FixedColumnWidth(100), // type
-        2: FlexColumnWidth(), // details
+        0: FixedColumnWidth(90),
+        1: FixedColumnWidth(100),
+        2: FlexColumnWidth(),
       },
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: logs.map((log) {
         final color = tagColor(log[1]);
         return TableRow(
           children: [
-            // Time
+            // TIME
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
@@ -376,16 +309,18 @@ class LogTable extends StatelessWidget {
               ),
             ),
 
-            // Type tag
+            // TAG
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
+                    color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -400,7 +335,7 @@ class LogTable extends StatelessWidget {
               ),
             ),
 
-            // Details
+            // DETAILS
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(

@@ -4,6 +4,7 @@ import 'package:tifli/widgets/growth_chart.dart';
 import 'package:tifli/widgets/sleep_chart.dart';
 import 'package:tifli/widgets/feeding_chart.dart';
 import 'package:tifli/widgets/temperature_chart.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
@@ -12,11 +13,7 @@ class StatisticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xffb03a57),
-        title: const Text("Statistics"),
-        centerTitle: true,
-      ),
+      appBar: const CustomAppBar(title: 'Statistics'),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
