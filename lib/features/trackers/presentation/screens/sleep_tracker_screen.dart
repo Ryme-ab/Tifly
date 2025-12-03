@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class SleepPage extends StatefulWidget {
   const SleepPage({super.key});
@@ -21,27 +22,7 @@ class _SleepPageState extends State<SleepPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1FBFE),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          'Add Trackers',
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/parent_placeholder.jpg'),
-            ),
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Sleep Tracker'),
 
       // --- Body ---
       body: SafeArea(

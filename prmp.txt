@@ -1,0 +1,237 @@
+(base) PS D:\Projects\MobDev\tifly> flutter run    
+Launching lib\main.dart on SM A566B in debug mode...
+Running Gradle task 'assembleDebug'...                              9,3s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...          24,4s
+D/FlutterJNI(26522): Beginning load of flutter...
+D/FlutterJNI(26522): flutter (null) was loaded normally!
+I/flutter (26522): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
+
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building MainTabScreen(dirty, state: _MainTabScreenState#4c318):
+Tried to use Provider with a subtype of Listenable/Stream (ValueNotifier<AppBarConfig>).
+
+This is likely a mistake, as Provider will not automatically update dependents
+when ValueNotifier<AppBarConfig> is updated. Instead, consider changing Provider for more specific
+implementation that handles the update mechanism, such as:
+
+- ListenableProvider
+- ChangeNotifierProvider
+- ValueListenableProvider
+- StreamProvider
+
+Alternatively, if you are making your own provider, consider using InheritedProvider.
+
+If you think that this is not an error, you can disable this check by setting
+Provider.debugCheckInvalidValueType to `null` in your main file:
+
+```
+void main() {
+  Provider.debugCheckInvalidValueType = null;
+
+  runApp(MyApp());
+}
+```
+
+
+The relevant error-causing widget was:
+  MainTabScreen MainTabScreen:file:///D:/Projects/MobDev/Tifly/lib/main.dart:23:19
+
+When the exception was thrown, this was the stack:
+#0      Provider.debugCheckInvalidValueType.<anonymous closure>.<anonymous closure>
+(package:provider/src/provider.dart:421:9)
+#1      Provider.debugCheckInvalidValueType.<anonymous closure> (package:provider/src/provider.dart:448:6)
+#2      new Provider.value.<anonymous closure> (package:provider/src/provider.dart:278:48)
+#3      new Provider.value (package:provider/src/provider.dart:280:10)
+#4      _MainTabScreenState.build (package:tifli/features/navigation/presentation/screens/main_tab_screen.dart:125:9)  
+#5      StatefulElement.build (package:flutter/src/widgets/framework.dart:5934:27)
+#6      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5820:15)
+#7      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5985:11)
+#8      Element.rebuild (package:flutter/src/widgets/framework.dart:5532:7)
+#9      ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5802:5)
+#10     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5976:11)
+#11     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5796:5)
+...     Normal element mounting (260 frames)
+#271    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4590:20)
+#272    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7269:36)
+#273    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7285:32)
+...     Normal element mounting (516 frames)
+#789    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4590:20)
+#790    Element.updateChild (package:flutter/src/widgets/framework.dart:4059:18)
+#791    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#792    _RawViewElement.mount (package:flutter/src/widgets/view.dart:504:5)
+...     Normal element mounting (15 frames)
+#807    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4590:20)
+#808    Element.updateChild (package:flutter/src/widgets/framework.dart:4059:18)
+#809    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1782:16)
+#810    RootElement.mount (package:flutter/src/widgets/binding.dart:1751:5)
+#811    RootWidget.attach.<anonymous closure> (package:flutter/src/widgets/binding.dart:1704:18)
+#812    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3101:19)
+#813    RootWidget.attach (package:flutter/src/widgets/binding.dart:1703:13)
+#814    WidgetsBinding.attachToBuildOwner (package:flutter/src/widgets/binding.dart:1379:27)
+#815    WidgetsBinding.attachRootWidget (package:flutter/src/widgets/binding.dart:1364:5)
+#816    WidgetsBinding.scheduleAttachRootWidget.<anonymous closure> (package:flutter/src/widgets/binding.dart:1350:7)  
+#820    _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:193:12)
+(elided 3 frames from class _Timer and dart:async-patch)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+D/HWUI    (26522): HWUI - treat SMPTE_170M as sRGB
+I/IDS_TAG (26522): Closing IDS observe window
+I/IDS_TAG (26522): Getting Shared Preference for android.app.Application@4c652e8 uid = 10350
+I/IDS_TAG (26522): IDS count updated to 1 for android.app.Application@4c652e8
+I/Choreographer(26522): Skipped 43 frames!  The application may be doing too much work on its main thread.
+I/WindowExtensionsImpl(26522): Initializing Window Extensions, vendor API level=9, activity embedding enabled=true     
+I/SV[160883301 MainActivity](26522): onWindowVisibilityChanged(0) true io.flutter.embedding.android.FlutterSurfaceView{996e265 V.E...... ......I. 0,0-0,0} of VRI[MainActivity]@fca7b6
+D/SurfaceView(26522): 160883301 updateSurface: has no frame
+I/BLASTBufferQueue_Java(26522): new BLASTBufferQueue, mName= VRI[MainActivity]@fca7b6 mNativeObject= 0xb400007d9a6d0ba0 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3585 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 android.view.Choreographer.doCallbacks:1367 android.view.Choreographer.doFrame:1292 android.view.Choreographer$FrameDisplayEventReceiver.run:1870
+I/BLASTBufferQueue_Java(26522): update, w= 1080 h= 2340 mName = VRI[MainActivity]@fca7b6 mNativeObject= 0xb400007d9a6d0ba0 sc.mNativeObject= 0xb400007cda633790 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3590 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+I/VRI[MainActivity]@fca7b6(26522): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)0 dur=5 res=0x3 s={true 0xb400007d1a633a10} ch=true seqId=0
+I/VRI[MainActivity]@fca7b6(26522): performConfigurationChange setNightDimText nightDimLevel=0
+D/VRI[MainActivity]@fca7b6(26522): mThreadedRenderer.initialize() mSurface={isValid=true 0xb400007d1a633a10} hwInitialized=true
+I/m.example.tifli(26522): Compiler allocated 5101KB to compile void android.view.ViewRootImpl.performTraversals()      
+D/SurfaceView(26522): 160883301 updateSurface: has no frame
+I/SV[160883301 MainActivity](26522): windowStopped(false) true io.flutter.embedding.android.FlutterSurfaceView{996e265 V.E...... ......ID 0,0-1080,2340} of VRI[MainActivity]@fca7b6
+D/SurfaceView(26522): 160883301 updateSurface: has no frame
+D/VRI[MainActivity]@fca7b6(26522): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910
+I/SurfaceView(26522): 160883301 Changes: creating=true format=true size=true visible=true alpha=false hint=false left=true top=true z=false attached=true lifecycleStrategy=false
+I/BLASTBufferQueue_Java(26522): new BLASTBufferQueue, mName= 996e265 SurfaceView[com.example.tifli/com.example.tifli.MainActivity]@0 mNativeObject= 0xb400007d9a64e380 caller= android.view.SurfaceView.createBlastSurfaceControls:1781 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229 android.view.ViewRootImpl.performTraversals:5448 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+I/BLASTBufferQueue_Java(26522): update, w= 1080 h= 2340 mName = 996e265 SurfaceView[com.example.tifli/com.example.tifli.MainActivity]@0 mNativeObject= 0xb400007d9a64e380 sc.mNativeObject= 0xb400007cda633490 format= 4 caller= android.view.SurfaceView.createBlastSurfaceControls:1782 android.view.SurfaceView.updateSurface:1450 android.view.SurfaceView.lambda$new$0:280 android.view.SurfaceView.$r8$lambda$NfZyM_TG8F8lqzaOVZ7noREFjzU:0 android.view.SurfaceView$$ExternalSyntheticLambda1.onPreDraw:0 android.view.ViewTreeObserver.dispatchOnPreDraw:1229
+I/SurfaceView(26522): 160883301 Cur surface: Surface(name=null mNativeObject=0)/@0x93e6133
+D/SurfaceComposerClient(26522): setCornerRadius ## 996e265 SurfaceView[com.example.tifli/com.example.tifli.MainActivity]@0#93471 cornerRadius=0.000000
+I/SV[160883301 MainActivity](26522): pST: sr = Rect(0, 0 - 1080, 2340) sw = 1080 sh = 2340
+D/SurfaceView(26522): 160883301 performSurfaceTransaction RenderWorker position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SV[160883301 MainActivity](26522): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[160883301 MainActivity](26522): updateSurface: mSurfaceCreated = false surfaceChanged = true visibleChanged = true
+I/SurfaceView(26522): 160883301 visibleChanged -- surfaceCreated
+I/SV[160883301 MainActivity](26522): surfaceCreated 1 #8 io.flutter.embedding.android.FlutterSurfaceView{996e265 V.E...... ......ID 0,0-1080,2340}
+I/SurfaceView(26522): 160883301 surfaceChanged -- format=4 w=1080 h=2340
+I/SV[160883301 MainActivity](26522): surfaceChanged (1080,2340) 1 #8 io.flutter.embedding.android.FlutterSurfaceView{996e265 V.E...... ......ID 0,0-1080,2340}
+I/SurfaceView(26522): 160883301 surfaceRedrawNeeded
+V/SurfaceView(26522): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+D/VRI[MainActivity]@fca7b6(26522): Canceling draw. cancelDueToPreDrawListener=true cancelDueToSync=false
+I/InsetsSourceConsumer(26522): applyRequestedVisibilityToControl: visible=true, type=statusBars, host=com.example.tifli/com.example.tifli.MainActivity
+I/InsetsSourceConsumer(26522): applyRequestedVisibilityToControl: visible=true, type=navigationBars, host=com.example.tifli/com.example.tifli.MainActivity
+I/BLASTBufferQueue_Java(26522): update, w= 1080 h= 2340 mName = VRI[MainActivity]@fca7b6 mNativeObject= 0xb400007d9a6d0ba0 sc.mNativeObject= 0xb400007cda6348d0 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3574 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901
+I/VRI[MainActivity]@fca7b6(26522): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)0 dur=4 res=0x1 s={true 0xb400007d1a633a10} ch=false seqId=0
+I/VRI[MainActivity]@fca7b6(26522): updateBoundsLayer: t=android.view.SurfaceControl$Transaction@ef1181c sc=Surface(name=Bounds for - com.example.tifli/com.example.tifli.MainActivity@0)/@0x3a7fc25 frame=1
+D/VRI[MainActivity]@fca7b6(26522): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910
+D/WindowLayoutComponentImpl(26522): Register WindowLayoutInfoListener on Context=com.example.tifli.MainActivity@d28d0a2, of which baseContext=android.app.ContextImpl@adac3ab
+I/GSC     (26522): SID[0] : 2d4f7174d8f192e9, Kind: 1, time : 45.291 ms
+I/GSC     (26522): SID[1] : 5827afe97e556e13, Kind: 1, time : 47.088 ms
+I/GSC     (26522): SID[2] : deb73e1cf1f2c027, Kind: 1, time : 46.869 ms
+I/GSC     (26522): SID[3] : 8ae9746b6415ff62, Kind: 0, time : 4.237 ms
+I/GSC     (26522): SID[4] : 8d5da1e6573d1a77, Kind: 0, time : 7.293 ms
+I/GSC     (26522): SID[5] : 484db06594007976, Kind: 1, time : 58.089 ms
+I/GSC     (26522): SID[6] : ec881026aa083e1c, Kind: 0, time : 12.652 ms
+I/GSC     (26522): SID[7] : 8e3675767c96be07, Kind: 0, time : 3.713 ms
+I/GSC     (26522): SID[8] : 390694d3cce50cc1, Kind: 1, time : 9.197 ms
+I/GSC     (26522): SID[9] : 55434555fbd5e19a, Kind: 0, time : 5.934 ms
+I/GSC     (26522): SID[10] : f03149b754058cb2, Kind: 1, time : 35.835 ms
+I/GSC     (26522): SID[11] : b9f155cfeaa4cdcd, Kind: 0, time : 4.560 ms
+I/GSC     (26522): SID[12] : 1042bb8503d04a87, Kind: 1, time : 33.106 ms
+I/BLASTBufferQueue(26522): [996e265 SurfaceView[com.example.tifli/com.example.tifli.MainActivity]@0#1](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/SurfaceView(26522): 160883301 finishedDrawing
+I/GSC     (26522): SID[13] : 91095f8a743ccd0d, Kind: 1, time : 59.917 ms
+D/VRI[MainActivity]@fca7b6(26522): Setup new sync=wmsSync-VRI[MainActivity]@fca7b6#1
+I/VRI[MainActivity]@fca7b6(26522): Creating new active sync group VRI[MainActivity]@fca7b6#2
+Syncing files to device SM A566B...                                117ms
+I/GSC     (26522): SID[14] : 1042bb8503d04a87, Kind: 1, time : 28.873 ms
+I/GSC     (26522): SID[15] : e67fcd380d6914fe, Kind: 1, time : 0.731 ms
+I/GSC     (26522): SID[16] : 1042bb8503d04a87, Kind: 1, time : 19.454 ms
+D/VRI[MainActivity]@fca7b6(26522): Draw frame after cancel
+D/VRI[MainActivity]@fca7b6(26522): registerCallbacksForSync syncBuffer=false
+I/GSC     (26522): SID[17] : b9f155cfeaa4cdcd, Kind: 0, time : 3.678 ms
+I/GSC     (26522): SID[18] : 1042bb8503d04a87, Kind: 1, time : 73.731 ms
+D/SurfaceView(26522): 160883301 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SV[160883301 MainActivity](26522): uSP: rtp = Rect(0, 0 - 1080, 2340) rtsw = 1080 rtsh = 2340
+I/SV[160883301 MainActivity](26522): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SV[160883301 MainActivity](26522): aOrMT: VRI[MainActivity]@fca7b6 t = android.view.SurfaceControl$Transaction@25e4eb4 fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:401
+I/VRI[MainActivity]@fca7b6(26522): mWNT: t=0xb400007c9a63d450 mBlastBufferQueue=0xb400007d9a6d0ba0 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932
+D/VRI[MainActivity]@fca7b6(26522): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@fca7b6(26522): mWNT: t=0xb400007c9a64a650 mBlastBufferQueue=0xb400007d9a6d0ba0 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack>
+I/VRI[MainActivity]@fca7b6(26522): Setting up sync and frameCommitCallback
+I/GSC     (26522): SID[19] : 1866fd7241179fcd, Kind: 0, time : 7.127 ms
+I/BLASTBufferQueue(26522): [VRI[MainActivity]@fca7b6#0](f:0,a:0,s:0) onFrameAvailable the first frame is available     
+I/VRI[MainActivity]@fca7b6(26522): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+
+Flutter run key commands.
+r Hot reload.
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on SM A566B is available at: http://127.0.0.1:64345/6nQTgkagrgs=/
+The Flutter DevTools debugger and profiler on SM A566B is available at:
+http://127.0.0.1:64345/6nQTgkagrgs=/devtools/?uri=ws://127.0.0.1:64345/6nQTgkagrgs=/ws
+D/HWUI    (26522): CFMS:: SetUp Pid : 26522    Tid : 26567
+D/VRI[MainActivity]@fca7b6(26522): reportDrawFinished seqId=0
+I/GSC     (26522): SID[20] : c1e615ce6bdc91ec, Kind: 1, time : 9.705 ms
+I/GSC     (26522): SID[21] : eb5c5b4ed6007c34, Kind: 1, time : 2.857 ms
+I/GSC     (26522): SID[22] : 28a06ea6ca88ed0e, Kind: 1, time : 34.908 ms
+I/GSC     (26522): SID[23] : 20f2bd0a4f4751d7, Kind: 1, time : 2.940 ms
+I/GSC     (26522): SID[24] : 8de86d1e29f2f945, Kind: 1, time : 3.274 ms
+I/GSC     (26522): SID[25] : 700966944e331700, Kind: 0, time : 4.360 ms
+I/GSC     (26522): SID[26] : 7d07d05696346c38, Kind: 1, time : 13.186 ms
+I/GSC     (26522): SID[27] : 06b11a47ac267602, Kind: 1, time : 6.300 ms
+I/GSC     (26522): SID[28] : aad7ee51021e4d4d, Kind: 0, time : 4.325 ms
+I/GSC     (26522): SID[29] : f1278a4b1234f7c3, Kind: 1, time : 6.503 ms
+I/GSC     (26522): SID[30] : ec881026aa083e1c, Kind: 0, time : 5.139 ms
+I/GSC     (26522): SID[31] : 22fd3f971a2878b0, Kind: 1, time : 2.157 ms
+I/GSC     (26522): SID[32] : 578de6ccda420e12, Kind: 0, time : 3.255 ms
+I/GSC     (26522): SID[33] : ae3865b8f0286348, Kind: 1, time : 13.802 ms
+I/GSC     (26522): SID[34] : 578de6ccda420e12, Kind: 0, time : 3.729 ms
+I/GSC     (26522): SID[35] : 22fd3f971a2878b0, Kind: 1, time : 7.126 ms
+I/GSC     (26522): SID[36] : 22fd3f971a2878b0, Kind: 1, time : 3.092 ms
+I/GSC     (26522): SID[37] : 578de6ccda420e12, Kind: 0, time : 4.186 ms
+I/GSC     (26522): SID[38] : 578de6ccda420e12, Kind: 0, time : 3.431 ms
+I/GSC     (26522): SID[39] : 87d56c06785c62e2, Kind: 1, time : 48.120 ms
+I/GSC     (26522): SID[40] : 22fd3f971a2878b0, Kind: 1, time : 4.134 ms
+I/GSC     (26522): SID[41] : 22fd3f971a2878b0, Kind: 1, time : 3.921 ms
+I/GSC     (26522): SID[42] : 578de6ccda420e12, Kind: 0, time : 6.388 ms
+I/GSC     (26522): SID[43] : 22fd3f971a2878b0, Kind: 1, time : 10.381 ms
+I/GSC     (26522): SID[44] : 3a1b0c574bf100a0, Kind: 1, time : 37.396 ms
+I/GSC     (26522): SID[45] : 22fd3f971a2878b0, Kind: 1, time : 3.612 ms
+I/GSC     (26522): SID[46] : 22fd3f971a2878b0, Kind: 1, time : 3.804 ms
+I/GSC     (26522): SID[47] : 578de6ccda420e12, Kind: 0, time : 4.520 ms
+I/GSC     (26522): SID[48] : 22fd3f971a2878b0, Kind: 1, time : 3.627 ms
+I/GSC     (26522): SID[49] : 22fd3f971a2878b0, Kind: 1, time : 8.154 ms
+I/GSC     (26522): SID[50] : 22fd3f971a2878b0, Kind: 1, time : 4.432 ms
+I/GSC     (26522): SID[51] : 22fd3f971a2878b0, Kind: 1, time : 12.545 ms
+I/GSC     (26522): SID[53] : 22fd3f971a2878b0, Kind: 1, time : 6.981 ms
+I/GSC     (26522): SID[52] : 22fd3f971a2878b0, Kind: 1, time : 7.352 ms
+I/GSC     (26522): SID[54] : 22fd3f971a2878b0, Kind: 1, time : 4.274 ms
+I/GSC     (26522): SID[55] : fff553ff524a5c2d, Kind: 1, time : 23.019 ms
+I/GSC     (26522): SID[56] : fff553ff524a5c2d, Kind: 1, time : 22.745 ms
+I/GSC     (26522): SID[57] : ec881026aa083e1c, Kind: 0, time : 6.001 ms
+I/GSC     (26522): SID[58] : fff553ff524a5c2d, Kind: 1, time : 38.581 ms
+I/GSC     (26522): SID[59] : fff553ff524a5c2d, Kind: 1, time : 40.442 ms
+I/GSC     (26522): SID[60] : fff553ff524a5c2d, Kind: 1, time : 25.123 ms
+I/GSC     (26522): SID[61] : fff553ff524a5c2d, Kind: 1, time : 26.510 ms
+I/GSC     (26522): SID[62] : fff553ff524a5c2d, Kind: 1, time : 25.953 ms
+I/GSC     (26522): SID[63] : fff553ff524a5c2d, Kind: 1, time : 38.285 ms
+I/GSC     (26522): SID[64] : fff553ff524a5c2d, Kind: 1, time : 22.815 ms
+I/GSC     (26522): SID[65] : fff553ff524a5c2d, Kind: 1, time : 28.882 ms
+I/GSC     (26522): SID[66] : fff553ff524a5c2d, Kind: 1, time : 18.842 ms
+I/GSC     (26522): SID[67] : fff553ff524a5c2d, Kind: 1, time : 27.266 ms
+I/GSC     (26522): SID[68] : fff553ff524a5c2d, Kind: 1, time : 45.629 ms
+I/GSC     (26522): SID[69] : e2aab5fd2f1c9bb6, Kind: 1, time : 4.978 ms
+I/GSC     (26522): SID[70] : 23f026140451c91e, Kind: 1, time : 5.495 ms
+I/GSC     (26522): SID[71] : fff553ff524a5c2d, Kind: 1, time : 40.701 ms
+I/GSC     (26522): SID[72] : 02b33aa6ee28bb3f, Kind: 1, time : 7.142 ms
+I/GSC     (26522): SID[73] : 6b251b41d4870e04, Kind: 1, time : 2.824 ms
+I/GSC     (26522): SID[74] : 69f3d164121ea5c4, Kind: 0, time : 11.608 ms
+I/GSC     (26522): SID[75] : 69f3d164121ea5c4, Kind: 0, time : 4.890 ms
+I/GSC     (26522): SID[76] : fff553ff524a5c2d, Kind: 1, time : 21.555 ms
+D/VRI[MainActivity]@fca7b6(26522): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb400007d1a633a10}
+D/InputMethodManagerUtils(26522): startInputInner - Id : 0
+I/InputMethodManager(26522): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InputMethodManager(26522): handleMessage: setImeVisibility visible=false
+D/InsetsController(26522): hide(ime(), fromIme=false)
+I/ImeTracker(26522): com.example.tifli:92685f65: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InputTransport(26522): Input channel constructed: 'ClientS', fd=160
+I/VRI[MainActivity]@fca7b6(26522): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@fca7b6
+D/ProfileInstaller(26522): Installing profile for com.example.tifli
+I/VRI[MainActivity]@fca7b6(26522): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@fca7b6

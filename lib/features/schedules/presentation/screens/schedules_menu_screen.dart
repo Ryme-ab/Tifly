@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointments_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/medicine_schedule_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/meal_planner_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class SchedMenuScreen extends StatelessWidget {
   const SchedMenuScreen({super.key});
@@ -9,12 +10,9 @@ class SchedMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(title: 'Schedule'),
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: AppBar(
-        title: const Text("Trackers"),
-        centerTitle: true,
-        backgroundColor: const Color(0xffb03a57),
-      ),
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
@@ -25,8 +23,8 @@ class SchedMenuScreen extends StatelessWidget {
             children: [
               _buildTrackerButton(
                 context,
-                icon: Icons.bedtime,
-                label: "Track Sleep",
+                icon: Icons.calendar_today,
+                label: "Appointments",
                 color: const Color(0xffffcdd2),
                 onTap: () {
                   Navigator.push(
@@ -39,8 +37,8 @@ class SchedMenuScreen extends StatelessWidget {
               ),
               _buildTrackerButton(
                 context,
-                icon: Icons.fitness_center,
-                label: "Track Growth",
+                icon: Icons.medication,
+                label: "Medicine",
                 color: const Color(0xfff8bbd0),
                 onTap: () {
                   Navigator.push(
@@ -52,7 +50,7 @@ class SchedMenuScreen extends StatelessWidget {
               _buildTrackerButton(
                 context,
                 icon: Icons.local_drink,
-                label: "Track Feeding",
+                label: "Meal",
                 color: const Color(0xfffff9c4),
                 onTap: () {
                   Navigator.push(

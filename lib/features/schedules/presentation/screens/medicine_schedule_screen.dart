@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class MedicineScreen extends StatefulWidget {
   const MedicineScreen({super.key});
@@ -25,25 +26,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Medicine Schedule',
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundImage: const AssetImage('assets/profile.jpg'),
-              backgroundColor: Colors.grey[200],
-            ),
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Medicine Schedule'),
       body: SafeArea(
         child: Column(
           children: [

@@ -28,11 +28,15 @@ import 'package:tifli/features/profiles/presentation/screens/create_profile_scre
 import 'package:tifli/features/profiles/presentation/screens/my_babies_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
 
 class AppRoutes {
   // Auth
   static const String splash = '/';
   static const String login = '/auth/login';
+  // Auth + Intro
+  static const String onboarding = '/onboarding';
+  static const String auth = '/auth'; // or login wrapper screen
 
   // Home
   static const String home = '/home';
@@ -50,7 +54,7 @@ class AppRoutes {
   static const String shoppingList = '/schedules/shopping';
 
   // Trackers
-  static const String trackers = '/trackers';
+  static const String trackers = '/trackers_menu_screen.dart';
   static const String foodTracker = '/trackers/food';
   static const String sleepTracker = '/trackers/sleep';
   static const String growthTracker = '/trackers/growth';
@@ -80,40 +84,59 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+
+      case AppRoutes.onboarding:
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+
+      case AppRoutes.auth:
+        return MaterialPageRoute(builder: (_) => const LoginPage());
+
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => const HomePage());
-      
+
       // Schedules
       case AppRoutes.schedules:
         return MaterialPageRoute(builder: (_) => const SchedMenuScreen());
       case AppRoutes.appointments:
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case AppRoutes.appointmentForm:
-        return MaterialPageRoute(builder: (_) => const AppointmentScreen()); // Note: Class name is AppointmentScreen
+        return MaterialPageRoute(
+          builder: (_) => const AppointmentScreen(),
+        ); // Note: Class name is AppointmentScreen
       case AppRoutes.appointmentDetails:
-        return MaterialPageRoute(builder: (_) => const AppointmentDetailsScreen());
+        return MaterialPageRoute(
+          builder: (_) => const AppointmentDetailsScreen(),
+        );
       case AppRoutes.appointmentMonth:
         // Note: MonthAppointmentsView requires arguments, might need wrapper or arguments passing
         // For now, assuming it's a standalone screen or part of AppointmentsScreen
         // But I moved appointment_month.dart to appointment_month_screen.dart
         // Let's check the class name in appointment_month.dart
-        return MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('Month View')))); 
+        return MaterialPageRoute(
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Month View'))),
+        );
       case AppRoutes.appointmentWeek:
-         return MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('Week View'))));
+        return MaterialPageRoute(
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Week View'))),
+        );
       case AppRoutes.mealPlanner:
         return MaterialPageRoute(builder: (_) => const MealPlannerScreenV2());
       case AppRoutes.medicineSchedule:
         return MaterialPageRoute(builder: (_) => const MedicineScreen());
       case AppRoutes.addMedicine:
-        return MaterialPageRoute(builder: (_) => const MedicineSchedulePage()); // Note: Class name is MedicineSchedulePage
+        return MaterialPageRoute(
+          builder: (_) => const MedicineSchedulePage(),
+        ); // Note: Class name is MedicineSchedulePage
       case AppRoutes.shoppingList:
         return MaterialPageRoute(builder: (_) => const ShoppingListScreen());
 
       // Trackers
       case AppRoutes.trackers:
-        return MaterialPageRoute(builder: (_) => const TrackerMenuScreen());
+        return MaterialPageRoute(builder: (_) => const TrackersMenuScreen());
       case AppRoutes.foodTracker:
         return MaterialPageRoute(builder: (_) => const FoodPage());
       case AppRoutes.sleepTracker:
@@ -135,9 +158,7 @@ class AppRouter {
       case AppRoutes.editFeedingLog:
         final args = settings.arguments as Map<String, dynamic>?;
         if (args != null) {
-          return MaterialPageRoute(
-            builder: (_) => EditLogForm(log: args),
-          );
+          return MaterialPageRoute(builder: (_) => EditLogForm(log: args));
         }
         return _errorRoute(settings);
 
@@ -165,9 +186,7 @@ class AppRouter {
   static Route<dynamic> _errorRoute(RouteSettings settings) {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
-        body: Center(
-          child: Text('No route defined for ${settings.name}'),
-        ),
+        body: Center(child: Text('No route defined for ${settings.name}')),
       ),
     );
   }

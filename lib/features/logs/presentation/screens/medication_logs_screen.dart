@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // built-in-ish, included in Flutter SDK; if missing remove and format manually
+import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:tifli/features/logs/presentation/screens/edit_feeding_log_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 
-class FeedingLogsScreen extends StatefulWidget {
-  const FeedingLogsScreen({super.key});
+class MedicationLogsScreen extends StatefulWidget {
+  const MedicationLogsScreen({super.key});
 
   @override
-  State<FeedingLogsScreen> createState() => _FeedingLogsScreenState();
+  State<MedicationLogsScreen> createState() => _MedicationLogsScreenState();
 }
 
-class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
+class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
   List<Map<String, dynamic>> logs = [
     {
-      "type": "Formula",
-      "icon": Icons.local_drink,
-      "time": "08:30 AM",
-      "amount": "120ml",
+      "type": "Vitamin D",
+      "icon": Icons.medication_liquid,
+      "time": "09:00 AM",
+      "dose": "1 drop",
+      "color": const Color(0xffe8f3ff),
+    },
+    {
+      "type": "Paracetamol",
+      "icon": Icons.vaccines,
+      "time": "02:30 PM",
+      "dose": "2.5ml",
       "color": const Color(0xfffff0f0),
     },
     {
-      "type": "Solid",
-      "icon": Icons.restaurant,
-      "time": "12:30 PM",
-      "amount": "40g",
-      "color": const Color(0xfffff9e0),
-    },
-    {
-      "type": "Breast Milk",
-      "icon": Icons.local_hospital,
-      "time": "16:00 PM",
-      "amount": "90ml",
-      "color": const Color(0xffffe5ec),
+      "type": "Nasal Spray",
+      "icon": Icons.healing,
+      "time": "07:00 PM",
+      "dose": "1 spray",
+      "color": const Color(0xfffff9e5),
     },
   ];
 
@@ -40,32 +39,34 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: const CustomAppBar(title: 'Feeding Tracker'),
+      appBar: const CustomAppBar(title: "Medication Tracker"),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // header row
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Feeding Logs',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  "Medication Logs",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 CircleAvatar(
                   radius: 18,
-                  backgroundImage: const AssetImage('assets/profile.jpg'),
+                  backgroundImage: const AssetImage("assets/profile.jpg"),
                   backgroundColor: Colors.grey[200],
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // logs (dismissible)
+            // Logs
             ...logs.map((log) => _logCard(log)),
 
             const SizedBox(height: 20),
+
+            // Summary chart
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -76,7 +77,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Daily Feeding Summary',
+                    "Daily Medication Summary",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
@@ -87,6 +88,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
           ],
         ),
       ),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
         onPressed: _addDummy,
@@ -99,7 +101,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-        key: Key(log['type'] + log.hashCode.toString()),
+        key: Key(log["type"] + log.hashCode.toString()),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -113,7 +115,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
         onDismissed: (_) => setState(() => logs.remove(log)),
         child: Container(
           decoration: BoxDecoration(
-            color: log['color'],
+            color: log["color"],
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(12),
@@ -126,32 +128,38 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(log['icon'], color: const Color(0xffb03a57)),
+                child: Icon(log["icon"], color: const Color(0xffb03a57)),
               ),
               const SizedBox(width: 12),
+
+              // Text section
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      log['type'],
+                      log["type"],
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      log['time'],
+                      log["time"],
                       style: const TextStyle(color: Colors.black54),
                     ),
                   ],
                 ),
               ),
+
+              // Dose
               Text(
-                log['amount'],
+                log["dose"],
                 style: const TextStyle(
                   color: Colors.pinkAccent,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(width: 10),
+
+              // Completed tag
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -159,31 +167,16 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(
-                  'Completed',
+                  "Taken",
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
+
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.grey),
-                onPressed: () async {
-                  // Open the edit form screen
-                  final updatedLog = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditLogForm(
-                        log: log, // pass the log data you want to edit
-                      ),
-                    ),
-                  );
-
-                  // When coming back from the form
-                  if (updatedLog != null) {
-                    setState(() {
-                      final index = logs.indexOf(log);
-                      logs[index] = updatedLog; // update the log in memory
-                    });
-                  }
+                onPressed: () {
+                  // YOU CAN CONNECT TO YOUR MEDICATION EDIT PAGE LATER
                 },
               ),
             ],
@@ -195,14 +188,10 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
 
   Widget _miniBarChart() {
     final barData = [
-      {"label": "Breast", "value": 4.0, "color": const Color(0xffffcdd2)},
-      {"label": "Formula", "value": 2.5, "color": const Color(0xfffff9c4)},
-      {"label": "Solid", "value": 1.5, "color": const Color(0xfffff0f0)},
+      {"label": "Vit D", "value": 1.0, "color": const Color(0xffe3f2fd)},
+      {"label": "Para", "value": 2.0, "color": const Color(0xffffcdd2)},
+      {"label": "Spray", "value": 1.0, "color": const Color(0xfffff9c4)},
     ];
-
-    final double maxVal = barData
-        .map((d) => d["value"] as double)
-        .reduce((a, b) => a > b ? a : b);
 
     return SizedBox(
       height: 180,
@@ -225,10 +214,9 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, _) {
-                  final int index = value.toInt();
-                  if (index < 0 || index >= barData.length) {
+                  final index = value.toInt();
+                  if (index < 0 || index >= barData.length)
                     return const SizedBox.shrink();
-                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
@@ -243,16 +231,13 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
               ),
             ),
           ),
-          barGroups: List.generate(barData.length, (index) {
-            final entry = barData[index];
-            final color = entry["color"] as Color;
-            final double value = entry["value"] as double;
+          barGroups: List.generate(barData.length, (i) {
             return BarChartGroupData(
-              x: index,
+              x: i,
               barRods: [
                 BarChartRodData(
-                  toY: value,
-                  color: color,
+                  toY: barData[i]["value"] as double,
+                  color: barData[i]["color"] as Color,
                   width: 30,
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -260,20 +245,19 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
             );
           }),
         ),
-        swapAnimationDuration: const Duration(milliseconds: 800),
       ),
     );
   }
 
   void _addDummy() {
-    setState(
-      () => logs.insert(0, {
-        "type": "New",
-        "icon": Icons.fastfood,
+    setState(() {
+      logs.insert(0, {
+        "type": "New Medication",
+        "icon": Icons.medication,
         "time": DateFormat('hh:mm a').format(DateTime.now()),
-        "amount": "50ml",
-        "color": const Color(0xfffff0f5),
-      }),
-    );
+        "dose": "1 ml",
+        "color": const Color(0xfff0eaff),
+      });
+    });
   }
 }

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_sizes.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class MealPlannerScreenV2 extends StatefulWidget {
   const MealPlannerScreenV2({super.key});
@@ -230,12 +231,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppColors.backgroundLight,
-        appBar: AppBar(
-          backgroundColor: AppColors.backgroundLight,
-          elevation: 0,
-          centerTitle: true,
-          title: Text('Meal Planner', style: AppFonts.heading1),
-        ),
+        appBar: const CustomAppBar(title: 'Meal Planner'),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.lg),

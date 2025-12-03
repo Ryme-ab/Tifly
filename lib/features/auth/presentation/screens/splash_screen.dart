@@ -1,120 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
-import 'package:tifli/core/constants/app_sizes.dart';
-import 'package:tifli/widgets/bottom_nav_bar.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // BOUNCE ANIMATION
+    _logoController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.elasticOut,
+    );
+
+    _logoController.forward();
+
+    // Auto-navigate
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/onboarding');
+    });
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F6), // 🎀 Baby pink background
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.lg),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40), // Push everything down
-              /// ✨ Title — smaller, fine font, lighter black
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: AppSizes.xxl,
-                  bottom: AppSizes.sm,
-                ), // Move text up by adding space below
-                child: Text(
-                  "Your Child’s Journey.\nBeautifully Tracked.",
-                  textAlign: TextAlign.center,
-                  style: AppFonts.body.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black54, // lighter black
-                    height: 1.4,
-                    fontFamily: 'OpenSans', // fine & modern font
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFFFEEF1), Color(0xFFFFF8FA)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/images/logo_notext.png", width: 230),
+                const SizedBox(height: 20),
+                Text(
+                  "Tifli",
+                  style: AppFonts.heading1.copyWith(
+                    fontSize: 30,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-
-              const SizedBox(height: AppSizes.xxl), // More space after text
-              /// 🖼️ Logo — bigger and moved slightly more to the right
-              Align(
-                alignment:
-                    Alignment.center, // centered horizontally and vertically
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 80.0,
-                  ), // Increased top padding to push logo down
-                  child: Image.asset(
-                    'assets/images/logo_notext.png',
-                    width: 230, // a bit larger
-                    height: 230,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-
-              const Spacer(
-                flex: 3,
-              ), // Increased flex more to push button further down
-              /// 🚀 Get started button — ensure white text, no blue
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSizes.xl),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: AppSizes.buttonHeight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/onboarding');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor:
-                          Colors.white, // ✅ fixes text turning blue
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSizes.radius),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xffb03a57),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MainTabScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Get started',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 247, 231, 231),
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.0,
-                          fontFamily: 'OpenSans',
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(
-                height: AppSizes.xl,
-              ), // Add extra space below button
-            ],
+              ],
+            ),
           ),
         ),
       ),

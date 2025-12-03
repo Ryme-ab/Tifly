@@ -4,6 +4,7 @@ import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_sizes.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart'; // 👈 import new page
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class AppointmentDetailsScreen extends StatefulWidget {
   const AppointmentDetailsScreen({super.key});
@@ -155,26 +156,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
-        elevation: 0,
-        centerTitle: true,
-        title: Text('Appointment Details', style: AppFonts.heading2),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            color: AppColors.textPrimaryLight,
-            onPressed: () {},
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: AppSizes.md),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundImage: AssetImage(_avatarAsset),
-            ),
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Appointment Details'),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(

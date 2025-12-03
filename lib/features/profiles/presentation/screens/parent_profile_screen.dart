@@ -1,6 +1,6 @@
 // lib/profile/parent_profile_screen.dart
 import 'package:flutter/material.dart';
-import 'package:tifli/widgets/appbar.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
@@ -20,12 +20,15 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   bool darkMode = false;
 
   // === User Data Controllers ===
-  final TextEditingController _nameController =
-      TextEditingController(text: "Eleanor Vance");
-  final TextEditingController _emailController =
-      TextEditingController(text: "eleanor.vance@example.com");
-  final TextEditingController _phoneController =
-      TextEditingController(text: "+1 (555) 123-4567");
+  final TextEditingController _nameController = TextEditingController(
+    text: "Eleanor Vance",
+  );
+  final TextEditingController _emailController = TextEditingController(
+    text: "eleanor.vance@example.com",
+  );
+  final TextEditingController _phoneController = TextEditingController(
+    text: "+1 (555) 123-4567",
+  );
 
   // === Edit States ===
   bool _isEditingName = false;
@@ -77,7 +80,9 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     _emailController.text,
-                    style: AppFonts.small.copyWith(color: AppColors.textSecondaryLight),
+                    style: AppFonts.small.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
                   ),
                 ],
               ),
@@ -98,13 +103,15 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               "Email Address",
               _emailController,
               _isEditingEmail,
-              onEditTap: () => setState(() => _isEditingEmail = !_isEditingEmail),
+              onEditTap: () =>
+                  setState(() => _isEditingEmail = !_isEditingEmail),
             ),
             _buildEditableField(
               "Phone Number",
               _phoneController,
               _isEditingPhone,
-              onEditTap: () => setState(() => _isEditingPhone = !_isEditingPhone),
+              onEditTap: () =>
+                  setState(() => _isEditingPhone = !_isEditingPhone),
             ),
 
             const SizedBox(height: 20),
@@ -112,15 +119,27 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             // === Account Preferences ===
             _buildSectionTitle("Account Preferences"),
             const SizedBox(height: 8),
-            _buildToggle("Enable Notifications", enableNotifications,
-                (value) => setState(() => enableNotifications = value)),
-            _buildToggle("Daily Summary Emails", dailySummaryEmails,
-                (value) => setState(() => dailySummaryEmails = value)),
-            _buildToggle("Share Activity Data", shareActivityData,
-                (value) => setState(() => shareActivityData = value)),
-            _buildToggle("Dark Mode (Coming Soon)", darkMode,
-                (value) => setState(() => darkMode = value),
-                enabled: false),
+            _buildToggle(
+              "Enable Notifications",
+              enableNotifications,
+              (value) => setState(() => enableNotifications = value),
+            ),
+            _buildToggle(
+              "Daily Summary Emails",
+              dailySummaryEmails,
+              (value) => setState(() => dailySummaryEmails = value),
+            ),
+            _buildToggle(
+              "Share Activity Data",
+              shareActivityData,
+              (value) => setState(() => shareActivityData = value),
+            ),
+            _buildToggle(
+              "Dark Mode (Coming Soon)",
+              darkMode,
+              (value) => setState(() => darkMode = value),
+              enabled: false,
+            ),
 
             const SizedBox(height: 24),
 
@@ -128,14 +147,17 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             // button to check babies list (light variant)
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushNamed('/parentProfile'); // adjust route
+                Navigator.of(
+                  context,
+                ).pushNamed('/parentProfile'); // adjust route
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary.withValues(alpha: 0.10),
                 foregroundColor: AppColors.primary,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 0,
               ),
               child: Text(
@@ -155,7 +177,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 foregroundColor: AppColors.surfaceLight,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 0,
               ),
               child: Text(
@@ -179,7 +202,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       alignment: Alignment.centerLeft,
       child: Text(
         title,
-        style: AppFonts.heading2.copyWith(fontSize: 16, color: AppColors.textPrimaryLight),
+        style: AppFonts.heading2.copyWith(
+          fontSize: 16,
+          color: AppColors.textPrimaryLight,
+        ),
       ),
     );
   }
@@ -197,7 +223,9 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         readOnly: !isEditing,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: AppFonts.small.copyWith(color: AppColors.textSecondaryLight),
+          labelStyle: AppFonts.small.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
           suffixIcon: IconButton(
             icon: Icon(
               isEditing ? Icons.check_circle : Icons.edit,
@@ -209,7 +237,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           filled: true,
           fillColor: AppColors.surfaceLight,
         ),
-        style: AppFonts.body.copyWith(fontSize: 15, color: AppColors.textPrimaryLight),
+        style: AppFonts.body.copyWith(
+          fontSize: 15,
+          color: AppColors.textPrimaryLight,
+        ),
         cursorColor: AppColors.primary,
       ),
     );
