@@ -2,19 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
-class TrackerMenuScreen extends StatelessWidget {
-  const TrackerMenuScreen({super.key});
+class TrackersMenuScreen extends StatelessWidget {
+  const TrackersMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 30, 30, 32),
-      appBar: AppBar(
-        title: const Text("Trackers"),
-        centerTitle: true,
-        backgroundColor: const Color(0xffb03a57),
-      ),
+      appBar: const CustomAppBar(title: 'Track'),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
@@ -26,7 +22,7 @@ class TrackerMenuScreen extends StatelessWidget {
               _buildTrackerButton(
                 context,
                 icon: Icons.bedtime,
-                label: "Track Sleep",
+                label: "Sleep",
                 color: const Color(0xffffcdd2),
                 onTap: () {
                   Navigator.push(
@@ -38,7 +34,7 @@ class TrackerMenuScreen extends StatelessWidget {
               _buildTrackerButton(
                 context,
                 icon: Icons.fitness_center,
-                label: "Track Growth",
+                label: "Growth",
                 color: const Color(0xfff8bbd0),
                 onTap: () {
                   Navigator.push(
@@ -50,7 +46,7 @@ class TrackerMenuScreen extends StatelessWidget {
               _buildTrackerButton(
                 context,
                 icon: Icons.local_drink,
-                label: "Track Feeding",
+                label: "Feeding",
                 color: const Color(0xfffff9c4),
                 onTap: () {
                   Navigator.push(

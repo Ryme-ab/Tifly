@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class AddTrackersPage extends StatefulWidget {
   const AddTrackersPage({super.key});
@@ -35,7 +36,7 @@ class _AddTrackersPageState extends State<AddTrackersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Trackers'), centerTitle: true),
+      appBar: const CustomAppBar(title: 'Add Trackers'),
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
