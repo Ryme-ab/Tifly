@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_sizes.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class ShoppingListScreen extends StatefulWidget {
   const ShoppingListScreen({super.key});
@@ -240,12 +241,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
-        elevation: 0,
-        centerTitle: true,
-        title: Text("Shopping List", style: AppFonts.heading2),
-      ),
+        appBar: const CustomAppBar(title: 'Shopping List'),
       body: SafeArea(
         child: Stack(
           children: [
