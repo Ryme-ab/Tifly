@@ -1,0 +1,219 @@
+import 'package:flutter/material.dart';
+import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
+import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
+import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
+import 'package:tifli/features/schedules/presentation/screens/checklist_screen.dart';
+
+class Tiflidrawer extends StatelessWidget {
+  static const Color primary = Color(0xFFBA224D);
+
+  const Tiflidrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // ---------- HEADER ----------
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.child_care, size: 28, color: primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Tifli",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 26),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ---------- MENU ITEMS ----------
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  menuItem(
+                    icon: Icons.home_outlined,
+                    title: "Home",
+                    onTap: () => Navigator.pushNamed(context, "/home"),
+                  ),
+
+                  menuItem(
+                    icon: Icons.person_outline,
+                    title: "Baby Profile",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const BabyProfileScreen(),
+                      ),
+                    ),
+                  ),
+
+                  menuItem(
+                    icon: Icons.local_drink_outlined,
+                    title: "Feeding Log",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FeedingLogsScreen(),
+                      ),
+                    ),
+                  ),
+
+                  menuItem(
+                    icon: Icons.nights_stay_outlined,
+                    title: "Sleep Log",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SleepingLogsScreen(),
+                      ),
+                    ),
+                  ),
+
+                  menuItem(
+                    icon: Icons.show_chart_outlined,
+                    title: "medication Tracking",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MedicationLogsScreen(),
+                      ),
+                    ),
+                  ),
+
+                  menuItem(
+                    icon: Icons.check_circle_outline,
+                    title: "Checklist",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ChecklistPage()),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                  Divider(color: Colors.grey.shade300),
+                  const SizedBox(height: 20),
+
+                  menuItem(
+                    icon: Icons.settings_outlined,
+                    title: "Settings",
+                    onTap: () => Navigator.pushNamed(context, "/settings"),
+                  ),
+
+                  menuItem(
+                    icon: Icons.help_outline,
+                    title: "Help & About",
+                    onTap: () => Navigator.pushNamed(context, "/help"),
+                  ),
+
+                  menuItem(
+                    icon: Icons.logout,
+                    title: "Logout",
+                    onTap: () {
+                      // add logout logic
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // ---------- BOTTOM AREA ----------
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: Colors.grey.shade300)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // User Tag
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: const [
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundImage: NetworkImage(
+                            "https://i.pravatar.cc/90?img=5",
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text("Parent"),
+                      ],
+                    ),
+                  ),
+
+                  const CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(
+                      "https://i.pravatar.cc/90?img=10",
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // MENU ITEM
+  Widget menuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    final Color primary = Tiflidrawer.primary;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.black87),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+}
