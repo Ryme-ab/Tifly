@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
+import 'package:tifli/features/logs/presentation/screens/statistics_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'feeding_logs_screen.dart';
 import 'sleeping_logs_screen.dart';
@@ -191,7 +192,12 @@ class BabyLogsReportsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+                );
+              },
             ),
           ],
         ),
