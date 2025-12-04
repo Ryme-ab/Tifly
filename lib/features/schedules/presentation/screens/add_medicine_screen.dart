@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 void main() {
   runApp(const MedicineApp());
@@ -104,26 +105,7 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.6,
-        title: const Text(
-          'Medicine Schedule',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-        ),
-        centerTitle: true,
-        actions: const [
-          Icon(Icons.notifications_outlined, color: Colors.grey),
-          SizedBox(width: 10),
-          CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage(
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuDCM45Jtq3D2rqHY4Ve7tQwkPXQzu1Qr5jyAf_GF9A57Y_t8Oal4aMD9XcQR2Df4og4dLoCsYZDRvDMKJo_wmg8edBIFElJ_HMBHK6y4ZvwnyVIZlcEr9El_dGV5o0oGU7wpqcTQJl6aa26Ep7yTl7gi1D3Z2QGetFWFg50-6LbcPvnJ2RcLuzX85HBiXiTZkE_GS082WtwWikBNqXQwg_5OdnpPHPNjoFPVLLQgA9pNW0l0AhSxmL5q2cBxFsy4v50rif9dv3D9JLM',
-            ),
-          ),
-          SizedBox(width: 16),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Medicine Schedule'),
       body: ListView(
         padding: const EdgeInsets.all(18),
         children: [

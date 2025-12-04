@@ -28,11 +28,15 @@ import 'package:tifli/features/profiles/presentation/screens/create_profile_scre
 import 'package:tifli/features/profiles/presentation/screens/add_baby_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
 
 class AppRoutes {
   // Auth
   static const String splash = '/';
   static const String login = '/auth/login';
+  // Auth + Intro
+  static const String onboarding = '/onboarding';
+  static const String auth = '/auth'; // or login wrapper screen
 
   // Home
   static const String home = '/home';
@@ -50,7 +54,7 @@ class AppRoutes {
   static const String shoppingList = '/schedules/shopping';
 
   // Trackers
-  static const String trackers = '/trackers';
+  static const String trackers = '/trackers_menu_screen.dart';
   static const String foodTracker = '/trackers/food';
   static const String sleepTracker = '/trackers/sleep';
   static const String growthTracker = '/trackers/growth';
@@ -80,6 +84,13 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
+
+      case AppRoutes.onboarding:
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+
+      case AppRoutes.auth:
+        return MaterialPageRoute(builder: (_) => const LoginPage());
+
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case AppRoutes.home:
@@ -125,7 +136,7 @@ class AppRouter {
 
       // Trackers
       case AppRoutes.trackers:
-        return MaterialPageRoute(builder: (_) => const TrackerMenuScreen());
+        return MaterialPageRoute(builder: (_) => const TrackersMenuScreen());
       case AppRoutes.foodTracker:
         return MaterialPageRoute(builder: (_) => const FoodPage());
       case AppRoutes.sleepTracker:
