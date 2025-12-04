@@ -17,7 +17,7 @@ import 'package:tifli/features/logs/data/data_sources/feeding_logs_data.dart';
 import 'package:tifli/features/logs/data/repositories/feeding_logs_repo.dart';
 import 'package:tifli/features/logs/presentation/cubit/feeding_logs_cubit.dart';
 
-// --- Feeding Logs ---
+// --- Growth Logs ---
 import 'package:tifli/features/logs/data/data_sources/growth_logs_data_source.dart';
 import 'package:tifli/features/logs/data/repositories/growth_logs_repository.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_cubit.dart';
@@ -42,6 +42,11 @@ import 'package:tifli/features/logs/data/data_sources/statistics_data_source.dar
 import 'package:tifli/features/logs/data/repositories/statistics_repository.dart';
 import 'package:tifli/features/logs/presentation/cubit/statistics_cubit.dart';
 
+// --- Checklist ---
+import 'package:tifli/features/schedules/data/data_sources/schedules_remote_data_source.dart';
+import 'package:tifli/features/schedules/data/repositories/schedules_repository.dart';
+import 'package:tifli/features/schedules/presentation/cubit/schedules_cubit.dart';
+
 // --- Children ---
 import 'package:tifli/features/profiles/data/data_sources/children_data_source.dart';
 import 'package:tifli/features/profiles/data/repositories/children_repository.dart';
@@ -50,8 +55,13 @@ import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 // --- Navigation ---
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
-import 'package:tifli/features/schedules/data/repositories/schedules_repository.dart';
-import 'package:tifli/features/schedules/presentation/cubit/schedules_cubit.dart';
+
+// --- Trackers ---
+import 'package:tifli/features/trackers/presentation/cubit/meal_cubit.dart';
+import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
+import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
+import 'package:tifli/features/trackers/data/repositories/sleep_repository.dart';
+import 'package:tifli/features/trackers/data/repositories/growth_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,12 +157,23 @@ Future<void> main() async {
             return cubit;
           },
         ),
+
+        /// TRACKERS SYSTEM
+        BlocProvider<MealCubit>(
+          create: (_) => MealCubit(childId: '75ec0c30-58d0-4306-b225-007cd9997b0f'),
+        ),
+        BlocProvider<SleepCubit>(
+          create: (_) => SleepCubit(SleepRepository(supabase)),
+        ),
+        BlocProvider<GrowthCubit>(
+          create: (_) => GrowthCubit(GrowthRepository(supabase)),
+        ),
       ],
 
       child: TestDataLoader(
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: MainTabScreen(),
+          home: const MainTabScreen(),
           onGenerateRoute: AppRouter.generateRoute,
         ),
       ),

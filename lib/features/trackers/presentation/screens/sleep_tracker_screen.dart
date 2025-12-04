@@ -1,31 +1,167 @@
-import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
+import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
-import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
+import 'package:tifli/features/trackers/data/models/sleep.dart';
+import 'package:tifli/core/config/supabaseClient.dart';
+
+String selectedChildId = "75ec0c30-58d0-4306-b225-007cd9997b0f";
 
 class SleepPage extends StatefulWidget {
-  final bool showTracker;
   const SleepPage({super.key, this.showTracker = true});
-
+  final bool showTracker;
   @override
   State<SleepPage> createState() => _SleepPageState();
 }
 
 class _SleepPageState extends State<SleepPage> {
-  String? selectedUnit1;
-  String? selectedUnit2;
-  String? selectedUnit3;
+  TimeOfDay? startTime = const TimeOfDay(hour: 8, minute: 30);
+  TimeOfDay? endTime = const TimeOfDay(hour: 8, minute: 30);
+  final notesController = TextEditingController();
+  String? selectedQuality; // Will store: 'not_good', 'good', or 'excellent'
+
+  // Quality options
+  final List<Map<String, dynamic>> qualityOptions = [
+    {'value': 'not_good', 'label': 'Not Good', 'color': Colors.black},
+    {'value': 'good', 'label': 'Good', 'color': Colors.black54},
+    {'value': 'excellent', 'label': 'Excellent', 'color': Colors.black87},
+  ];
+
+  Future<void> logSleep() async {
+    final client = SupabaseClientManager().client;
+
+    if (notesController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Notes field cannot be empty! Please add notes."),
+        ),
+      );
+      return;
+    }
+
+    // Quality validation (optional but recommended)
+    if (selectedQuality == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select sleep quality."),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (startTime == null || endTime == null) return;
+
+    final now = DateTime.now();
+
+    final startDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      startTime!.hour,
+      startTime!.minute,
+    );
+
+    final endDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      endTime!.hour,
+      endTime!.minute,
+    );
+
+    final notes = notesController.text.trim();
+    final quality = selectedQuality!; // We know it's not null due to validation
+
+    try {
+      //  CHECK FOR DUPLICATE SLEEP LOG
+      final duplicateCheck = await client
+          .from('sleep')
+          .select('id')
+          .eq('child_id', selectedChildId)
+          .eq('start_time', startDateTime.toIso8601String())
+          .eq('end_time', endDateTime.toIso8601String())
+          .eq('descp', notes)
+          //.eq('quality', quality)
+          .maybeSingle();
+
+      // If a record is found, it means a duplicate exists
+      if (duplicateCheck != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("This sleep log already exists!"),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      // If no duplicate found, proceed with insertion
+      final sleepLog = SleepLog(
+        id: '',
+        childId: selectedChildId,
+        startTime: startDateTime,
+        endTime: endDateTime,
+        quality: quality,
+        notes: notes,
+      );
+
+      await context.read<SleepCubit>().addSleepLog(sleepLog, selectedChildId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Sleep logged successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Clear form
+      notesController.clear();
+      setState(() {
+        selectedQuality = null;
+      });
+    } catch (e) {
+      print("ERROR logging sleep: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to log sleep."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF1FBFE),
       resizeToAvoidBottomInset: true,
-      appBar: const CustomAppBar(title: 'Sleep Tracker'),
-
-      // --- Body ---
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        centerTitle: true,
+        title: const Text(
+          'Add Trackers',
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.black),
+            onPressed: () {},
+          ),
+          const Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: CircleAvatar(
+              backgroundImage: AssetImage(
+                'assets/images/parent_placeholder.jpg',
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -37,11 +173,10 @@ class _SleepPageState extends State<SleepPage> {
                 TrackerButtonsRow(),
                 const SizedBox(height: 20),
               ],
-
               SmallWeekCalendar(),
               const SizedBox(height: 20),
 
-              // --- Tracker Container ---
+              // --- Sleep Tracker Container ---
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
@@ -55,19 +190,23 @@ class _SleepPageState extends State<SleepPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const TimePickerRow(),
+                    TimePickerRow(
+                      onStartChanged: (value) => startTime = value,
+                      onEndChanged: (value) => endTime = value,
+                    ),
                     const SizedBox(height: 20),
 
-                    // --- Notes ---
                     const Text(
                       'Notes',
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 6),
+
                     TextField(
+                      controller: notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Add any notes...',
+                        hintText: 'Add sleep notes...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -75,14 +214,66 @@ class _SleepPageState extends State<SleepPage> {
                         contentPadding: const EdgeInsets.all(10),
                       ),
                     ),
+
+                    const SizedBox(height: 20),
+
+                    // --- NEW: Quality Dropdown ---
+                    const Text(
+                      'Sleep Quality',
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 6),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedQuality,
+                          isExpanded: true,
+                          hint: const Text(
+                            'Select sleep quality',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          items: qualityOptions.map((option) {
+                            return DropdownMenuItem<String>(
+                              value: option['value'],
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: option['color'],
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(option['label']),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedQuality = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 30),
 
-                    // --- Button ---
+                    // --- Log Sleep Button ---
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: logSleep,
                         icon: const Icon(
                           Icons.nightlight_round,
                           color: Colors.white,
@@ -114,7 +305,6 @@ class _SleepPageState extends State<SleepPage> {
   }
 }
 
-// --- Tracker Buttons Row ---
 class TrackerButtonsRow extends StatelessWidget {
   const TrackerButtonsRow({super.key});
 
@@ -123,7 +313,6 @@ class TrackerButtonsRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // --- Yellow button (Water tracker) ---
         TrackerButton(
           icon: Icons.water_drop,
           borderColor: Colors.amber,
@@ -132,23 +321,21 @@ class TrackerButtonsRow extends StatelessWidget {
           onTap: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const FoodPage()),
+              MaterialPageRoute(
+                builder: (context) => const FoodTrackerScreen(),
+              ),
             );
           },
         ),
         const SizedBox(width: 20),
-
-        // --- Blue button (Sleep tracker) --- (CURRENT PAGE)
         TrackerButton(
           icon: Icons.nightlight_round,
           borderColor: Colors.blue,
           activeColor: Colors.blue,
-          isActive: true, // ✅ stays active here
-          onTap: () {}, // stays on same page
+          isActive: true,
+          onTap: () {},
         ),
         const SizedBox(width: 20),
-
-        // --- Green button (Growth tracker) ---
         TrackerButton(
           icon: Icons.child_care,
           borderColor: Colors.green,
@@ -166,69 +353,50 @@ class TrackerButtonsRow extends StatelessWidget {
   }
 }
 
-// --- Time Picker Row ---
 class TimePickerRow extends StatefulWidget {
-  const TimePickerRow({super.key});
+  final Function(TimeOfDay) onStartChanged;
+  final Function(TimeOfDay) onEndChanged;
+
+  const TimePickerRow({
+    super.key,
+    required this.onStartChanged,
+    required this.onEndChanged,
+  });
 
   @override
   State<TimePickerRow> createState() => _TimePickerRowState();
 }
 
 class _TimePickerRowState extends State<TimePickerRow> {
-  TimeOfDay? startTime = const TimeOfDay(hour: 8, minute: 30);
-  TimeOfDay? endTime = const TimeOfDay(hour: 8, minute: 30);
-
-  Future<void> _selectTime(BuildContext context, bool isStart) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: isStart ? startTime! : endTime!,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFA41639),
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isStart) {
-          startTime = picked;
-        } else {
-          endTime = picked;
-        }
-      });
-    }
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
+  TimeOfDay startTime = const TimeOfDay(hour: 8, minute: 30);
+  TimeOfDay endTime = const TimeOfDay(hour: 8, minute: 30);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildTimeColumn("Start time", startTime!, () {
-            _selectTime(context, true);
-          }),
-          _buildTimeColumn("End time", endTime!, () {
-            _selectTime(context, false);
-          }),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildTimeColumn("Start time", startTime, () async {
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: startTime,
+          );
+          if (picked != null) {
+            setState(() => startTime = picked);
+            widget.onStartChanged(picked);
+          }
+        }),
+        _buildTimeColumn("End time", endTime, () async {
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: endTime,
+          );
+          if (picked != null) {
+            setState(() => endTime = picked);
+            widget.onEndChanged(picked);
+          }
+        }),
+      ],
     );
   }
 
@@ -249,7 +417,7 @@ class _TimePickerRowState extends State<TimePickerRow> {
               borderRadius: BorderRadius.circular(30),
             ),
             child: Text(
-              _formatTime(time),
+              "${time.hour}:${time.minute.toString().padLeft(2, '0')}",
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,

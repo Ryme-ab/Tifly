@@ -51,7 +51,9 @@ class TrackersMenuScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const FoodPage()),
+                    MaterialPageRoute(
+                      builder: (_) => const FoodTrackerScreen(),
+                    ),
                   );
                 },
               ),
