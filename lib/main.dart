@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // --- Supabase Core ---
@@ -72,12 +73,12 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        /// AUTH SYSTEM
+        // AUTH SYSTEM
         BlocProvider<AuthCubit>(
           create: (_) => AuthCubit(AuthRepository(supabase)),
         ),
 
-        /// FEEDING LOGS SYSTEM
+        // FEEDING LOGS SYSTEM
         BlocProvider<FeedingLogCubit>(
           create: (_) => FeedingLogCubit(
             repository: FeedingLogRepository(
@@ -86,7 +87,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// Growth System
+        // Growth System
         BlocProvider<GrowthLogCubit>(
           create: (_) => GrowthLogCubit(
             repository: GrowthLogRepository(
@@ -95,7 +96,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// BABY LOGS SYSTEM
+        // BABY LOGS SYSTEM
         BlocProvider<BabyLogsCubit>(
           create: (_) => BabyLogsCubit(
             repository: BabyLogsRepository(
@@ -104,7 +105,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// SLEEP LOGS SYSTEM
+        // SLEEP LOGS SYSTEM
         BlocProvider<SleepLogCubit>(
           create: (_) => SleepLogCubit(
             repository: SleepLogRepository(
@@ -113,7 +114,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// MEDICATION LOGS SYSTEM
+        // MEDICATION LOGS SYSTEM
         BlocProvider<MedicationCubit>(
           create: (_) => MedicationCubit(
             repo: MedicationRepository(
@@ -122,7 +123,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// STATISTICS SYSTEM
+        // STATISTICS SYSTEM
         BlocProvider<StatisticsCubit>(
           create: (_) => StatisticsCubit(
             repository: StatisticsRepository(
@@ -131,7 +132,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// Checklist System
+        // CHECKLIST SYSTEM
         BlocProvider<ChecklistCubit>(
           create: (_) => ChecklistCubit(
             repository: ChecklistRepository(
@@ -140,7 +141,7 @@ Future<void> main() async {
           ),
         ),
 
-        /// CHILDREN SYSTEM
+        // CHILDREN SYSTEM
         BlocProvider<ChildrenCubit>(
           create: (context) {
             final cubit = ChildrenCubit(
@@ -149,7 +150,6 @@ Future<void> main() async {
               ),
             );
 
-            // AUTO-LOAD TEST DATA (REMOVE IN PRODUCTION)
             if (TestConfig.enableTestMode) {
               cubit.loadChildren(TestConfig.testParentId);
             }
@@ -158,9 +158,10 @@ Future<void> main() async {
           },
         ),
 
-        /// TRACKERS SYSTEM
+        // TRACKERS SYSTEM
         BlocProvider<MealCubit>(
-          create: (_) => MealCubit(childId: '75ec0c30-58d0-4306-b225-007cd9997b0f'),
+          create: (_) =>
+              MealCubit(childId: '75ec0c30-58d0-4306-b225-007cd9997b0f'),
         ),
         BlocProvider<SleepCubit>(
           create: (_) => SleepCubit(SleepRepository(supabase)),
