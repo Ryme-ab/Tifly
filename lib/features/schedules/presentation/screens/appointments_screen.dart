@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // built-in-ish, included in Flutter SDK; if missing remove and format manually
 import 'package:tifli/features/schedules/presentation/screens/appointment_month_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_week_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({super.key});
@@ -54,16 +55,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(title: 'Appointments'),
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Appointments',
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: false,
-      ),
       body: SafeArea(
         child: Column(
           children: [

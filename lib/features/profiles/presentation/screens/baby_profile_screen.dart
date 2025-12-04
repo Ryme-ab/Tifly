@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
-import 'package:tifli/widgets/appbar.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class BabyProfileScreen extends StatelessWidget {
   const BabyProfileScreen({super.key});
@@ -15,7 +15,8 @@ class BabyProfileScreen extends StatelessWidget {
     final String subtitle = "happy and healthy";
     final String dob = "October 15, 2023";
     final String gender = "Female";
-    final String notes = "Islam loves bright colors and giggles when she sees her favorite soft toy, a pink bunny. She recently started trying solid foods, with a particular fondness for pureed carrots. No known allergies.";
+    final String notes =
+        "Islam loves bright colors and giggles when she sees her favorite soft toy, a pink bunny. She recently started trying solid foods, with a particular fondness for pureed carrots. No known allergies.";
 
     return Scaffold(
       appBar: const CustomAppBar(title: "Baby Profile"),
@@ -29,7 +30,9 @@ class BabyProfileScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFFAFB), // very light aqua from screenshot
+                color: const Color(
+                  0xFFEFFAFB,
+                ), // very light aqua from screenshot
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.withValues(alpha: 0.08)),
               ),
@@ -73,13 +76,15 @@ class BabyProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.withValues(alpha: 0.12)),
+                      border: Border.all(
+                        color: Colors.grey.withValues(alpha: 0.12),
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.03),
                           blurRadius: 6,
-                          offset: const Offset(0,2),
-                        )
+                          offset: const Offset(0, 2),
+                        ),
                       ],
                     ),
                     child: IconButton(
@@ -106,8 +111,8 @@ class BabyProfileScreen extends StatelessWidget {
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
-                    offset: const Offset(0,4),
-                  )
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               child: Column(
@@ -117,11 +122,14 @@ class BabyProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Basic Information", style: AppFonts.heading2.copyWith(fontSize: 14)),
+                      Text(
+                        "Basic Information",
+                        style: AppFonts.heading2.copyWith(fontSize: 14),
+                      ),
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.edit, size: 18),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -142,9 +150,7 @@ class BabyProfileScreen extends StatelessWidget {
                     children: [
                       const Icon(Icons.wc, size: 18),
                       const SizedBox(width: 10),
-                      Expanded(
-                        child: Text("Gender", style: AppFonts.small),
-                      ),
+                      Expanded(child: Text("Gender", style: AppFonts.small)),
                       Text(gender, style: AppFonts.body),
                     ],
                   ),
@@ -160,7 +166,9 @@ class BabyProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.warning.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.warning.withValues(alpha: 0.14)),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.14),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -168,18 +176,18 @@ class BabyProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Additional notes", style: AppFonts.heading2.copyWith(fontSize: 14)),
+                      Text(
+                        "Additional notes",
+                        style: AppFonts.heading2.copyWith(fontSize: 14),
+                      ),
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.edit, size: 18),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    notes,
-                    style: AppFonts.body.copyWith(fontSize: 13),
-                  ),
+                  Text(notes, style: AppFonts.body.copyWith(fontSize: 13)),
                 ],
               ),
             ),
@@ -195,7 +203,9 @@ class BabyProfileScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   elevation: 0,
                 ),
                 child: const Text(
