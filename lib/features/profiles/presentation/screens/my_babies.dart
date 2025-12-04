@@ -27,9 +27,11 @@ class MyBabiesPage extends StatelessWidget {
                   children: state.babies
                       .map(
                         (baby) => BabyCard(
-                          name: baby.name,
-                          age: baby.age,
-                          imageUrl: baby.imageUrl,
+                          name: baby.firstName,
+                          age: baby.birthDate,
+                          imageUrl:
+                              baby.profileImage ??
+                              'https://via.placeholder.com/150',
                           borderColor: Colors.pinkAccent,
                         ),
                       )
