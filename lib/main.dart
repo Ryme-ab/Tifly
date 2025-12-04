@@ -1,33 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
-import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
-import 'package:tifli/features/auth/data/repositories/signin_repository.dart';
-import 'package:tifli/features/auth/presentation/screens/signin_screen.dart';
-import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
-import 'package:tifli/features/navigation/app_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
+import 'package:tifli/core/config/supabaseClient.dart';
+
+import 'package:tifli/features/profiles/data/data_sources/baby_remote_data_source.dart';
+import 'package:tifli/features/profiles/data/repositories/baby_repo.dart';
+import 'package:tifli/features/profiles/presentation/cubit/baby_cubit.dart';
+import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Initialize Supabase
   await SupabaseClientManager.initialize();
 
-  runApp(
-    MultiBlocProvider(
+  final supabase = SupabaseClientManager().client;
+
+  runApp(MyApp(supabase: supabase));
+}
+
+class MyApp extends StatelessWidget {
+  final SupabaseClient supabase;
+  const MyApp({super.key, required this.supabase});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthCubit>(
+        BlocProvider<BabyCubit>(
           create: (_) =>
-              AuthCubit(AuthRepository(SupabaseClientManager().client)),
+              BabyCubit(BabyRepository(BabyRemoteDataSource(supabase))),
         ),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const SignUpPage(),
+        home: AddBabyPage(),
       ),
-      initialRoute: '/',
-      onGenerateRoute: AppRouter.generateRoute,
-      home: const MainTabScreen(),
     );
   }
 }
