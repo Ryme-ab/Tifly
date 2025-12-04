@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tifli/widgets/custom_app_bar.dart';
 
 void main() {
   runApp(const AddBabyPage());

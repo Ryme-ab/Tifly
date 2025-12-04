@@ -6,8 +6,8 @@ import 'package:tifli/features/trackers/presentation/screens/growth_tracker_scre
 import 'package:tifli/widgets/custom_app_bar.dart';
 
 class FoodPage extends StatefulWidget {
-  const FoodPage({super.key});
-
+  const FoodPage({super.key, this.showTracker = true});
+  final bool showTracker;
   @override
   State<FoodPage> createState() => _FoodPageState();
 }
@@ -29,8 +29,10 @@ class _FoodPageState extends State<FoodPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --- Tracker Buttons Row ---
-              TrackerButtonsRow(currentPage: 'food'),
-              const SizedBox(height: 20),
+              if (widget.showTracker) ...[
+                TrackerButtonsRow(currentPage: 'food'),
+                const SizedBox(height: 20),
+              ],
 
               SmallWeekCalendar(),
               const SizedBox(height: 20),

@@ -6,7 +6,8 @@ import 'package:tifli/features/trackers/presentation/screens/growth_tracker_scre
 import 'package:tifli/widgets/custom_app_bar.dart';
 
 class SleepPage extends StatefulWidget {
-  const SleepPage({super.key});
+  final bool showTracker;
+  const SleepPage({super.key, this.showTracker = true});
 
   @override
   State<SleepPage> createState() => _SleepPageState();
@@ -32,8 +33,10 @@ class _SleepPageState extends State<SleepPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const TrackerButtonsRow(),
-              const SizedBox(height: 20),
+              if (widget.showTracker) ...[
+                TrackerButtonsRow(),
+                const SizedBox(height: 20),
+              ],
 
               SmallWeekCalendar(),
               const SizedBox(height: 20),
