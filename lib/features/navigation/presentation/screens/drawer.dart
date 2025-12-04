@@ -103,7 +103,7 @@ class Tiflidrawer extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const MedicationLogsScreen(),
+                        builder: (_) => const MedicationsScreen(),
                       ),
                     ),
                   ),
@@ -198,8 +198,6 @@ class Tiflidrawer extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    final Color primary = Tiflidrawer.primary;
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
