@@ -139,7 +139,7 @@ class AppRouter {
       case AppRoutes.trackers:
         return MaterialPageRoute(builder: (_) => const TrackersMenuScreen());
       case AppRoutes.foodTracker:
-        return MaterialPageRoute(builder: (_) => const FoodPage());
+        return MaterialPageRoute(builder: (_) => const FoodTrackerScreen());
       case AppRoutes.sleepTracker:
         return MaterialPageRoute(builder: (_) => const SleepPage());
       case AppRoutes.growthTracker:

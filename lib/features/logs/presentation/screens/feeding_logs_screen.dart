@@ -145,7 +145,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   final updated = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => FoodPage(
+                      builder: (_) => FoodTrackerScreen(
                         //existingLog: log,
                         showTracker: false,
                       ),
@@ -319,7 +319,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
         onPressed: () async {
           final added = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const FoodPage()),
+            MaterialPageRoute(builder: (_) => const FoodTrackerScreen()),
           );
           if (added != null && added is FeedingLog) {
             // call add on cubit
