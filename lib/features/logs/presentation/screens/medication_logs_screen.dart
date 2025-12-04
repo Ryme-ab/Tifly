@@ -1,39 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
+import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
+import 'package:tifli/features/logs/data/models/medication_log_model.dart';
+import 'package:tifli/core/config/test_config.dart'; // For test child ID
 
-class MedicationLogsScreen extends StatefulWidget {
-  const MedicationLogsScreen({super.key});
+class MedicationsScreen extends StatefulWidget {
+  const MedicationsScreen({super.key});
 
   @override
-  State<MedicationLogsScreen> createState() => _MedicationLogsScreenState();
+  State<MedicationsScreen> createState() => _MedicationsScreenState();
 }
 
-class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
-  List<Map<String, dynamic>> logs = [
-    {
-      "type": "Vitamin D",
-      "icon": Icons.medication_liquid,
-      "time": "09:00 AM",
-      "dose": "1 drop",
-      "color": const Color(0xffe8f3ff),
-    },
-    {
-      "type": "Paracetamol",
-      "icon": Icons.vaccines,
-      "time": "02:30 PM",
-      "dose": "2.5ml",
-      "color": const Color(0xfffff0f0),
-    },
-    {
-      "type": "Nasal Spray",
-      "icon": Icons.healing,
-      "time": "07:00 PM",
-      "dose": "1 spray",
-      "color": const Color(0xfffff9e5),
-    },
-  ];
+class _MedicationsScreenState extends State<MedicationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load medications data when screen is initialized
+    // Using test child ID - replace with actual child ID in production
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MedicationCubit>().loadMedications(TestConfig.testChildId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,67 +33,118 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
       backgroundColor: const Color(0xfff5f4f8),
       appBar: const CustomAppBar(title: "Medication Tracker"),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Medication Logs",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                CircleAvatar(
-                  radius: 18,
-                  backgroundImage: const AssetImage("assets/profile.jpg"),
-                  backgroundColor: Colors.grey[200],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+        child: BlocBuilder<MedicationCubit, MedicationState>(
+          builder: (context, state) {
+            if (state is MedicationLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is MedicationError) {
+              return Center(child: Text('Error: ${state.message}'));
+            } else if (state is MedicationLoaded) {
+              final medicines = state.medicines;
 
-            // Logs
-            ...logs.map((log) => _logCard(log)),
-
-            const SizedBox(height: 20),
-
-            // Summary chart
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return ListView(
+                padding: const EdgeInsets.all(16),
                 children: [
-                  const Text(
-                    "Daily Medication Summary",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Medications",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundImage: const AssetImage("assets/profile.jpg"),
+                        backgroundColor: Colors.grey[200],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  _miniBarChart(),
+                  const SizedBox(height: 16),
+
+                  // Medicines list
+                  if (medicines.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: Text('No medications yet'),
+                      ),
+                    )
+                  else
+                    ...medicines.map((med) => _medicationCard(med, context)),
+
+                  const SizedBox(height: 20),
+
+                  // Summary chart
+                  if (medicines.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Medication Summary",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          _miniBarChart(medicines),
+                        ],
+                      ),
+                    ),
                 ],
-              ),
-            ),
-          ],
+              );
+            }
+
+            return const Center(child: Text('No data'));
+          },
         ),
       ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
-        onPressed: _addDummy,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MedicineApp()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _logCard(Map<String, dynamic> log) {
+  Widget _medicationCard(Medication med, BuildContext context) {
+    IconData icon = Icons.medication;
+
+    // Customize icon by medicine name
+    final nameLower = med.medicineName.toLowerCase();
+    if (nameLower.contains('vitamin')) {
+      icon = Icons.medication_liquid;
+    } else if (nameLower.contains('spray')) {
+      icon = Icons.healing;
+    } else if (nameLower.contains('vaccine')) {
+      icon = Icons.vaccines;
+    }
+
+    final colors = [
+      const Color(0xffe8f3ff),
+      const Color(0xfffff0f0),
+      const Color(0xfffff9e5),
+      const Color(0xfff0eaff),
+    ];
+    final color = colors[med.medicineName.hashCode % colors.length];
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-        key: Key(log["type"] + log.hashCode.toString()),
+        key: Key(med.id),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -112,10 +155,12 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
           padding: const EdgeInsets.only(right: 20),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
-        onDismissed: (_) => setState(() => logs.remove(log)),
+        onDismissed: (_) {
+          context.read<MedicationCubit>().deleteMedication(med.id);
+        },
         child: Container(
           decoration: BoxDecoration(
-            color: log["color"],
+            color: color,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(12),
@@ -128,55 +173,41 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(log["icon"], color: const Color(0xffb03a57)),
+                child: Icon(icon, color: const Color(0xffb03a57)),
               ),
               const SizedBox(width: 12),
 
-              // Text section
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      log["type"],
+                      med.medicineName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      log["time"],
-                      style: const TextStyle(color: Colors.black54),
-                    ),
+                    if (med.timeOfMedication != null)
+                      Text(
+                        DateFormat(
+                          'hh:mm a',
+                        ).format(DateTime.parse(med.timeOfMedication!)),
+                        style: const TextStyle(color: Colors.black54),
+                      ),
+                    if (med.notes != null && med.notes!.isNotEmpty)
+                      Text(
+                        med.notes!,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
                   ],
                 ),
               ),
 
-              // Dose
-              Text(
-                log["dose"],
-                style: const TextStyle(
-                  color: Colors.pinkAccent,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // Completed tag
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffb03a57),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  "Taken",
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-
-              const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.grey),
                 onPressed: () {
-                  // YOU CAN CONNECT TO YOUR MEDICATION EDIT PAGE LATER
+                  // TODO: Navigate to edit medication screen
                 },
               ),
             ],
@@ -186,11 +217,30 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
     );
   }
 
-  Widget _miniBarChart() {
-    final barData = [
-      {"label": "Vit D", "value": 1.0, "color": const Color(0xffe3f2fd)},
-      {"label": "Para", "value": 2.0, "color": const Color(0xffffcdd2)},
-      {"label": "Spray", "value": 1.0, "color": const Color(0xfffff9c4)},
+  Widget _miniBarChart(List<Medication> medicines) {
+    final medCounts = <String, int>{};
+
+    for (final med in medicines) {
+      String shortName = med.medicineName;
+      if (shortName.length > 8) shortName = shortName.substring(0, 8);
+      medCounts[shortName] = (medCounts[shortName] ?? 0) + 1;
+    }
+
+    final barData = medCounts.entries.take(5).toList();
+
+    if (barData.isEmpty) {
+      return const SizedBox(
+        height: 180,
+        child: Center(child: Text('No data to display')),
+      );
+    }
+
+    final colors = [
+      const Color(0xffe3f2fd),
+      const Color(0xffffcdd2),
+      const Color(0xfffff9c4),
+      const Color(0xfff0eaff),
+      const Color(0xffe0f7fa),
     ];
 
     return SizedBox(
@@ -220,7 +270,7 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      barData[index]["label"] as String,
+                      barData[index].key,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -236,8 +286,8 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
               x: i,
               barRods: [
                 BarChartRodData(
-                  toY: barData[i]["value"] as double,
-                  color: barData[i]["color"] as Color,
+                  toY: barData[i].value.toDouble(),
+                  color: colors[i % colors.length],
                   width: 30,
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -247,17 +297,5 @@ class _MedicationLogsScreenState extends State<MedicationLogsScreen> {
         ),
       ),
     );
-  }
-
-  void _addDummy() {
-    setState(() {
-      logs.insert(0, {
-        "type": "New Medication",
-        "icon": Icons.medication,
-        "time": DateFormat('hh:mm a').format(DateTime.now()),
-        "dose": "1 ml",
-        "color": const Color(0xfff0eaff),
-      });
-    });
   }
 }
