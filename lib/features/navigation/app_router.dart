@@ -24,7 +24,7 @@ import 'package:tifli/features/logs/presentation/screens/statistics_screen.dart'
 import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
 
 import 'package:tifli/features/profiles/presentation/screens/create_profile_screen.dart';
-import 'package:tifli/features/profiles/presentation/screens/my_babies_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/add_baby_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';

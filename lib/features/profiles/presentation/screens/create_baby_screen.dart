@@ -1,38 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const AddBabyPage());
-}
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tifli/core/config/supabaseClient.dart';
+import 'create_baby_screen_2.dart';
 
 class AddBabyPage extends StatelessWidget {
   const AddBabyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFFBE185D);
-    const backgroundLight = Color(0xFFF8FAFC);
-    const backgroundDark = Color(0xFF1E293B);
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light, // default: light mode
-      theme: ThemeData(
-        fontFamily: 'Poppins',
-        colorScheme: const ColorScheme.light(
-          primary: primaryColor,
-          background: backgroundLight,
-        ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        fontFamily: 'Poppins',
-        colorScheme: const ColorScheme.dark(
-          primary: primaryColor,
-          background: backgroundDark,
-        ),
-      ),
-      home: const AddBabyScreen(),
-    );
+    return const AddBabyScreen();
   }
 }
 
@@ -46,13 +23,10 @@ class AddBabyScreen extends StatefulWidget {
 class _AddBabyScreenState extends State<AddBabyScreen> {
   bool isBoy = true;
 
-  // Form key and controllers
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-
-  // For birth date
   final _birthController = TextEditingController();
   DateTime? _selectedDate;
 
@@ -92,42 +66,6 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                         ),
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Dots
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 12,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[600] : Colors.grey[400],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[600] : Colors.grey[400],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[600] : Colors.grey[400],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                   ),
                 ],
               ),
@@ -178,7 +116,6 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Baby Name
                         _buildTextFormField(
                           label: "Baby's Name",
                           hint: "E.g., Luna, Leo",
@@ -189,56 +126,45 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Birth Date - Updated with date picker
                         _buildDatePickerField(
                           label: "Birth Date",
                           hint: "Select birth date",
                           controller: _birthController,
                           isDark: isDark,
-                          selectedDate: _selectedDate,
                           onTap: () => _selectDate(context),
                           validator: (v) =>
                               v!.isEmpty ? "Please select birth date" : null,
                         ),
                         const SizedBox(height: 20),
 
-                        // Height
                         _buildNumericFormField(
                           label: "Baby's Height",
                           hint: "E.g., 30 cm",
                           controller: _heightController,
                           isDark: isDark,
                           validator: (v) {
-                            if (v!.isEmpty) {
-                              return "Please enter height";
-                            }
-                            if (!_isNumeric(v)) {
+                            if (v!.isEmpty) return "Please enter height";
+                            if (!_isNumeric(v))
                               return "Please enter numbers only";
-                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 20),
 
-                        // Weight
                         _buildNumericFormField(
                           label: "Baby's Weight",
                           hint: "E.g., 3.5 kg",
                           controller: _weightController,
                           isDark: isDark,
                           validator: (v) {
-                            if (v!.isEmpty) {
-                              return "Please enter weight";
-                            }
-                            if (!_isNumeric(v)) {
+                            if (v!.isEmpty) return "Please enter weight";
+                            if (!_isNumeric(v))
                               return "Please enter numbers only";
-                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 24),
 
-                        // Gender
                         Text(
                           "Gender",
                           style: TextStyle(
@@ -327,14 +253,50 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Baby details saved successfully!"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                onPressed: () async {
+                  if (_formKey.currentState!.validate() &&
+                      _selectedDate != null) {
+                    try {
+                      final userId =
+                          "36264fb0-3622-4342-bd06-332e6639da32"; // Testing
+                      final babyData = {
+                        'first_name': _nameController.text,
+                        'birth_date': _selectedDate!.toIso8601String(),
+                        'gender': isBoy ? 'male' : 'female',
+                        'parent_id': userId,
+                      };
+
+                      final insertedRows = await SupabaseClientManager().client
+                          .from('children')
+                          .insert([babyData])
+                          .select();
+
+                      if (insertedRows.isEmpty)
+                        throw Exception("Failed to insert baby");
+
+                      final babyId = insertedRows[0]['id'];
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Baby added successfully!"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddBabyPage2(babyId: babyId),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Error adding baby: $e"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 },
                 child: const Text(
@@ -352,68 +314,41 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     );
   }
 
-  // Date picker function
+  // DATE PICKER
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
-      builder: (BuildContext context, Widget? child) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFBE185D),
-              onPrimary: Colors.white,
-            ),
-            dialogBackgroundColor: isDark
-                ? const Color(0xFF1E293B)
-                : Colors.white,
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-        _birthController.text = _formatDate(picked);
+        _birthController.text =
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
 
-  // Format date to display
-  String _formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
+  bool _isNumeric(String str) => RegExp(r'^\d*\.?\d*$').hasMatch(str);
 
-  // Helper method to check if string is numeric (allows decimals)
-  bool _isNumeric(String str) {
-    if (str.isEmpty) return false;
-    // Allow numbers with optional decimal point
-    final numericRegex = RegExp(r'^\d*\.?\d*$');
-    return numericRegex.hasMatch(str);
-  }
-
+  // REUSABLE FIELDS
   Widget _buildTextFormField({
     required String label,
     required String hint,
     required TextEditingController controller,
     required bool isDark,
-    IconData? prefixIcon,
     String? Function(String?)? validator,
   }) {
-    const primaryColor = Color(0xFFBE185D);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
+            color: isDark ? Colors.grey[300] : Colors.grey[700],
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -423,51 +358,31 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
           controller: controller,
           validator: validator,
           decoration: InputDecoration(
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: isDark ? Colors.grey[500] : Colors.grey.shade500,
-                    size: 18,
-                  )
-                : null,
             hintText: hint,
             filled: true,
             fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: primaryColor),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ],
     );
   }
 
-  // New method for date picker field
   Widget _buildDatePickerField({
     required String label,
     required String hint,
     required TextEditingController controller,
     required bool isDark,
-    required DateTime? selectedDate,
     required VoidCallback onTap,
     String? Function(String?)? validator,
   }) {
-    const primaryColor = Color(0xFFBE185D);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
+            color: isDark ? Colors.grey[300] : Colors.grey[700],
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -483,25 +398,14 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                 prefixIcon: Icon(
                   Icons.calendar_today_outlined,
                   color: isDark ? Colors.grey[500] : Colors.grey.shade500,
-                  size: 18,
                 ),
                 hintText: hint,
                 filled: true,
                 fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: primaryColor),
-                ),
-                suffixIcon: Icon(
-                  Icons.arrow_drop_down,
-                  color: isDark ? Colors.grey[500] : Colors.grey.shade500,
-                ),
+                suffixIcon: const Icon(Icons.arrow_drop_down),
               ),
             ),
           ),
@@ -510,7 +414,6 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     );
   }
 
-  // Method for numeric-only fields
   Widget _buildNumericFormField({
     required String label,
     required String hint,
@@ -518,15 +421,13 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     required bool isDark,
     String? Function(String?)? validator,
   }) {
-    const primaryColor = Color(0xFFBE185D);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
+            color: isDark ? Colors.grey[300] : Colors.grey[700],
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -535,21 +436,12 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
         TextFormField(
           controller: controller,
           validator: validator,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
             fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: primaryColor),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ],
