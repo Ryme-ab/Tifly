@@ -1,20 +1,45 @@
-I have a Flutter project using Supabase and Bloc/Cubit architecture. The project has two screens where data fetching seems to not be working correctly: 
+I need help fixing my Flutter project.
 
-1. FeedingLogsScreen  
-2. MedicationLogsScreen 
-3. SleepLogsScreen
-4. BabyLogsScreen 
-5. StatisticsScreen 
+Requirements:
 
-The screens use Cubits (FeedingLogCubit, MedicationLogCubit), repositories, and data sources. The UI is working fine, but the logs are not being displayed — the Cubits do not seem to fetch the correct data from Supabase.
+Tracker Forms Navigation
 
-Here’s what you need to do:  
-1. Analyze the Cubits, repositories, and data sources for both screens.  
-2. Ensure the fetching logic correctly queries Supabase for the selected child. The child ID is passed to the Cubits.  
-3. Ensure the Cubits emit the proper states (Loading, Loaded, Error) so the UI updates correctly.  
-4. Check the mapping from Supabase rows to the model classes and make sure the data types match.  
-5. Keep the UI code unchanged.  
+I have 3 trackers: Growth, Sleep, and Meal.
 
-Provide the **corrected Cubit, repository, and data source code** for both Feeding and Medication logs, with comments explaining what was fixed.  
+Each tracker has an “Add Tracker” form.
 
-Also, give **step-by-step instructions** on how to test the fix in the app using a test child ID.
+When the user saves a new entry:
+
+The app should automatically navigate back to the corresponding Logs screen:
+
+Growth form → GrowthLogsScreen
+
+Sleep form → SleepLogsScreen
+
+Meal form → FeedingLogsScreen
+
+Please update the code so the navigation is handled correctly after saving.
+
+General Notes
+
+The backend is already implemented (Supabase).
+
+I am using Cubit for state management.
+
+I want clean, maintainable navigation logic.
+
+Deliverables:
+
+Updated code for:
+
+Growth add form
+
+Sleep add form
+
+Meal add form
+
+Correct navigation after saving
+
+A short explanation of the changes
+
+Make sure the solution works with Flutter + Supabase + Cubit.

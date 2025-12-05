@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 import '../../data/models/user_model.dart';
 import '../cubit/signin_cubit.dart';
 import '../cubit/signin_state.dart';
@@ -31,10 +32,16 @@ class _SignUpPageState extends State<SignUpPage> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
+            // SHOW MESSAGE
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Sign Up Successful!')),
             );
-          } else if (state is AuthError) {
+
+            // NAVIGATE TO HOME
+            Navigator.pushReplacementNamed(context, AppRoutes.maintabscreen);
+          }
+
+          if (state is AuthError) {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.message)));
@@ -52,10 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   Center(
                     child: Column(
                       children: [
-                        Image.asset(
-                          "assets/logo.png", // replace with your logo
-                          height: 60,
-                        ),
+                        Image.asset("assets/logo.png", height: 60),
                         const SizedBox(height: 10),
                         const Text(
                           "TIFLI",
@@ -86,7 +90,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                   const SizedBox(height: 30),
 
-                  /// PINK CONTAINER
+                  /// FORM CONTAINER
                   Container(
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
@@ -95,51 +99,68 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     child: Column(
                       children: [
+                        // FULL NAME
                         _buildTextField(
                           label: "Full Name",
                           controller: fullNameController,
                           hint: "Joshua Davis",
                           icon: Icons.person_outline,
+                          validator: (value) =>
+                              value!.isEmpty ? "Full name required" : null,
                         ),
                         const SizedBox(height: 16),
 
+                        // EMAIL
                         _buildTextField(
                           label: "Email Address",
                           controller: emailController,
                           hint: "your.email@example.com",
                           icon: Icons.email_outlined,
+                          validator: (value) =>
+                              value!.contains("@") ? null : "Invalid email",
                         ),
                         const SizedBox(height: 16),
+
+                        // PHONE
                         _buildTextField(
                           label: "Phone Number",
                           controller: phoneController,
                           hint: "0567889999",
                           icon: Icons.phone_outlined,
+                          validator: (value) =>
+                              value!.length < 8 ? "Invalid phone number" : null,
                         ),
                         const SizedBox(height: 16),
 
+                        // PASSWORD
                         _buildPasswordField(
                           label: "Password",
                           controller: passwordController,
                           obscure: _obscurePassword,
                           toggle: () {
-                            setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            );
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
                           },
+                          validator: (value) =>
+                              value!.length < 6 ? "Password too short" : null,
                         ),
                         const SizedBox(height: 16),
 
+                        // CONFIRM PASSWORD
                         _buildPasswordField(
                           label: "Confirm Password",
                           controller: confirmPasswordController,
                           obscure: _obscureConfirmPassword,
                           toggle: () {
-                            setState(
-                              () => _obscureConfirmPassword =
-                                  !_obscureConfirmPassword,
-                            );
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
                           },
+                          validator: (value) => value != passwordController.text
+                              ? "Passwords do not match"
+                              : null,
                         ),
 
                         const SizedBox(height: 25),
@@ -162,9 +183,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                       final user = UserModel(
                                         fullName: fullNameController.text,
                                         email: emailController.text,
-                                        phone: "",
+                                        phone: phoneController.text,
                                         pwd: passwordController.text,
                                       );
+
                                       context.read<AuthCubit>().signUp(user);
                                     }
                                   },
@@ -225,6 +247,7 @@ class _SignUpPageState extends State<SignUpPage> {
     required TextEditingController controller,
     required String hint,
     required IconData icon,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,6 +256,7 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: Icon(icon),
@@ -254,6 +278,7 @@ class _SignUpPageState extends State<SignUpPage> {
     required TextEditingController controller,
     required bool obscure,
     required VoidCallback toggle,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,6 +288,7 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFormField(
           controller: controller,
           obscureText: obscure,
+          validator: validator,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.lock_outline),
             suffixIcon: IconButton(
