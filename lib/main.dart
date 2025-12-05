@@ -57,6 +57,7 @@ import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 // --- Navigation ---
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
+import 'package:tifli/features/trackers/data/repositories/meal_repository.dart';
 
 // --- Trackers ---
 import 'package:tifli/features/trackers/presentation/cubit/meal_cubit.dart';
@@ -65,7 +66,7 @@ import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/trackers/data/repositories/sleep_repository.dart';
 import 'package:tifli/features/trackers/data/repositories/growth_repository.dart';
 
-// --- Child Selection (NEW) ---
+// --- Child Selection ---
 import 'package:tifli/core/state/child_selection_cubit.dart';
 
 Future<void> main() async {
@@ -77,10 +78,8 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        // CHILD SELECTION SYSTEM (FIRST - REQUIRED BY OTHER CUBITS)
-        BlocProvider<ChildSelectionCubit>(
-          create: (_) => ChildSelectionCubit(),
-        ),
+        // CHILD SELECTION (FIRST - REQUIRED BY OTHER CUBITS)
+        BlocProvider<ChildSelectionCubit>(create: (_) => ChildSelectionCubit()),
 
         // AUTH SYSTEM
         BlocProvider<AuthCubit>(
@@ -178,10 +177,7 @@ Future<void> main() async {
         ),
 
         // TRACKERS SYSTEM
-        BlocProvider<MealCubit>(
-          create: (_) =>
-              MealCubit(childId: '75ec0c30-58d0-4306-b225-007cd9997b0f'),
-        ),
+        BlocProvider<MealCubit>(create: (_) => MealCubit(childId: '')),
         BlocProvider<SleepCubit>(
           create: (_) => SleepCubit(SleepRepository(supabase)),
         ),

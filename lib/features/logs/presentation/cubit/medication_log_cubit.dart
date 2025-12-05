@@ -86,4 +86,6 @@ class MedicationLogCubit extends Cubit<MedicationState> {
     _childSelectionSubscription.cancel();
     return super.close();
   }
+
+  void deleteMedication(String id) {}
 }

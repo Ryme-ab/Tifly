@@ -14,7 +14,6 @@ import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 import 'feeding_logs_screen.dart';
 import 'sleeping_logs_screen.dart';
 import 'medication_logs_screen.dart';
-import 'statistics_screen.dart';
 import 'package:tifli/core/config/test_config.dart'; // For test child ID
 
 class BabyLogsReportsPage extends StatefulWidget {
@@ -33,7 +32,9 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
     // Load baby logs data when screen is initialized
     // Using test child ID - replace with actual child ID in production
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<BabyLogsCubit>().loadAllLogs(TestConfig.testChildId);
+      if (selectedChildId != null) {
+        context.read<BabyLogsCubit>().loadAllLogs(selectedChildId!);
+      }
     });
   }
 

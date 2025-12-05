@@ -44,10 +44,6 @@ class MedicationDataSource {
 
   // Delete a medicine
   Future<void> deleteMedicine(String id, String userId) async {
-    await client
-        .from('medicines')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+    await client.from('medicines').delete().eq('id', id).eq('user_id', userId);
   }
 }

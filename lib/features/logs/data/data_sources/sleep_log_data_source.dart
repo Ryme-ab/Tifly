@@ -40,10 +40,6 @@ class SleepLogDataSource {
   }
 
   Future<void> deleteLog(String id, String userId) async {
-    await client
-        .from('sleep')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+    await client.from('sleep').delete().eq('id', id).eq('user_id', userId);
   }
 }

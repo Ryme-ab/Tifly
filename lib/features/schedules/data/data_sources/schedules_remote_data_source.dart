@@ -36,10 +36,6 @@ class ChecklistDataSource {
   }
 
   Future<void> deleteItem(String id, String userId) async {
-    await client
-        .from('checklist')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+    await client.from('checklist').delete().eq('id', id).eq('user_id', userId);
   }
 }

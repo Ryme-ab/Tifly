@@ -53,7 +53,7 @@ class _TestDataLoaderState extends State<TestDataLoader> {
     context.read<MedicationLogCubit>().loadMedicines();
 
     // Load Statistics - may need updating later
-   // context.read<StatisticsCubit>().loadStatistics(); // Commented out for now
+    // context.read<StatisticsCubit>().loadStatistics(); // Commented out for now
 
     print('🧪 TEST MODE: Auto-loaded data from ChildSelectionCubit');
   }
