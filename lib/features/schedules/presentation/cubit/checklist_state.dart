@@ -1,4 +1,4 @@
-import 'package:tifli/features/schedules/data/models/schedules_model.dart';
+part of 'schedules_cubit.dart';
 
 abstract class ChecklistState {}
 
