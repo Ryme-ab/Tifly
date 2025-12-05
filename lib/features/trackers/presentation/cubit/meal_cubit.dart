@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/meal.dart';
 import '../../data/repositories/meal_repository.dart';
+import 'package:tifli/core/utils/user_context.dart';
 
 // State Class
 class MealState {
@@ -33,15 +34,12 @@ class MealState {
 
 class MealCubit extends Cubit<MealState> {
   final MealRepository _repository;
-  final String childId;
 
-  MealCubit({required this.childId}) 
+  MealCubit() 
       : _repository = MealRepository(),
-        super(const MealState()) {
-    loadMealLogs();
-  }
+        super(const MealState());
 
-  Future<void> loadMealLogs() async {
+  Future<void> loadMealLogs(String childId) async {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
@@ -61,6 +59,7 @@ class MealCubit extends Cubit<MealState> {
   }
 
   Future<void> addMeal({
+    required String childId,
     required DateTime mealTime,
     required String mealType,
     required String items,
@@ -68,9 +67,17 @@ class MealCubit extends Cubit<MealState> {
     String status = 'completed',
   }) async {
     try {
+      // Get user ID from context
+      final userId = UserContext.getCurrentUserId();
+      if (userId == null) {
+        emit(state.copyWith(error: 'User not authenticated'));
+        throw Exception('User not authenticated');
+      }
+
       final meal = Meal(
         id: '',
         childId: childId,
+        userId: userId,
         mealTime: mealTime,
         mealType: mealType,
         items: items,
@@ -80,17 +87,17 @@ class MealCubit extends Cubit<MealState> {
       );
 
       await _repository.addMeal(meal);
-      await loadMealLogs(); // Reload to show new data
+      await loadMealLogs(childId); // Reload to show new data
     } catch (e) {
       emit(state.copyWith(error: 'Failed to add meal: ${e.toString()}'));
       rethrow;
     }
   }
 
-  Future<void> deleteMeal(String id) async {
+  Future<void> deleteMeal(String id, String childId) async {
     try {
       await _repository.deleteMeal(id);
-      await loadMealLogs();
+      await loadMealLogs(childId);
     } catch (e) {
       emit(state.copyWith(error: 'Failed to delete meal: ${e.toString()}'));
     }

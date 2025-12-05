@@ -1,45 +1,95 @@
-I need help fixing my Flutter project.
+ **What I want you to do**
 
-Requirements:
+1. **Analyze the entire project** including:
+    
+    - Data layer (repositories, services, API calls, Firebase calls)
+        
+    - State management (Cubit/BLoC)
+        
+    - Models (fromJson/toJson)
+        
+    - UI screens that use CRUD
+        
+    - Any middleware or local database logic
+        
+2. **Identify every issue** causing:
+    
+    - Create not writing data
+        
+    - Read/fetch not returning or not updating UI
+        
+    - Update not saving or wrong model fields
+        
+    - Delete not working
+        
+    - Cubits not emitting states
+        
+    - Repository methods that never run
+        
+    - Incorrect async/await usage
+        
+    - Wrong endpoints or collection names
+        
+    - Model serialization mismatches
+        
+    - State not refreshing after CRUD operations
+        
+3. **Show the exact files and lines where the problems occur.**
+    
+4. **Fix everything directly**:
+    
+    - Rewrite broken methods
+        
+    - Fix incorrect Cubit logic
+        
+    - Correct models and serialization
+        
+    - Fix fetch logic (streams, futures, listeners)
+        
+    - Update UI code to react properly
+        
+    - Ensure all CRUD paths work end-to-end
+        
+5. **Explain the root cause** for each bug and how your fix solves it.
+    
+6. **Improve architecture** if needed:
+    
+    - Clean repository pattern
+        
+    - Consistent error handling
+        
+    - Proper state flows
+        
+    - Real-time or cached reads
+        
+    - Clear separation of concerns
+        
+7. **Run a full validation**:
+    
+    - Simulate Create → Read → Update → Delete for all features
+        
+    - Show me the logs
+        
+    - Confirm everything works
+        
 
-Tracker Forms Navigation
+---
 
-I have 3 trackers: Growth, Sleep, and Meal.
+### 📌 **Extra context**
 
-Each tracker has an “Add Tracker” form.
+- This is a Flutter project using  Supabase
 
-When the user saves a new entry:
 
-The app should automatically navigate back to the corresponding Logs screen:
+---
 
-Growth form → GrowthLogsScreen
+### 🛠️ **Your output should include**
 
-Sleep form → SleepLogsScreen
-
-Meal form → FeedingLogsScreen
-
-Please update the code so the navigation is handled correctly after saving.
-
-General Notes
-
-The backend is already implemented (Supabase).
-
-I am using Cubit for state management.
-
-I want clean, maintainable navigation logic.
-
-Deliverables:
-
-Updated code for:
-
-Growth add form
-
-Sleep add form
-
-Meal add form
-
-Correct navigation after saving
-
-A short explanation of the changes
-
-Make sure the solution works with Flutter + Supabase + Cubit.
+- A list of all detected issues
+    
+- Patched code with correct CRUD implementations
+    
+- Explanation of what was wrong
+    
+- A final architecture diagram of how CRUD flows after fixes
+    
+- A test checklist for me to validate everything

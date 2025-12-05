@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 class Meal {
   final String id;
   final String childId;
+  final String userId;
   final DateTime mealTime;
   final String mealType;
   final String items;
@@ -14,6 +15,7 @@ class Meal {
   Meal({
     required this.id,
     required this.childId,
+    required this.userId,
     required this.mealTime,
     required this.mealType,
     required this.items,
@@ -26,6 +28,7 @@ class Meal {
     return Meal(
       id: json['id']?.toString() ?? '',
       childId: json['child_id']?.toString() ?? '',
+      userId: json['user_id']?.toString() ?? '',
       mealTime: DateTime.parse(json['meal_time']?.toString() ?? DateTime.now().toIso8601String()),
       mealType: json['meal_type']?.toString() ?? '',
       items: json['items']?.toString() ?? '',
@@ -38,6 +41,7 @@ class Meal {
   Map<String, dynamic> toInsertJson() {
     return {
       'child_id': childId,
+      'user_id': userId,
       'meal_time': mealTime.toIso8601String(),
       'meal_type': mealType,
       'items': items,

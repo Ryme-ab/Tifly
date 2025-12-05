@@ -1,6 +1,7 @@
 class GrowthLog {
   final String id;
   final String childId;
+  final String userId;
   final DateTime date;
   final double? height;
   final double? weight;
@@ -11,6 +12,7 @@ class GrowthLog {
   GrowthLog({
     required this.id,
     required this.childId,
+    required this.userId,
     required this.date,
     this.height,
     this.weight,
@@ -22,6 +24,7 @@ class GrowthLog {
   Map<String, dynamic> toMap() {
     return {
       'child_id': childId,
+      'user_id': userId,
       'date': date.toIso8601String(),
       'height': height,
       'weight': weight,
@@ -34,6 +37,7 @@ class GrowthLog {
     return GrowthLog(
       id: map['id'],
       childId: map['child_id'],
+      userId: map['user_id'] ?? '',
       date: DateTime.parse(map['date']),
       height: map['height'] != null
           ? double.parse(map['height'].toString())
