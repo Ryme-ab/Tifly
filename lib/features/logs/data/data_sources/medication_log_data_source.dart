@@ -7,10 +7,11 @@ class MedicationDataSource {
   MedicationDataSource({required this.client});
 
   // Get all medicines for a specific baby
-  Future<List<Medication>> getMedicines(String babyId) async {
+  Future<List<Medication>> getMedicines(String userId, String babyId) async {
     final data = await client
         .from('medicines')
         .select()
+        .eq('user_id', userId)
         .eq('baby_id', babyId)
         .order('created_at', ascending: false);
 
@@ -29,11 +30,12 @@ class MedicationDataSource {
   }
 
   // Update an existing medicine
-  Future<Medication> updateMedicine(String id, Medication medicine) async {
+  Future<Medication> updateMedicine(String id, String userId, Medication medicine) async {
     final response = await client
         .from('medicines')
         .update(medicine.toJson())
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
         .single();
 
@@ -41,7 +43,11 @@ class MedicationDataSource {
   }
 
   // Delete a medicine
-  Future<void> deleteMedicine(String id) async {
-    await client.from('medicines').delete().eq('id', id);
+  Future<void> deleteMedicine(String id, String userId) async {
+    await client
+        .from('medicines')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
   }
 }

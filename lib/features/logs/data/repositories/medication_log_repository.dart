@@ -6,13 +6,13 @@ class MedicationRepository {
 
   MedicationRepository({required this.dataSource});
 
-  Future<List<Medication>> getMedicines(String babyId) =>
-      dataSource.getMedicines(babyId);
+  Future<List<Medication>> getMedicines(String userId, String babyId) =>
+      dataSource.getMedicines(userId, babyId);
 
   Future<Medication> addMedicine(Medication med) => dataSource.addMedicine(med);
 
-  Future<Medication> updateMedicine(String id, Medication med) =>
-      dataSource.updateMedicine(id, med);
+  Future<Medication> updateMedicine(String id, String userId, Medication med) =>
+      dataSource.updateMedicine(id, userId, med);
 
-  Future<void> deleteMedicine(String id) => dataSource.deleteMedicine(id);
+  Future<void> deleteMedicine(String id, String userId) => dataSource.deleteMedicine(id, userId);
 }

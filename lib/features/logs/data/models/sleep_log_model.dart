@@ -1,5 +1,6 @@
 class SleepLog {
   final String id;
+  final String userId;
   final String childId;
   final DateTime startTime;
   final DateTime endTime;
@@ -9,6 +10,7 @@ class SleepLog {
 
   SleepLog({
     required this.id,
+    required this.userId,
     required this.childId,
     required this.startTime,
     required this.endTime,
@@ -20,6 +22,7 @@ class SleepLog {
   factory SleepLog.fromJson(Map<String, dynamic> json) {
     return SleepLog(
       id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
       startTime: json['start_time'] != null 
           ? DateTime.parse(json['start_time']) 
@@ -37,6 +40,7 @@ class SleepLog {
 
   Map<String, dynamic> toJson() {
     return {
+      'user_id': userId,
       'child_id': childId,
       'start_time': startTime.toIso8601String(),
       'end_time': endTime.toIso8601String(),
@@ -49,6 +53,7 @@ class SleepLog {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'child_id': childId,
       'start_time': startTime.toIso8601String(),
       'end_time': endTime.toIso8601String(),
@@ -60,6 +65,7 @@ class SleepLog {
 
   SleepLog copyWith({
     String? id,
+    String? userId,
     String? childId,
     DateTime? startTime,
     DateTime? endTime,
@@ -69,6 +75,7 @@ class SleepLog {
   }) {
     return SleepLog(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       childId: childId ?? this.childId,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
