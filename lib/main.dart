@@ -12,6 +12,7 @@ import 'package:tifli/core/widgets/test_data_loader.dart';
 // --- Auth ---
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/data/repositories/signin_repository.dart';
+import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 
 // --- Feeding Logs ---
 import 'package:tifli/features/logs/data/data_sources/feeding_logs_data.dart';
@@ -174,7 +175,7 @@ Future<void> main() async {
       child: TestDataLoader(
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: const MainTabScreen(),
+          home: const SplashScreen(),
           onGenerateRoute: AppRouter.generateRoute,
         ),
       ),

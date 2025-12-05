@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
 import 'package:tifli/features/trackers/data/models/sleep.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 
 String selectedChildId = "75ec0c30-58d0-4306-b225-007cd9997b0f";
 
@@ -123,6 +124,10 @@ class _SleepPageState extends State<SleepPage> {
       setState(() {
         selectedQuality = null;
       });
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.sleepingLogs);
+      }
     } catch (e) {
       print("ERROR logging sleep: $e");
       ScaffoldMessenger.of(context).showSnackBar(
