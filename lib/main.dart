@@ -65,6 +65,9 @@ import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/trackers/data/repositories/sleep_repository.dart';
 import 'package:tifli/features/trackers/data/repositories/growth_repository.dart';
 
+// --- Child Selection (NEW) ---
+import 'package:tifli/core/state/child_selection_cubit.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseClientManager.initialize();
@@ -74,6 +77,11 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
+        // CHILD SELECTION SYSTEM (FIRST - REQUIRED BY OTHER CUBITS)
+        BlocProvider<ChildSelectionCubit>(
+          create: (_) => ChildSelectionCubit(),
+        ),
+
         // AUTH SYSTEM
         BlocProvider<AuthCubit>(
           create: (_) => AuthCubit(AuthRepository(supabase)),
@@ -81,19 +89,23 @@ Future<void> main() async {
 
         // FEEDING LOGS SYSTEM
         BlocProvider<FeedingLogCubit>(
-          create: (_) => FeedingLogCubit(
+          create: (context) => FeedingLogCubit(
             repository: FeedingLogRepository(
               dataSource: FeedingLogDataSource(client: supabase),
             ),
+            supabase: supabase,
+            childSelectionCubit: context.read<ChildSelectionCubit>(),
           ),
         ),
 
         // Growth System
         BlocProvider<GrowthLogCubit>(
-          create: (_) => GrowthLogCubit(
+          create: (context) => GrowthLogCubit(
             repository: GrowthLogRepository(
               dataSource: GrowthLogDataSource(client: supabase),
             ),
+            supabase: supabase,
+            childSelectionCubit: context.read<ChildSelectionCubit>(),
           ),
         ),
 
@@ -108,19 +120,23 @@ Future<void> main() async {
 
         // SLEEP LOGS SYSTEM
         BlocProvider<SleepLogCubit>(
-          create: (_) => SleepLogCubit(
+          create: (context) => SleepLogCubit(
             repository: SleepLogRepository(
               dataSource: SleepLogDataSource(client: supabase),
             ),
+            supabase: supabase,
+            childSelectionCubit: context.read<ChildSelectionCubit>(),
           ),
         ),
 
         // MEDICATION LOGS SYSTEM
-        BlocProvider<MedicationCubit>(
-          create: (_) => MedicationCubit(
-            repo: MedicationRepository(
+        BlocProvider<MedicationLogCubit>(
+          create: (context) => MedicationLogCubit(
+            repository: MedicationRepository(
               dataSource: MedicationDataSource(client: supabase),
             ),
+            supabase: supabase,
+            childSelectionCubit: context.read<ChildSelectionCubit>(),
           ),
         ),
 
@@ -135,10 +151,12 @@ Future<void> main() async {
 
         // CHECKLIST SYSTEM
         BlocProvider<ChecklistCubit>(
-          create: (_) => ChecklistCubit(
+          create: (context) => ChecklistCubit(
             repository: ChecklistRepository(
               dataSource: ChecklistDataSource(client: supabase),
             ),
+            supabase: supabase,
+            childSelectionCubit: context.read<ChildSelectionCubit>(),
           ),
         ),
 

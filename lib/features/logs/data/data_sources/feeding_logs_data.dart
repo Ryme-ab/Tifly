@@ -6,10 +6,11 @@ class FeedingLogDataSource {
 
   FeedingLogDataSource({required this.client});
 
-  Future<List<FeedingLog>> getLogs(String childId) async {
+  Future<List<FeedingLog>> getLogs(String userId, String childId) async {
     final data = await client
         .from('meals')
         .select()
+        .eq('user_id', userId)
         .eq('child_id', childId)
         .order('created_at', ascending: false);
 
@@ -26,18 +27,23 @@ class FeedingLogDataSource {
     return FeedingLog.fromJson(response);
   }
 
-  Future<FeedingLog> updateLog(String id, FeedingLog log) async {
+  Future<FeedingLog> updateLog(String id, String userId, FeedingLog log) async {
     final response = await client
         .from('meals')
         .update(log.toJson())
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
         .single();
     
     return FeedingLog.fromJson(response);
   }
 
-  Future<void> deleteLog(String id) async {
-    await client.from('meals').delete().eq('id', id);
+  Future<void> deleteLog(String id, String userId) async {
+    await client
+        .from('meals')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
   }
 }
