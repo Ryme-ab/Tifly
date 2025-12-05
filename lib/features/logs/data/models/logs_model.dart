@@ -1,5 +1,6 @@
 class FeedingLog {
   final String id;
+  final String userId;
   final String childId;
   final DateTime mealTime;
   final String mealType;
@@ -10,6 +11,7 @@ class FeedingLog {
 
   FeedingLog({
     required this.id,
+    required this.userId,
     required this.childId,
     required this.mealTime,
     required this.mealType,
@@ -22,6 +24,7 @@ class FeedingLog {
   factory FeedingLog.fromJson(Map<String, dynamic> json) {
     return FeedingLog(
       id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
       mealTime: json['meal_time'] != null 
           ? DateTime.parse(json['meal_time']) 
@@ -38,6 +41,7 @@ class FeedingLog {
 
   Map<String, dynamic> toJson() {
     return {
+      'user_id': userId,
       'child_id': childId,
       'meal_time': mealTime.toIso8601String(),
       'meal_type': mealType,
@@ -51,6 +55,7 @@ class FeedingLog {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'child_id': childId,
       'meal_time': mealTime.toIso8601String(),
       'meal_type': mealType,
@@ -63,16 +68,18 @@ class FeedingLog {
 
   FeedingLog copyWith({
     String? id,
+    String? userId,
     String? childId,
     DateTime? mealTime,
     String? mealType,
     String? items,
     int? amount,
     String? status,
-    DateTime? createdAt, required String mealtype,
+    DateTime? createdAt,
   }) {
     return FeedingLog(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       childId: childId ?? this.childId,
       mealTime: mealTime ?? this.mealTime,
       mealType: mealType ?? this.mealType,

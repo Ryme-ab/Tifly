@@ -21,7 +21,7 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<GrowthLogCubit>().loadLogs(TestConfig.testChildId);
+      context.read<GrowthLogCubit>().loadLogs();
     });
   }
 
