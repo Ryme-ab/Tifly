@@ -26,6 +26,7 @@ import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen
 import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/create_profile_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/add_baby_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
@@ -166,11 +167,17 @@ class AppRouter {
       case AppRoutes.babyProfile:
         return MaterialPageRoute(builder: (_) => const BabyProfileScreen());
       case AppRoutes.createBaby:
-        return MaterialPageRoute(builder: (_) => const CreateBabyScreen());
+        return MaterialPageRoute(builder: (_) => const AddBabyScreen());
       case AppRoutes.createProfile:
         return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
       case AppRoutes.myBabies:
-        return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
+        final args = settings.arguments as Map<String, dynamic>?;
+        if (args != null && args['parentId'] != null) {
+          return MaterialPageRoute(
+            builder: (_) => MyBabiesPage(parentId: args['parentId']),
+          );
+        }
+        return _errorRoute(settings);
       case AppRoutes.parentProfile:
         return MaterialPageRoute(builder: (_) => const ParentProfileScreen());
 
