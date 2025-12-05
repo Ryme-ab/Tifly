@@ -1,7 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/features/logs/presentation/cubit/sleep_log_cubit.dart';
+import 'package:tifli/features/logs/presentation/cubit/sleep_log_state.dart';
+import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
+import 'package:tifli/core/config/test_config.dart'; // For test child ID
 
 class SleepingLogsScreen extends StatefulWidget {
   const SleepingLogsScreen({super.key});
@@ -11,16 +17,47 @@ class SleepingLogsScreen extends StatefulWidget {
 }
 
 class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
-  Widget _buildQuickStatsRow() {
-    final totalSleep = weeklyHours.reduce((a, b) => a + b);
-    final todaySleep = weeklyHours[DateTime.now().weekday % 7];
+  @override
+  void initState() {
+    super.initState();
+    // Load sleep logs data when screen is initialized
+    // Using test child ID - replace with actual child ID in production
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SleepLogCubit>().loadLogs();
+    });
+  }
+
+  Widget _buildQuickStatsRow(List<SleepLog> logs) {
+    final now = DateTime.now();
+    final weekAgo = now.subtract(const Duration(days: 7));
+
+    final weeklyLogs = logs
+        .where((log) => log.createdAt.isAfter(weekAgo))
+        .toList();
+    final todayLogs = logs
+        .where(
+          (log) =>
+              log.createdAt.year == now.year &&
+              log.createdAt.month == now.month &&
+              log.createdAt.day == now.day,
+        )
+        .toList();
+
+    final totalWeeklyHours = weeklyLogs.fold<double>(
+      0.0,
+      (sum, log) => sum + log.getDurationInHours(),
+    );
+    final totalTodayHours = todayLogs.fold<double>(
+      0.0,
+      (sum, log) => sum + log.getDurationInHours(),
+    );
 
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
             title: "This Week",
-            value: "${totalSleep.toStringAsFixed(1)} hrs",
+            value: "${totalWeeklyHours.toStringAsFixed(1)} hrs",
             icon: Icons.calendar_month,
             color: const Color(0xffe1bee7),
           ),
@@ -29,7 +66,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
         Expanded(
           child: _buildStatCard(
             title: "Today",
-            value: "${todaySleep.toStringAsFixed(1)} hrs",
+            value: "${totalTodayHours.toStringAsFixed(1)} hrs",
             icon: Icons.nightlight_round,
             color: const Color(0xffffccbc),
           ),
@@ -38,98 +75,115 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
     );
   }
 
-  List<Map<String, dynamic>> sleepLogs = [
-    {
-      "date": "Oct 25, 2025",
-      "duration": "7h 45m",
-      "quality": "Good",
-      "color": const Color(0xffe0f7fa),
-    },
-    {
-      "date": "Oct 24, 2025",
-      "duration": "5h 30m",
-      "quality": "Poor",
-      "color": const Color(0xffffebee),
-    },
-    {
-      "date": "Oct 23, 2025",
-      "duration": "6h 15m",
-      "quality": "Fair",
-      "color": const Color(0xfffff9c4),
-    },
-  ];
-
-  final Map<String, double> qualityData = {"Good": 60, "Fair": 25, "Poor": 15};
-
-  final List<double> weeklyHours = [7.5, 6, 8, 5.5, 7, 6.5, 7.2];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
       appBar: const CustomAppBar(title: 'Sleeping Tracker'),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Sleep Logs",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                CircleAvatar(
-                  radius: 18,
-                  backgroundImage: const AssetImage('assets/profile.jpg'),
-                  backgroundColor: Colors.grey[200],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+        child: BlocBuilder<SleepLogCubit, SleepLogState>(
+          builder: (context, state) {
+            if (state is SleepLogLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is SleepLogError) {
+              return Center(child: Text('Error: ${state.message}'));
+            } else if (state is SleepLogLoaded) {
+              final logs = state.logs;
 
-            // Pie Chart
-            _buildPieChartSection(),
-            const SizedBox(height: 24),
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Sleep Logs",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundImage: const AssetImage('assets/profile.jpg'),
+                        backgroundColor: Colors.grey[200],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
-            // Quick Stats Cards — 🧩 moved here above log list
-            _buildQuickStatsRow(),
+                  // Pie Chart
+                  _buildPieChartSection(logs),
+                  const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
+                  // Quick Stats Cards
+                  _buildQuickStatsRow(logs),
+                  const SizedBox(height: 24),
 
-            // Logs
-            const Text(
-              "Recent Sleep Logs",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            ...sleepLogs.map(_buildSleepCard).toList(),
+                  // Logs
+                  const Text(
+                    "Recent Sleep Logs",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  if (logs.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: Text('No sleep logs yet'),
+                      ),
+                    )
+                  else
+                    ...logs
+                        .map((log) => _buildSleepCard(log, context))
+                        .toList(),
 
-            const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-            // Weekly Trend
-            const Text(
-              "Weekly Sleep Trend",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-            _buildWeeklyBarChart(),
-          ],
+                  // Weekly Trend
+                  const Text(
+                    "Weekly Sleep Trend",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildWeeklyBarChart(logs),
+                ],
+              );
+            }
+
+            return const Center(child: Text('No data'));
+          },
         ),
       ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
-        onPressed: _addDummyLog,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SleepPage()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
   }
 
   // 🥧 Pie chart for sleep quality
-  Widget _buildPieChartSection() {
+  Widget _buildPieChartSection(List<SleepLog> logs) {
+    final qualityData = <String, double>{};
+
+    for (final log in logs) {
+      qualityData[log.quality] = (qualityData[log.quality] ?? 0) + 1;
+    }
+
+    if (qualityData.isEmpty) {
+      qualityData['No Data'] = 1;
+    }
+
     final total = qualityData.values.reduce((a, b) => a + b);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -148,10 +202,10 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
             child: PieChart(
               PieChartData(
                 sections: qualityData.entries.map((entry) {
-                  final color = switch (entry.key) {
-                    "Good" => const Color(0xffb2dfdb),
-                    "Fair" => const Color(0xfffff9c4),
-                    "Poor" => const Color(0xffffccbc),
+                  final color = switch (entry.key.toLowerCase()) {
+                    "good" => const Color(0xffb2dfdb),
+                    "fair" => const Color(0xfffff9c4),
+                    "poor" => const Color(0xffffccbc),
                     _ => Colors.grey,
                   };
                   final percentage = (entry.value / total) * 100;
@@ -176,10 +230,10 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: qualityData.keys.map((key) {
-              final color = switch (key) {
-                "Good" => const Color(0xffb2dfdb),
-                "Fair" => const Color(0xfffff9c4),
-                "Poor" => const Color(0xffffccbc),
+              final color = switch (key.toLowerCase()) {
+                "good" => const Color(0xffb2dfdb),
+                "fair" => const Color(0xfffff9c4),
+                "poor" => const Color(0xffffccbc),
                 _ => Colors.grey,
               };
               return Row(
@@ -197,11 +251,22 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
   }
 
   // 💤 Sleep logs cards
-  Widget _buildSleepCard(Map<String, dynamic> log) {
+  Widget _buildSleepCard(SleepLog log, BuildContext context) {
+    final color = switch (log.quality.toLowerCase()) {
+      "good" => const Color(0xffe0f7fa),
+      "fair" => const Color(0xfffff9c4),
+      "poor" => const Color(0xffffebee),
+      _ => Colors.white,
+    };
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-        key: Key(log['date'] + log.hashCode.toString()),
+        key: Key(
+          log.id.isEmpty
+              ? log.createdAt.millisecondsSinceEpoch.toString()
+              : log.id,
+        ),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -212,10 +277,14 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
           padding: const EdgeInsets.only(right: 20),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
-        onDismissed: (_) => setState(() => sleepLogs.remove(log)),
+        onDismissed: (_) {
+          if (log.id.isNotEmpty) {
+            context.read<SleepLogCubit>().deleteLog(log.id);
+          }
+        },
         child: Container(
           decoration: BoxDecoration(
-            color: log['color'] ?? Colors.white,
+            color: color,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(12),
@@ -239,31 +308,66 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      log['date'],
+                      DateFormat('MMM d, yyyy').format(log.startTime),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      "Duration: ${log['duration']}",
+                      "Duration: ${log.getFormattedDuration()}",
                       style: const TextStyle(color: Colors.pinkAccent),
                     ),
+                    if (log.description.isNotEmpty)
+                      Text(
+                        log.description,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xffb03a57),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  log['quality'],
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffb03a57),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        log.quality,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.grey),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SleepPage(
+                              //existingLog: log,
+                              showTracker: false,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -274,11 +378,20 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
   }
 
   // 📊 Weekly bar chart (sleep duration trend)
-  // 📊 Weekly bar chart (sleep duration trend)
-  Widget _buildWeeklyBarChart() {
+  Widget _buildWeeklyBarChart(List<SleepLog> logs) {
     final days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    final totalSleep = weeklyHours.reduce((a, b) => a + b);
-    final todaySleep = weeklyHours[DateTime.now().weekday % 7];
+    final now = DateTime.now();
+    final weekAgo = now.subtract(const Duration(days: 7));
+
+    // Calculate daily totals for the past week
+    final weeklyHours = List<double>.filled(7, 0.0);
+
+    for (final log in logs) {
+      if (log.createdAt.isAfter(weekAgo)) {
+        final dayIndex = log.createdAt.weekday % 7;
+        weeklyHours[dayIndex] += log.getDurationInHours();
+      }
+    }
 
     return Column(
       children: [
@@ -329,7 +442,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                   x: i,
                   barRods: [
                     BarChartRodData(
-                      toY: weeklyHours[i],
+                      toY: weeklyHours[i] > 0 ? weeklyHours[i] : 0.1,
                       color: const Color(0xffb03a57),
                       width: 16,
                       borderRadius: BorderRadius.circular(6),
@@ -403,18 +516,5 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
         ],
       ),
     );
-  }
-
-  // ➕ Add dummy data
-  void _addDummyLog() {
-    setState(() {
-      sleepLogs.insert(0, {
-        "date": DateFormat("MMM d, yyyy").format(DateTime.now()),
-        "duration":
-            "${5 + sleepLogs.length % 3}h ${20 + sleepLogs.length * 5}m",
-        "quality": "Good",
-        "color": const Color(0xffe0f7fa),
-      });
-    });
   }
 }

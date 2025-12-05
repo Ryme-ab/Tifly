@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const TifliApp());
-}
-
-class TifliApp extends StatelessWidget {
-  const TifliApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TIFLI Login',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xFFC21E56),
-        fontFamily: 'Poppins',
-      ),
-      home: const LoginPage(),
-    );
-  }
-}
+import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
+import 'signin_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,27 +13,61 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
-  bool _obscurePassword = true;
+  bool _obscure = true;
+  bool _loading = false;
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+    final supabase = SupabaseClientManager().client;
+
+    try {
+      final res = await supabase.auth.signInWithPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      final user = res.user;
+
+      if (user == null) throw Exception("Login failed");
+
+      // Fetch profile
+      final profile = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Login successful! 🎉'),
+          content: Text("Login Successful 🎉"),
           backgroundColor: Color(0xFFC21E56),
         ),
       );
-    }
-  }
 
-  void _navigateToSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SignUpPage()),
-    );
+      // Navigate to SplashScreen which will determine next route
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Login failed: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   @override
@@ -60,165 +77,116 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Logo
-            Column(
-              children: const [
-                Icon(Icons.child_care, color: Color(0xFFC21E56), size: 50),
-                SizedBox(height: 8),
-                Text(
-                  "TIFLI",
-                  style: TextStyle(
-                    color: Color(0xFFC21E56),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-
-            // Title
+            const Icon(Icons.child_care, color: Color(0xFFC21E56), size: 50),
+            const SizedBox(height: 10),
             const Text(
-              "Get back to Your Account",
+              "TIFLI",
               style: TextStyle(
+                color: Color(0xFFC21E56),
+                fontWeight: FontWeight.bold,
                 fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 40),
+            const Text(
+              "Get back to Your Account",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
 
-            // Login Form
             Form(
               key: _formKey,
               child: Column(
                 children: [
-                  // Email Address
+                  // Email
                   TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email Address",
-                      hintText: "your.email@example.com",
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
+                    controller: emailController,
+                    decoration: inputStyle(
+                      "Email Address",
+                      icon: Icons.email_outlined,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email is required';
-                      }
-                      final emailRegex =
-                          RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
+                    validator: (v) =>
+                        v == null || v.isEmpty ? "Email required" : null,
                   ),
                   const SizedBox(height: 15),
-
                   // Password
                   TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
+                    controller: passwordController,
+                    obscureText: _obscure,
+                    decoration: inputStyle(
+                      "Password",
+                      icon: Icons.lock_outline,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscure ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () => setState(() => _obscure = !_obscure),
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password is required';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
+                    validator: (v) =>
+                        v == null || v.length < 6 ? "Min 6 chars" : null,
                   ),
                   const SizedBox(height: 30),
-
-                  // Log in Button
+                  // Login button
                   SizedBox(
                     width: double.infinity,
                     height: 45,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.login),
-                      label: const Text(
-                        "Log in",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                    child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFC21E56),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: _submitForm,
+                      onPressed: _loading ? null : _login,
+                      child: _loading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              "Log in",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                    ),
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?"),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SignUpPage(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Sign in here",
+                            style: TextStyle(color: Color(0xFFE91E63)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 25),
-
-            // Sign up link
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("you don't have an account? ",
-                    style: TextStyle(color: Colors.black54)),
-                GestureDetector(
-                  onTap: _navigateToSignUp,
-                  child: const Text(
-                    "Sign up",
-                    style: TextStyle(
-                      color: Color(0xFFC21E56),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text("Sign-Up Page (placeholder for navigation)"),
-      ),
+  InputDecoration inputStyle(String label, {IconData? icon, Widget? suffix}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: icon != null ? Icon(icon) : null,
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 }

@@ -1,105 +1,59 @@
+// lib/screens/feeding_logs_screen.dart
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // built-in-ish, included in Flutter SDK; if missing remove and format manually
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:tifli/features/logs/presentation/screens/edit_feeding_log_screen.dart';
-import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:intl/intl.dart';
+import 'package:tifli/features/logs/presentation/cubit/feeding_logs_cubit.dart';
+import 'package:tifli/features/logs/presentation/cubit/feeding_logs_state.dart';
+import 'package:tifli/features/logs/data/models/logs_model.dart';
+
+// import 'add_feeding_log_screen.dart';
+import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
+// If you have a custom app bar widget import it or replace with AppBar
+import 'package:tifli/widgets/custom_app_bar.dart'; // optional
+import 'package:tifli/core/config/test_config.dart'; // For test child ID
 
 class FeedingLogsScreen extends StatefulWidget {
-  const FeedingLogsScreen({super.key});
+  const FeedingLogsScreen({Key? key}) : super(key: key);
 
   @override
   State<FeedingLogsScreen> createState() => _FeedingLogsScreenState();
 }
 
 class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
-  List<Map<String, dynamic>> logs = [
-    {
-      "type": "Formula",
-      "icon": Icons.local_drink,
-      "time": "08:30 AM",
-      "amount": "120ml",
-      "color": const Color(0xfffff0f0),
-    },
-    {
-      "type": "Solid",
-      "icon": Icons.restaurant,
-      "time": "12:30 PM",
-      "amount": "40g",
-      "color": const Color(0xfffff9e0),
-    },
-    {
-      "type": "Breast Milk",
-      "icon": Icons.local_hospital,
-      "time": "16:00 PM",
-      "amount": "90ml",
-      "color": const Color(0xffffe5ec),
-    },
-  ];
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xfff5f4f8),
-      appBar: const CustomAppBar(title: 'Feeding Tracker'),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // header row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Feeding Logs',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                CircleAvatar(
-                  radius: 18,
-                  backgroundImage: const AssetImage('assets/profile.jpg'),
-                  backgroundColor: Colors.grey[200],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // logs (dismissible)
-            ...logs.map((log) => _logCard(log)),
-
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Daily Feeding Summary',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _miniBarChart(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffb03a57),
-        onPressed: _addDummy,
-        child: const Icon(Icons.add),
-      ),
-    );
+  void initState() {
+    super.initState();
+    // Load feeding logs data when screen is initialized
+    // Using test child ID - replace with actual child ID in production
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FeedingLogCubit>().loadLogs();
+    });
   }
 
-  Widget _logCard(Map<String, dynamic> log) {
+  // icon mapping helper
+  IconData _iconFromMealType(String type) {
+    switch (type.toLowerCase()) {
+      case 'formula':
+        return Icons.local_drink;
+      case 'solid':
+        return Icons.restaurant;
+      case 'breast milk':
+        return Icons.local_hospital;
+      default:
+        return Icons.fastfood;
+    }
+  }
+
+  Widget _logCard(FeedingLog log, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-        key: Key(log['type'] + log.hashCode.toString()),
+        key: Key(
+          log.id.isEmpty
+              ? log.createdAt.millisecondsSinceEpoch.toString()
+              : log.id,
+        ),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -110,13 +64,17 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
           padding: const EdgeInsets.only(right: 20),
           child: const Icon(Icons.delete, color: Colors.white),
         ),
-        onDismissed: (_) => setState(() => logs.remove(log)),
+        onDismissed: (_) {
+          if (log.id.isNotEmpty) {
+            context.read<FeedingLogCubit>().deleteLog(log.id);
+          }
+        },
         child: Container(
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: log['color'],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               Container(
@@ -126,7 +84,10 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(log['icon'], color: const Color(0xffb03a57)),
+                child: Icon(
+                  _iconFromMealType(log.mealType),
+                  color: const Color(0xffb03a57),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -134,18 +95,26 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      log['type'],
+                      log.mealType,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      log['time'],
+                      DateFormat('hh:mm a').format(log.mealTime),
                       style: const TextStyle(color: Colors.black54),
                     ),
+                    if (log.items.isNotEmpty)
+                      Text(
+                        log.items,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
                   ],
                 ),
               ),
               Text(
-                log['amount'],
+                '${log.amount}ml',
                 style: const TextStyle(
                   color: Colors.pinkAccent,
                   fontWeight: FontWeight.bold,
@@ -158,31 +127,50 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                   color: const Color(0xffb03a57),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Completed',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                child: Text(
+                  log.status,
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.grey),
                 onPressed: () async {
-                  // Open the edit form screen
-                  final updatedLog = await Navigator.push(
+                  final logMap = {
+                    'id': log.id,
+                    'type': log.mealType,
+                    'amount': log.amount.toString(),
+                    'time': log.mealTime.toIso8601String(),
+                  };
+                  final updated = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditLogForm(
-                        log: log, // pass the log data you want to edit
+                      builder: (_) => FoodTrackerScreen(
+                        //existingLog: log,
+                        showTracker: false,
                       ),
                     ),
                   );
-
-                  // When coming back from the form
-                  if (updatedLog != null) {
-                    setState(() {
-                      final index = logs.indexOf(log);
-                      logs[index] = updatedLog; // update the log in memory
-                    });
+                  if (updated != null && updated is Map<String, dynamic>) {
+                    // Convert map back to FeedingLog
+                    final updatedLog = FeedingLog(
+                      id: log.id,
+                      userId: log.userId,
+                      childId: log.childId,
+                      mealType: updated['type'] ?? log.mealType,
+                      amount:
+                          int.tryParse(updated['amount'] ?? '0') ?? log.amount,
+                      mealTime:
+                          DateTime.tryParse(updated['time'] ?? '') ??
+                          log.mealTime,
+                      items: log.items,
+                      status: log.status,
+                      createdAt: log.createdAt,
+                    );
+                    context.read<FeedingLogCubit>().updateLog(
+                      log.id,
+                      updatedLog,
+                    );
                   }
                 },
               ),
@@ -193,87 +181,153 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
     );
   }
 
-  Widget _miniBarChart() {
-    final barData = [
-      {"label": "Breast", "value": 4.0, "color": const Color(0xffffcdd2)},
-      {"label": "Formula", "value": 2.5, "color": const Color(0xfffff9c4)},
-      {"label": "Solid", "value": 1.5, "color": const Color(0xfffff0f0)},
-    ];
+  // simple summary card building counts per mealtype
+  Widget _summaryCard(List<FeedingLog> logs) {
+    final counts = <String, int>{};
+    for (final l in logs) {
+      counts[l.mealType] = (counts[l.mealType] ?? 0) + 1;
+    }
+    final barData = counts.entries.toList();
 
-    final double maxVal = barData
-        .map((d) => d["value"] as double)
-        .reduce((a, b) => a > b ? a : b);
-
-    return SizedBox(
-      height: 180,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, _) {
-                  final int index = value.toInt();
-                  if (index < 0 || index >= barData.length) {
-                    return const SizedBox.shrink();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      barData[index]["label"] as String,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Daily Feeding Summary',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 140,
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                borderData: FlBorderData(show: false),
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, _) {
+                        final idx = value.toInt();
+                        if (idx < 0 || idx >= barData.length)
+                          return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            barData[idx].key,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
                     ),
+                  ),
+                ),
+                barGroups: List.generate(barData.length, (i) {
+                  final val = barData[i].value.toDouble();
+                  return BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: val,
+                        width: 24,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ],
                   );
-                },
+                }),
               ),
             ),
           ),
-          barGroups: List.generate(barData.length, (index) {
-            final entry = barData[index];
-            final color = entry["color"] as Color;
-            final double value = entry["value"] as double;
-            return BarChartGroupData(
-              x: index,
-              barRods: [
-                BarChartRodData(
-                  toY: value,
-                  color: color,
-                  width: 30,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ],
-            );
-          }),
-        ),
-        swapAnimationDuration: const Duration(milliseconds: 800),
+        ],
       ),
     );
   }
 
-  void _addDummy() {
-    setState(
-      () => logs.insert(0, {
-        "type": "New",
-        "icon": Icons.fastfood,
-        "time": DateFormat('hh:mm a').format(DateTime.now()),
-        "amount": "50ml",
-        "color": const Color(0xfffff0f5),
-      }),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xfff5f4f8),
+      appBar: const CustomAppBar(
+        title: 'Feeding Tracker',
+      ), // replace or use normal AppBar
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Feeding Logs',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundImage: const AssetImage('assets/profile.jpg'),
+                    backgroundColor: Colors.grey[200],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: BlocBuilder<FeedingLogCubit, FeedingLogState>(
+                  builder: (context, state) {
+                    if (state is FeedingLogLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is FeedingLogLoaded) {
+                      final logs = state.logs;
+                      if (logs.isEmpty) {
+                        return const Center(child: Text('No logs yet'));
+                      }
+                      return ListView(
+                        children: [
+                          ...logs.map((log) => _logCard(log, context)).toList(),
+                          const SizedBox(height: 20),
+                          _summaryCard(logs),
+                        ],
+                      );
+                    } else if (state is FeedingLogError) {
+                      return Center(child: Text('Error: ${state.message}'));
+                    }
+                    return const Center(child: Text('No data'));
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xffb03a57),
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          final added = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FoodTrackerScreen()),
+          );
+          if (added != null && added is FeedingLog) {
+            // call add on cubit
+            context.read<FeedingLogCubit>().addLog(added);
+          }
+        },
+      ),
     );
   }
 }

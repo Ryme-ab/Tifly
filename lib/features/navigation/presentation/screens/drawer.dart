@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
+import 'package:tifli/features/navigation/presentation/widgets/drawer_footer.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
-import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/schedules/presentation/screens/checklist_screen.dart';
 
 class Tiflidrawer extends StatelessWidget {
@@ -66,11 +69,14 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.person_outline,
-                    title: "Baby Profile",
+                    title: "Baby Profiles",
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const BabyProfileScreen(),
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const MyBabiesPage(),
+                        ),
                       ),
                     ),
                   ),
@@ -81,7 +87,10 @@ class Tiflidrawer extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const FeedingLogsScreen(),
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const FeedingLogsScreen(),
+                        ),
                       ),
                     ),
                   ),
@@ -92,18 +101,24 @@ class Tiflidrawer extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const SleepingLogsScreen(),
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const SleepingLogsScreen(),
+                        ),
                       ),
                     ),
                   ),
 
                   menuItem(
                     icon: Icons.show_chart_outlined,
-                    title: "medication Tracking",
+                    title: "Medication Tracking",
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const MedicationLogsScreen(),
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const MedicationsScreen(),
+                        ),
                       ),
                     ),
                   ),
@@ -113,7 +128,12 @@ class Tiflidrawer extends StatelessWidget {
                     title: "Checklist",
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ChecklistPage()),
+                      MaterialPageRoute(
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const ChecklistPage(),
+                        ),
+                      ),
                     ),
                   ),
 
@@ -137,7 +157,7 @@ class Tiflidrawer extends StatelessWidget {
                     icon: Icons.logout,
                     title: "Logout",
                     onTap: () {
-                      // add logout logic
+                      // TODO: Add logout logic
                     },
                   ),
                 ],
@@ -145,47 +165,7 @@ class Tiflidrawer extends StatelessWidget {
             ),
 
             // ---------- BOTTOM AREA ----------
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // User Tag
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                          radius: 14,
-                          backgroundImage: NetworkImage(
-                            "https://i.pravatar.cc/90?img=5",
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text("Parent"),
-                      ],
-                    ),
-                  ),
-
-                  const CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/90?img=10",
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const DrawerFooter(),
           ],
         ),
       ),
@@ -198,8 +178,6 @@ class Tiflidrawer extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    final Color primary = Tiflidrawer.primary;
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
