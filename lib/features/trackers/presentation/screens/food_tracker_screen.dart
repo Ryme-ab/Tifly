@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/widgets/calendar.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
@@ -94,11 +95,25 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     try {
       final client = SupabaseClientManager().client;
 
+      // Get selected child ID from ChildSelectionCubit
+      final childState = context.read<ChildSelectionCubit>().state;
+      if (childState is! ChildSelected) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please select a baby first"),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+      final selectedChildId = childState.childId;
+
       // CHECK FOR DUPLICATE MEAL LOG
       final duplicateCheck = await client
           .from('meals')
           .select('id')
-          .eq('child_id', '75ec0c30-58d0-4306-b225-007cd9997b0f')
+          .eq('child_id', selectedChildId)
           .eq('meal_time', mealTime.toIso8601String())
           .eq('meal_type', _selectedFeeding)
           .eq('amount', _quantity)
@@ -120,6 +135,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       // If no duplicate found, proceed with adding the meal
       if (!mounted) return;
       await context.read<MealCubit>().addMeal(
+        childId: selectedChildId,
         mealTime: mealTime,
         mealType: _selectedFeeding,
         items: _notes.isNotEmpty ? _notes : _selectedFeeding,
@@ -149,7 +165,13 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     } catch (e) {
       // Even if duplicate check fails, still add the meal
       if (!mounted) return;
+      
+      // Get child ID again for error case
+      final childState = context.read<ChildSelectionCubit>().state;
+      if (childState is! ChildSelected) return;
+      
       await context.read<MealCubit>().addMeal(
+        childId: childState.childId,
         mealTime: mealTime,
         mealType: _selectedFeeding,
         items: _notes.isNotEmpty ? _notes : _selectedFeeding,

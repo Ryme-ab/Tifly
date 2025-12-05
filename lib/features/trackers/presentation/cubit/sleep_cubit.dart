@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import '../../data/models/sleep.dart';
 import '../../data/repositories/sleep_repository.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/utils/user_context.dart';
+
 class SleepCubit extends Cubit<List<SleepLog>> {
   final SleepRepository repository;
 
@@ -12,9 +13,47 @@ class SleepCubit extends Cubit<List<SleepLog>> {
     emit(logs);
   }
 
-  Future<void> addSleepLog(SleepLog log, String childId) async {
-    await repository.addSleep(log);
-    await loadSleepLogs(childId);
+  Future<void> addSleepLog({
+    required String childId,
+    required DateTime startTime,
+    required DateTime endTime,
+    String? notes, required SleepLog sleepLog,
+  }) async {
+    try {
+      // 🔐 Get logged-in user ID
+      final userId = await UserContext.getCurrentUserId();
+      if (userId == null) {
+        throw Exception("User not authenticated");
+      }
+
+      // ❗ Check duplicate
+      final isDuplicate = await repository.checkDuplicate(
+        childId: childId,
+        startTime: startTime,
+        endTime: endTime,
+      );
+
+      if (isDuplicate) {
+        throw Exception("This sleep log already exists!");
+      }
+
+      // 🆕 Create new sleep log
+      final sleepLog = SleepLog(
+        id: '',
+        childId: childId,
+        userId: userId,
+        startTime: startTime,
+        endTime: endTime,
+        notes: notes,
+      );
+
+      await repository.addSleep(sleepLog);
+
+      await loadSleepLogs(childId);
+    } catch (e) {
+      print("Error adding sleep log: $e");
+      rethrow;
+    }
   }
 
   Future<void> deleteSleep(String id, String childId) async {

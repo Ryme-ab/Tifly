@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
+import 'package:tifli/features/navigation/presentation/widgets/drawer_footer.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
@@ -164,47 +165,7 @@ class Tiflidrawer extends StatelessWidget {
             ),
 
             // ---------- BOTTOM AREA ----------
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // User Tag
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                          radius: 14,
-                          backgroundImage: NetworkImage(
-                            "https://i.pravatar.cc/90?img=5",
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text("Parent"),
-                      ],
-                    ),
-                  ),
-
-                  const CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/90?img=10",
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const DrawerFooter(),
           ],
         ),
       ),
