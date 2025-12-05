@@ -1,5 +1,6 @@
 class ChecklistItem {
   final String id;
+  final String userId;
   final String childId;
   final String title;
   final bool done;
@@ -8,6 +9,7 @@ class ChecklistItem {
 
   ChecklistItem({
     required this.id,
+    required this.userId,
     required this.childId,
     required this.title,
     required this.done,
@@ -18,6 +20,7 @@ class ChecklistItem {
   factory ChecklistItem.fromJson(Map<String, dynamic> json) {
     return ChecklistItem(
       id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
       title: json['title'] ?? '',
       done: json['done'] ?? false,
@@ -32,6 +35,7 @@ class ChecklistItem {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
+      'user_id': userId,
       'child_id': childId,
       'title': title,
       'done': done,
@@ -53,6 +57,7 @@ class ChecklistItem {
 
   ChecklistItem copyWith({
     String? id,
+    String? userId,
     String? childId,
     String? title,
     bool? done,
@@ -61,6 +66,7 @@ class ChecklistItem {
   }) {
     return ChecklistItem(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       childId: childId ?? this.childId,
       title: title ?? this.title,
       done: done ?? this.done,

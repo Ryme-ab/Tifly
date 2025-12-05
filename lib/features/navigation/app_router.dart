@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 import 'package:tifli/features/home/presentation/screens/home_screen.dart';
+import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/schedules_menu_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointments_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
@@ -18,6 +19,7 @@ import 'package:tifli/features/trackers/presentation/screens/growth_tracker_scre
 import 'package:tifli/features/logs/presentation/screens/baby_logs_reports_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
+import 'package:tifli/features/logs/presentation/screens/growth_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/souvenirs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/statistics_screen.dart';
 
@@ -30,7 +32,6 @@ import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:tifli/features/logs/data/models/logs_model.dart';
 
-
 class AppRoutes {
   // Auth
   static const String splash = '/';
@@ -41,7 +42,7 @@ class AppRoutes {
 
   // Home
   static const String home = '/home';
-
+  static const String maintabscreen = '/main_tab_screen';
   // Schedules
   static const String schedules = '/schedules_menu_screen.dart';
   static const String appointments = '/schedules/appointments';
@@ -64,6 +65,7 @@ class AppRoutes {
   static const String logs = '/logs';
   static const String feedingLogs = '/logs/feeding';
   static const String sleepingLogs = '/logs/sleeping';
+  static const String growthLogs = '/logs/growth';
   static const String souvenirs = '/logs/souvenirs';
   static const String statistics = '/logs/statistics';
   static const String editFeedingLog = '/logs/edit-feeding';
@@ -85,7 +87,8 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-
+      case AppRoutes.maintabscreen:
+        return MaterialPageRoute(builder: (_) => const MainTabScreen());
       case AppRoutes.onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingScreen());
 
@@ -152,6 +155,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const FeedingLogsScreen());
       case AppRoutes.sleepingLogs:
         return MaterialPageRoute(builder: (_) => const SleepingLogsScreen());
+      case AppRoutes.growthLogs:
+        return MaterialPageRoute(builder: (_) => const GrowthLogsScreen());
       case AppRoutes.souvenirs:
         return MaterialPageRoute(builder: (_) => const SouvenirsScreen());
       case AppRoutes.statistics:
@@ -165,7 +170,7 @@ class AppRouter {
       case AppRoutes.createProfile:
         return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
       case AppRoutes.myBabies:
-        return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
+      // return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
       case AppRoutes.parentProfile:
         return MaterialPageRoute(builder: (_) => const ParentProfileScreen());
 
