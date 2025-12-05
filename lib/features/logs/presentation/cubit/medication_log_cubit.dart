@@ -1,59 +1,91 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tifli/features/logs/data/repositories/medication_log_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/features/logs/data/models/medication_log_model.dart';
-import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
+import 'package:tifli/features/logs/data/repositories/medication_log_repository.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'medication_log_state.dart';
 
-class MedicationCubit extends Cubit<MedicationState> {
-  final MedicationRepository repo;
-  String? currentBabyId;
+class MedicationLogCubit extends Cubit<MedicationState> {
+  final MedicationRepository repository;
+  final SupabaseClient supabase;
+  final ChildSelectionCubit childSelectionCubit;
+  
+  late final StreamSubscription _childSelectionSubscription;
 
-  MedicationCubit({required this.repo}) : super(MedicationInitial());
-
-  // Load all medications for a baby
-  Future<void> loadMedications(String babyId) async {
-    currentBabyId = babyId;
-    emit(MedicationLoading());
-    try {
-      final meds = await repo.getMedicines(babyId);
-      emit(MedicationLoaded(meds));
-    } catch (e) {
-      emit(MedicationError(e.toString()));
-    }
-  }
-
-  // Add a new medication
-  Future<void> addMedication(Medication med) async {
-    try {
-      await repo.addMedicine(med);
-      if (currentBabyId != null) {
-        await loadMedications(currentBabyId!);
+  MedicationLogCubit({
+    required this.repository,
+    required this.supabase,
+    required this.childSelectionCubit,
+  }) : super(MedicationInitial()) {
+    _childSelectionSubscription = childSelectionCubit.stream.listen((state) {
+      if (state is ChildSelected) {
+        loadMedicines();
+      } else if (state is NoChildSelected) {
+        emit(MedicationInitial());
       }
+    });
+  }
+
+  Future<void> loadMedicines() async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+      final childState = childSelectionCubit.state;
+      
+      if (userId == null || childState is! ChildSelected) {
+        emit(MedicationError('No user or child selected'));
+        return;
+      }
+
+      emit(MedicationLoading());
+      final medicines = await repository.getMedicines(userId, childState.childId);
+      emit(MedicationLoaded(medicines));
     } catch (e) {
       emit(MedicationError(e.toString()));
     }
   }
 
-  // Update existing medication
-  Future<void> updateMedication(String id, Medication med) async {
+  Future<void> addMedicine(Medication medicine) async {
     try {
-      await repo.updateMedicine(id, med);
-      if (currentBabyId != null) {
-        await loadMedications(currentBabyId!);
-      }
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.addMedicine(medicine);
+      await loadMedicines();
     } catch (e) {
       emit(MedicationError(e.toString()));
     }
   }
 
-  // Delete medication
-  Future<void> deleteMedication(String id) async {
+  Future<void> updateMedicine(String id, Medication medicine) async {
     try {
-      await repo.deleteMedicine(id);
-      if (currentBabyId != null) {
-        await loadMedications(currentBabyId!);
-      }
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.updateMedicine(id, userId, medicine);
+      await loadMedicines();
     } catch (e) {
       emit(MedicationError(e.toString()));
     }
   }
+
+  Future<void> deleteMedicine(String id) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.deleteMedicine(id, userId);
+      await loadMedicines();
+    } catch (e) {
+      emit(MedicationError(e.toString()));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _childSelectionSubscription.cancel();
+    return super.close();
+  }
+
+  void deleteMedication(String id) {}
 }

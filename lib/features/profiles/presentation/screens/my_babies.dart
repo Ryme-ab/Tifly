@@ -1,58 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'package:tifli/core/utils/user_context.dart';
+import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
+import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 import 'baby_card.dart';
 
 class MyBabiesPage extends StatefulWidget {
-  final String parentId;
-
-  const MyBabiesPage({super.key, required this.parentId});
+  const MyBabiesPage({super.key});
 
   @override
   State<MyBabiesPage> createState() => _MyBabiesPageState();
 }
 
 class _MyBabiesPageState extends State<MyBabiesPage> {
-  final SupabaseClient supabase = Supabase.instance.client;
-
-  List<Map<String, dynamic>> babies = [];
-  bool isLoading = true;
-  String? error;
-
   @override
   void initState() {
     super.initState();
-    fetchBabies();
-  }
-
-  // Fetch babies for this parent
-  Future<void> fetchBabies() async {
-    setState(() {
-      isLoading = true;
-      error = null;
+    // Load children for the current authenticated user
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = UserContext.getCurrentUserId();
+      if (userId != null) {
+        context.read<ChildrenCubit>().loadChildren(userId);
+      }
     });
-
-    try {
-      final response = await supabase
-          .from('children')
-          .select()
-          .eq('parent_id', widget.parentId)
-          .execute();
-
-      setState(() {
-        babies = List<Map<String, dynamic>>.from(response.data as List);
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
-    }
   }
 
   // Helper to calculate age in years
-  int calculateAgeInYears(String birthDateString) {
-    final birthDate = DateTime.parse(birthDateString);
+  int calculateAgeInYears(DateTime birthDate) {
     final now = DateTime.now();
 
     int age = now.year - birthDate.year;
@@ -67,32 +43,118 @@ class _MyBabiesPageState extends State<MyBabiesPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (error != null) {
-      return Scaffold(body: Center(child: Text('Error: $error')));
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text('My Babies')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
-          spacing: 20,
-          runSpacing: 20,
-          children: babies.map((baby) {
-            return BabyCard(
-              name: baby['first_name'] as String,
-              age: calculateAgeInYears(baby['birth_date'] as String),
-              imageUrl:
-                  baby['profile_image'] as String? ??
-                  'https://via.placeholder.com/150',
-              borderColor: Colors.pinkAccent,
+      backgroundColor: const Color(0xFFF5F4F8),
+      appBar: const CustomAppBar(title: 'My Babies'),
+      body: BlocBuilder<ChildrenCubit, ChildrenState>(
+        builder: (context, state) {
+          if (state is ChildrenLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is ChildrenError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading children',
+                    style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.message,
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
             );
-          }).toList(),
-        ),
+          }
+
+          if (state is ChildrenLoaded) {
+            if (state.children.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.child_care,
+                      size: 64,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No babies yet',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Add your first baby to get started!',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                children: state.children.map((child) {
+                  return GestureDetector(
+                    onTap: () {
+                      // Select this child in ChildSelectionCubit
+                      context.read<ChildSelectionCubit>().selectChild(
+                        child.id,
+                        child.firstName,
+                      );
+
+                      // Show snackbar confirmation
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Selected ${child.firstName}'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                    child: BabyCard(
+                      name: child.firstName,
+                      age: calculateAgeInYears(child.birthDate),
+                      imageUrl:
+                          child.profileImage ??
+                          'https://via.placeholder.com/150',
+                      borderColor: Colors.pinkAccent,
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          }
+
+          // Initial state
+          return const Center(child: Text('Loading...'));
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddBabyPage()),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Baby'),
+        backgroundColor: const Color(0xFFBA224D),
       ),
     );
   }

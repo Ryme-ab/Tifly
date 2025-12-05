@@ -27,7 +27,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
     // Load feeding logs data when screen is initialized
     // Using test child ID - replace with actual child ID in production
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<FeedingLogCubit>().loadLogs(TestConfig.testChildId);
+      context.read<FeedingLogCubit>().loadLogs();
     });
   }
 

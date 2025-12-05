@@ -8,7 +8,7 @@
 class TestConfig {
   /// Enable or disable test mode
   /// Set to false to use actual logged-in user data
-  static const bool enableTestMode = true;
+  static const bool enableTestMode = false;
 
   /// Test Parent ID
   static const String testParentId = '5f78f913-354a-45f2-805c-5f39bbc09aae';

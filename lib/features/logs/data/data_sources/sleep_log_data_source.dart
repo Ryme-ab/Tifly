@@ -6,10 +6,11 @@ class SleepLogDataSource {
 
   SleepLogDataSource({required this.client});
 
-  Future<List<SleepLog>> getLogs(String childId) async {
+  Future<List<SleepLog>> getLogs(String userId, String childId) async {
     final data = await client
         .from('sleep')
         .select()
+        .eq('user_id', userId)
         .eq('child_id', childId)
         .order('created_at', ascending: false);
 
@@ -26,18 +27,19 @@ class SleepLogDataSource {
     return SleepLog.fromJson(response);
   }
 
-  Future<SleepLog> updateLog(String id, SleepLog log) async {
+  Future<SleepLog> updateLog(String id, String userId, SleepLog log) async {
     final response = await client
         .from('sleep')
         .update(log.toJson())
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
         .single();
     
     return SleepLog.fromJson(response);
   }
 
-  Future<void> deleteLog(String id) async {
-    await client.from('sleep').delete().eq('id', id);
+  Future<void> deleteLog(String id, String userId) async {
+    await client.from('sleep').delete().eq('id', id).eq('user_id', userId);
   }
 }

@@ -6,14 +6,14 @@ class ChecklistRepository {
 
   ChecklistRepository({required this.dataSource});
 
-  Future<List<ChecklistItem>> fetchChecklist(String childId) =>
-      dataSource.getChecklists(childId);
+  Future<List<ChecklistItem>> fetchChecklist(String userId, String childId) =>
+      dataSource.getChecklists(userId, childId);
 
   Future<ChecklistItem> addChecklistItem(ChecklistItem item) =>
       dataSource.addItem(item);
 
-  Future<void> updateChecklistItem(ChecklistItem item) =>
-      dataSource.updateItem(item);
+  Future<void> updateChecklistItem(ChecklistItem item, String userId) =>
+      dataSource.updateItem(item, userId);
 
-  Future<void> deleteChecklistItem(String id) => dataSource.deleteItem(id);
+  Future<void> deleteChecklistItem(String id, String userId) => dataSource.deleteItem(id, userId);
 }

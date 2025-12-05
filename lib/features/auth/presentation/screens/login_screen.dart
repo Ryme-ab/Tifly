@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 import 'signin_screen.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,14 +51,11 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      // Navigate to home screen (placeholder)
-      Navigator.push(
+      // Navigate to SplashScreen which will determine next route
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => Scaffold(
-            appBar: AppBar(title: const Text("Welcome")),
-            body: Center(child: Text("Profile Loaded:\n$profile")),
-          ),
+          builder: (_) => const SplashScreen(),
         ),
       );
     } catch (e) {

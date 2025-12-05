@@ -23,7 +23,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
     // Load sleep logs data when screen is initialized
     // Using test child ID - replace with actual child ID in production
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SleepLogCubit>().loadLogs(TestConfig.testChildId);
+      context.read<SleepLogCubit>().loadLogs();
     });
   }
 

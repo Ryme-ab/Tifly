@@ -21,13 +21,13 @@ class _ChecklistPageState extends State<ChecklistPage> {
     super.initState();
     // Load checklists when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChecklistCubit>().loadChecklists(TestConfig.testChildId);
+      context.read<ChecklistCubit>().loadChecklist();
     });
   }
 
   void addItem() {
     if (newItemController.text.trim().isEmpty) return;
-    context.read<ChecklistCubit>().addItem(newItemController.text.trim());
+    context.read<ChecklistCubit>().addItem(newItemController.text.trim() as ChecklistItem);
     newItemController.clear();
   }
 
