@@ -11,7 +11,7 @@ class ChecklistCubit extends Cubit<ChecklistState> {
   final ChecklistRepository repository;
   final SupabaseClient supabase;
   final ChildSelectionCubit childSelectionCubit;
-  
+
   late final StreamSubscription _childSelectionSubscription;
 
   ChecklistCubit({
@@ -32,7 +32,7 @@ class ChecklistCubit extends Cubit<ChecklistState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       final childState = childSelectionCubit.state;
-      
+
       if (userId == null || childState is! ChildSelected) {
         emit(ChecklistError('No user or child selected'));
         return;
@@ -50,7 +50,7 @@ class ChecklistCubit extends Cubit<ChecklistState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.addChecklistItem(item);
       await loadChecklist();
     } catch (e) {
@@ -62,7 +62,7 @@ class ChecklistCubit extends Cubit<ChecklistState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       final updatedItem = item.copyWith(done: !item.done);
       await repository.updateChecklistItem(updatedItem, userId);
       await loadChecklist();
@@ -75,7 +75,7 @@ class ChecklistCubit extends Cubit<ChecklistState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.deleteChecklistItem(id, userId);
       await loadChecklist();
     } catch (e) {
