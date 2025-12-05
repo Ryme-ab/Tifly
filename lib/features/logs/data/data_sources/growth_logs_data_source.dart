@@ -40,6 +40,10 @@ class GrowthLogDataSource {
   }
 
   Future<void> deleteLog(String id, String userId) async {
-    await client.from('growth').delete().eq('id', id).eq('user_id', userId);
+    await client
+        .from('growth')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
   }
 }
