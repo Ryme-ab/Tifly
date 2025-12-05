@@ -4,7 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/features/schedules/data/models/schedules_model.dart';
 import 'package:tifli/features/schedules/data/repositories/schedules_repository.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
-import 'checklist_state.dart';
+
+part 'checklist_state.dart';
 
 class ChecklistCubit extends Cubit<ChecklistState> {
   final ChecklistRepository repository;

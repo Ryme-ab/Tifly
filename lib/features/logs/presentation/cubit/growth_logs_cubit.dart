@@ -18,7 +18,6 @@ class GrowthLogCubit extends Cubit<GrowthLogState> {
     required this.supabase,
     required this.childSelectionCubit,
   }) : super(GrowthLogInitial()) {
-    // Listen to child selection changes and auto-reload
     _childSelectionSubscription = childSelectionCubit.stream.listen((state) {
       if (state is ChildSelected) {
         loadLogs();

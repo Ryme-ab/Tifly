@@ -21,7 +21,6 @@ import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dar
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/growth_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/souvenirs_screen.dart';
-import 'package:tifli/features/logs/presentation/screens/statistics_screen.dart';
 
 import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
 
@@ -159,8 +158,6 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const GrowthLogsScreen());
       case AppRoutes.souvenirs:
         return MaterialPageRoute(builder: (_) => const SouvenirsScreen());
-      case AppRoutes.statistics:
-        return MaterialPageRoute(builder: (_) => const StatisticsScreen());
 
       // Profiles
       case AppRoutes.babyProfile:

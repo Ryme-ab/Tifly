@@ -156,7 +156,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
-          context.read<MedicationLogCubit>().deleteMedicine(med.id);
+          context.read<MedicationLogCubit>().deleteMedication(med.id);
         },
         child: Container(
           decoration: BoxDecoration(
