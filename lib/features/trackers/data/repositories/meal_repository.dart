@@ -6,10 +6,18 @@ class MealRepository {
     try {
       print('🔍 Fetching meals for child: $childId');
 
+      // Get user ID from auth
+      final userId = SupabaseClientManager().client.auth.currentUser?.id;
+      if (userId == null) {
+        print('❌ User not authenticated');
+        return [];
+      }
+
       final response = await SupabaseClientManager().client
           .from('meals')
           .select('*')
           .eq('child_id', childId)
+          .eq('user_id', userId)
           .order('meal_time', ascending: false);
 
       print('✅ Found ${response.length} meals in database');
@@ -62,10 +70,17 @@ class MealRepository {
 
   Future<Map<String, double>> getMealTypeStats(String childId) async {
     try {
+      // Get user ID from auth
+      final userId = SupabaseClientManager().client.auth.currentUser?.id;
+      if (userId == null) {
+        return {'Breast Milk': 0, 'Formula': 0, 'Solid Food': 0, 'Juice': 0};
+      }
+
       final response = await SupabaseClientManager().client
           .from('meals')
           .select('meal_type')
           .eq('child_id', childId)
+          .eq('user_id', userId)
           .not('meal_type', 'is', null);
 
       final Map<String, int> counts = {

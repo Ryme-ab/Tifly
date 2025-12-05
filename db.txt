@@ -1,0 +1,155 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.appointments (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  parent_id uuid,
+  doctor_name text,
+  location text,
+  appointment_time timestamp without time zone NOT NULL,
+  type text,
+  notes text,
+  status text DEFAULT 'scheduled'::text,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT appointments_pkey PRIMARY KEY (id),
+  CONSTRAINT appointments_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.checklist (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid NOT NULL,
+  title text NOT NULL,
+  done boolean NOT NULL DEFAULT false,
+  created_at timestamp without time zone NOT NULL DEFAULT now(),
+  updated_at timestamp without time zone NOT NULL DEFAULT now(),
+  checklist_date date DEFAULT now(),
+  user_id uuid NOT NULL,
+  CONSTRAINT checklist_pkey PRIMARY KEY (id),
+  CONSTRAINT checklist_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT checklist_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.children (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  first_name text NOT NULL,
+  birth_date date NOT NULL,
+  gender text CHECK (gender = ANY (ARRAY['male'::text, 'female'::text])),
+  blood_type text,
+  profile_image text,
+  created_at timestamp without time zone DEFAULT now(),
+  parent_id uuid,
+  circum integer,
+  born_weight integer,
+  born_height integer,
+  CONSTRAINT children_pkey PRIMARY KEY (id),
+  CONSTRAINT children_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.gallery (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  uploaded_by uuid,
+  file_path text NOT NULL,
+  media_type text,
+  title text,
+  picture_date date,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT gallery_pkey PRIMARY KEY (id),
+  CONSTRAINT gallery_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.growth (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  date date NOT NULL,
+  height double precision,
+  weight double precision,
+  head_circumference double precision,
+  created_at timestamp without time zone DEFAULT now(),
+  notes text,
+  updated_at timestamp without time zone DEFAULT now(),
+  unit_height text DEFAULT 'cm'::text,
+  unit_weight text DEFAULT 'kg'::text,
+  unit_head_circ text DEFAULT 'cm'::text,
+  user_id uuid NOT NULL,
+  CONSTRAINT growth_pkey PRIMARY KEY (id),
+  CONSTRAINT growth_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT growth_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.health_records (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  record_date date NOT NULL,
+  diagnosis text,
+  notes text,
+  doctor_name text,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT health_records_pkey PRIMARY KEY (id),
+  CONSTRAINT health_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.meals (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  meal_time timestamp without time zone NOT NULL,
+  meal_type text,
+  items text,
+  amount integer,
+  status text,
+  created_at timestamp without time zone DEFAULT now(),
+  user_id uuid NOT NULL,
+  CONSTRAINT meals_pkey PRIMARY KEY (id),
+  CONSTRAINT meals_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT meals_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.medicines (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  baby_id uuid,
+  medicine_name text NOT NULL,
+  dosage integer CHECK (dosage >= 1 AND dosage <= 7),
+  duration_unit text CHECK (duration_unit = ANY (ARRAY['days'::text, 'weeks'::text, 'months'::text])),
+  duration_value integer CHECK (duration_value > 0),
+  frequency_type text NOT NULL,
+  appearance_color text,
+  time_of_medication time without time zone,
+  frequency_per_day integer,
+  interval_hours integer,
+  interval_start_time time without time zone,
+  notes text,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now(),
+  user_id uuid NOT NULL,
+  CONSTRAINT medicines_pkey PRIMARY KEY (id),
+  CONSTRAINT medicines_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT medicines_baby_id_fkey FOREIGN KEY (baby_id) REFERENCES public.children(id)
+);
+CREATE TABLE public.notifications (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid,
+  title text NOT NULL,
+  body text NOT NULL,
+  is_enabled boolean DEFAULT true,
+  is_read boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT notifications_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  full_name text,
+  phone text,
+  email text,
+  pwd text,
+  role text DEFAULT 'parent'::text,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.sleep (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  child_id uuid,
+  start_time timestamp without time zone NOT NULL,
+  end_time timestamp without time zone,
+  quality text,
+  created_at timestamp without time zone DEFAULT now(),
+  descp text CHECK (length(descp) <= 201),
+  user_id uuid NOT NULL,
+  CONSTRAINT sleep_pkey PRIMARY KEY (id),
+  CONSTRAINT sleep_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT sleep_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.children(id)
+);

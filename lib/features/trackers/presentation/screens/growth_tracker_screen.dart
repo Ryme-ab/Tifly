@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/widgets/calendar.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
@@ -23,7 +24,6 @@ class _GrowthPageState extends State<GrowthPage> {
   final TextEditingController bmiController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
-  String selectedChildId = "75ec0c30-58d0-4306-b225-007cd9997b0f";
 
   @override
   void dispose() {
@@ -67,8 +67,20 @@ class _GrowthPageState extends State<GrowthPage> {
     }
 
     try {
+      // Get selected child ID from ChildSelectionCubit
+      final childState = context.read<ChildSelectionCubit>().state;
+      if (childState is! ChildSelected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please select a baby first"),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+      
       await context.read<GrowthCubit>().addGrowthLog(
-        childId: selectedChildId,
+        childId: childState.childId,
         date: today,
         height: height,
         weight: weight,

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import '../../data/models/growth.dart';
 import '../../data/repositories/growth_repository.dart';
+import 'package:tifli/core/utils/user_context.dart';
 
 class GrowthCubit extends Cubit<List<GrowthLog>> {
   final GrowthRepository repository;
@@ -21,6 +22,12 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
     String? notes,
   }) async {
     try {
+      // Get user ID from auth
+      final userId = await _getUserId();
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
       // Check for duplicate
       final isDuplicate = await repository.checkDuplicate(
         childId: childId,
@@ -38,6 +45,7 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
       final growthLog = GrowthLog(
         id: '',
         childId: childId,
+        userId: userId,
         date: date,
         height: height,
         weight: weight,
@@ -52,6 +60,11 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
       print("Error adding growth log: $e");
       rethrow;
     }
+  }
+
+  Future<String?> _getUserId() async {
+    // Import and use UserContext
+    return UserContext.getCurrentUserId();
   }
 
   Future<void> deleteGrowth(String id, String childId) async {

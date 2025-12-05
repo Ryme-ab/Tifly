@@ -177,7 +177,7 @@ Future<void> main() async {
         ),
 
         // TRACKERS SYSTEM
-        BlocProvider<MealCubit>(create: (_) => MealCubit(childId: '')),
+        BlocProvider<MealCubit>(create: (_) => MealCubit()),
         BlocProvider<SleepCubit>(
           create: (_) => SleepCubit(SleepRepository(supabase)),
         ),
