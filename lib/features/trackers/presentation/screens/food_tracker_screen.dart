@@ -6,6 +6,7 @@ import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_scree
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import '../cubit/meal_cubit.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 
 class FoodTrackerScreen extends StatefulWidget {
   const FoodTrackerScreen({super.key, this.showTracker = true});
@@ -141,6 +142,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
         _selectedTime = const TimeOfDay(hour: 8, minute: 30);
         _notes = "";
       });
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.feedingLogs);
+      }
     } catch (e) {
       // Even if duplicate check fails, still add the meal
       if (!mounted) return;

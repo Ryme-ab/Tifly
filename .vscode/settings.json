@@ -1,6 +1,4 @@
 {
-
-    "cmake.sourceDirectory": "C:/Users/DELL/Desktop/Tifli/Tifly/linux"
+  "cmake.sourceDirectory": "C:/Users/DELL/Desktop/Tifli/Tifly/linux",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }
-
-
