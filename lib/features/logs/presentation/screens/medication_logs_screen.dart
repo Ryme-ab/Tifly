@@ -23,7 +23,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     // Load medications data when screen is initialized
     // Using test child ID - replace with actual child ID in production
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MedicationCubit>().loadMedications(TestConfig.testChildId);
+      context.read<MedicationLogCubit>().loadMedicines();
     });
   }
 
@@ -33,7 +33,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       backgroundColor: const Color(0xfff5f4f8),
       appBar: const CustomAppBar(title: "Medication Tracker"),
       body: SafeArea(
-        child: BlocBuilder<MedicationCubit, MedicationState>(
+        child: BlocBuilder<MedicationLogCubit, MedicationState>(
           builder: (context, state) {
             if (state is MedicationLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -156,7 +156,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
-          context.read<MedicationCubit>().deleteMedication(med.id);
+          context.read<MedicationLogCubit>().deleteMedication(med.id);
         },
         child: Container(
           decoration: BoxDecoration(

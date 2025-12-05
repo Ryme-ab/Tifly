@@ -19,7 +19,6 @@ import 'package:tifli/features/logs/presentation/screens/baby_logs_reports_scree
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/souvenirs_screen.dart';
-import 'package:tifli/features/logs/presentation/screens/statistics_screen.dart';
 
 import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
 
@@ -29,7 +28,6 @@ import 'package:tifli/features/profiles/presentation/screens/parent_profile_scre
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:tifli/features/logs/data/models/logs_model.dart';
-
 
 class AppRoutes {
   // Auth
@@ -154,8 +152,6 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SleepingLogsScreen());
       case AppRoutes.souvenirs:
         return MaterialPageRoute(builder: (_) => const SouvenirsScreen());
-      case AppRoutes.statistics:
-        return MaterialPageRoute(builder: (_) => const StatisticsScreen());
 
       // Profiles
       case AppRoutes.babyProfile:
@@ -165,7 +161,7 @@ class AppRouter {
       case AppRoutes.createProfile:
         return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
       case AppRoutes.myBabies:
-        return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
+      // return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
       case AppRoutes.parentProfile:
         return MaterialPageRoute(builder: (_) => const ParentProfileScreen());
 

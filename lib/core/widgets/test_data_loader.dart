@@ -37,24 +37,25 @@ class _TestDataLoaderState extends State<TestDataLoader> {
   }
 
   void _loadAllTestData() {
-    final childId = TestConfig.testChildId;
-
+    // All cubits now auto-load based on ChildSelectionCubit
+    // Just trigger the loads without parameters
+    
     // Load Feeding Logs
-    context.read<FeedingLogCubit>().loadLogs(childId);
+    context.read<FeedingLogCubit>().loadLogs();
 
-    // Load Baby Logs (all types)
-    context.read<BabyLogsCubit>().loadAllLogs(childId);
+    // Load Baby Logs (all types) - may need updating later
+    // context.read<BabyLogsCubit>().loadAllLogs(); // Commented out for now
 
     // Load Sleep Logs
-    context.read<SleepLogCubit>().loadLogs(childId);
+    context.read<SleepLogCubit>().loadLogs();
 
     // Load Medication Logs
-    context.read<MedicationCubit>().loadMedications(childId);
+    context.read<MedicationLogCubit>().loadMedicines();
 
-    // Load Statistics
-    context.read<StatisticsCubit>().loadStatistics(childId);
+    // Load Statistics - may need updating later
+    // context.read<StatisticsCubit>().loadStatistics(); // Commented out for now
 
-    print('🧪 TEST MODE: Auto-loaded data for child ID: $childId');
+    print('🧪 TEST MODE: Auto-loaded data from ChildSelectionCubit');
   }
 
   @override

@@ -1,21 +1,44 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tifli/features/logs/data/repositories/sleep_log_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
-import 'package:tifli/features/logs/presentation/cubit/sleep_log_state.dart';
+import 'package:tifli/features/logs/data/repositories/sleep_log_repository.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'sleep_log_state.dart';
 
 class SleepLogCubit extends Cubit<SleepLogState> {
-  final SleepLogRepository repo;
-  String? currentChildId;
+  final SleepLogRepository repository;
+  final SupabaseClient supabase;
+  final ChildSelectionCubit childSelectionCubit;
+  
+  late final StreamSubscription _childSelectionSubscription;
 
-  SleepLogCubit({required SleepLogRepository repository}) 
-      : repo = repository, 
-        super(SleepLogInitial());
+  SleepLogCubit({
+    required this.repository,
+    required this.supabase,
+    required this.childSelectionCubit,
+  }) : super(SleepLogInitial()) {
+    _childSelectionSubscription = childSelectionCubit.stream.listen((state) {
+      if (state is ChildSelected) {
+        loadLogs();
+      } else if (state is NoChildSelected) {
+        emit(SleepLogInitial());
+      }
+    });
+  }
 
-  Future<void> loadLogs(String childId) async {
-    currentChildId = childId;
-    emit(SleepLogLoading());
+  Future<void> loadLogs() async {
     try {
-      final logs = await repo.getLogs(childId);
+      final userId = supabase.auth.currentUser?.id;
+      final childState = childSelectionCubit.state;
+      
+      if (userId == null || childState is! ChildSelected) {
+        emit(SleepLogError('No user or child selected'));
+        return;
+      }
+
+      emit(SleepLogLoading());
+      final logs = await repository.getLogs(userId, childState.childId);
       emit(SleepLogLoaded(logs));
     } catch (e) {
       emit(SleepLogError(e.toString()));
@@ -24,10 +47,11 @@ class SleepLogCubit extends Cubit<SleepLogState> {
 
   Future<void> addLog(SleepLog log) async {
     try {
-      await repo.addLog(log);
-      if (currentChildId != null) {
-        await loadLogs(currentChildId!);
-      }
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.addLog(log);
+      await loadLogs();
     } catch (e) {
       emit(SleepLogError(e.toString()));
     }
@@ -35,10 +59,11 @@ class SleepLogCubit extends Cubit<SleepLogState> {
 
   Future<void> updateLog(String id, SleepLog log) async {
     try {
-      await repo.updateLog(id, log);
-      if (currentChildId != null) {
-        await loadLogs(currentChildId!);
-      }
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.updateLog(id, userId, log);
+      await loadLogs();
     } catch (e) {
       emit(SleepLogError(e.toString()));
     }
@@ -46,12 +71,19 @@ class SleepLogCubit extends Cubit<SleepLogState> {
 
   Future<void> deleteLog(String id) async {
     try {
-      await repo.deleteLog(id);
-      if (currentChildId != null) {
-        await loadLogs(currentChildId!);
-      }
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+      
+      await repository.deleteLog(id, userId);
+      await loadLogs();
     } catch (e) {
       emit(SleepLogError(e.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _childSelectionSubscription.cancel();
+    return super.close();
   }
 }

@@ -6,13 +6,13 @@ class GrowthLogRepository {
 
   GrowthLogRepository({required this.dataSource});
 
-  Future<List<GrowthLog>> getLogs(String childId) =>
-      dataSource.getLogs(childId);
+  Future<List<GrowthLog>> getLogs(String userId, String childId) =>
+      dataSource.getLogs(userId, childId);
 
   Future<GrowthLog> addLog(GrowthLog log) => dataSource.addLog(log);
 
-  Future<GrowthLog> updateLog(String id, GrowthLog log) =>
-      dataSource.updateLog(id, log);
+  Future<GrowthLog> updateLog(String id, String userId, GrowthLog log) =>
+      dataSource.updateLog(id, userId, log);
 
-  Future<void> deleteLog(String id) => dataSource.deleteLog(id);
+  Future<void> deleteLog(String id, String userId) => dataSource.deleteLog(id, userId);
 }
