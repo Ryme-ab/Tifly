@@ -68,6 +68,11 @@ class MealRepository {
     }
   }
 
+
+
+
+  
+
   Future<Map<String, double>> getMealTypeStats(String childId) async {
     try {
       // Get user ID from auth
@@ -118,4 +123,35 @@ class MealRepository {
       return {'Breast Milk': 0, 'Formula': 0, 'Solid Food': 0, 'Juice': 0};
     }
   }
+
+
+  Future<void> updateMeal(Meal meal) async {
+  try {
+    print('✏️ Updating meal in database...');
+    print('   Meal ID: ${meal.id}');
+    print('   Child ID: ${meal.childId}');
+    print('   Meal Type: ${meal.mealType}');
+    print('   Amount: ${meal.amount}ml');
+    print('   Time: ${meal.mealTime}');
+
+    // Prepare data for update
+    final updateData = meal.toInsertJson(); // Use same as addMeal
+    print('   Update data: $updateData');
+
+    // Execute update
+    await SupabaseClientManager().client
+        .from('meals')
+        .update(updateData)
+        .eq('id', meal.id)
+        .eq('child_id', meal.childId)
+        .eq('user_id', SupabaseClientManager().client.auth.currentUser?.id)
+        .execute();
+
+    print('✅ Meal updated successfully! ID: ${meal.id}');
+  } catch (e) {
+    print('❌ Error updating meal: $e');
+    rethrow;
+  }
+}
+
 }

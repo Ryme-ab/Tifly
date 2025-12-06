@@ -71,4 +71,28 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
     await repository.deleteGrowth(id);
     await loadGrowthLogs(childId);
   }
+
+  Future<void> updateGrowthLog(GrowthLog updatedLog) async {
+  try {
+    // User must exist
+    final userId = await _getUserId();
+    if (userId == null) {
+      throw Exception("User not authenticated");
+    }
+
+    // Ensure the log belongs to this user
+    if (updatedLog.userId != userId) {
+      throw Exception("You cannot edit a log that doesn't belong to you.");
+    }
+
+    await repository.updateGrowth(updatedLog);
+
+    // Refresh logs
+    await loadGrowthLogs(updatedLog.childId);
+  } catch (e) {
+    print("Error updating growth log: $e");
+    rethrow;
+  }
+}
+
 }

@@ -35,9 +35,7 @@ class MealState {
 class MealCubit extends Cubit<MealState> {
   final MealRepository _repository;
 
-  MealCubit() 
-      : _repository = MealRepository(),
-        super(const MealState());
+  MealCubit() : _repository = MealRepository(), super(const MealState());
 
   Future<void> loadMealLogs(String childId) async {
     emit(state.copyWith(isLoading: true, error: null));
@@ -45,16 +43,16 @@ class MealCubit extends Cubit<MealState> {
     try {
       final logs = await _repository.getMealLogs(childId);
       final stats = await _repository.getMealTypeStats(childId);
-      emit(state.copyWith(
-        mealLogs: logs,
-        mealTypeStats: stats,
-        isLoading: false,
-      ));
+      emit(
+        state.copyWith(mealLogs: logs, mealTypeStats: stats, isLoading: false),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: 'Failed to load meal logs: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: 'Failed to load meal logs: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -106,7 +104,7 @@ class MealCubit extends Cubit<MealState> {
   double getTodayTotal() {
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
-    
+
     return state.mealLogs
         .where((meal) => meal.mealTime.isAfter(todayStart))
         .fold(0.0, (sum, meal) => sum + meal.amount);
@@ -115,9 +113,57 @@ class MealCubit extends Cubit<MealState> {
   double getWeeklyTotal() {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday));
-    
+
     return state.mealLogs
         .where((meal) => meal.mealTime.isAfter(weekStart))
         .fold(0.0, (sum, meal) => sum + meal.amount);
+  }
+
+  Future<void> updateMeal({
+    required String id,
+    required String childId,
+    required DateTime mealTime,
+    required String mealType,
+    required String items,
+    required int amount,
+    String status = 'completed',
+  }) async {
+    try {
+      emit(state.copyWith(isLoading: true, error: null));
+
+      // Get user ID
+      final userId = UserContext.getCurrentUserId();
+      if (userId == null) {
+        emit(state.copyWith(isLoading: false, error: 'User not authenticated'));
+        return;
+      }
+
+      // Construct updated Meal object
+      final updatedMeal = Meal(
+        id: id,
+        childId: childId,
+        userId: userId,
+        mealTime: mealTime,
+        mealType: mealType,
+        items: items,
+        amount: amount,
+        status: status,
+        createdAt:
+            DateTime.now(), // optional: keep original createdAt if needed
+      );
+
+      // Call repository
+      await _repository.updateMeal(updatedMeal);
+
+      // Reload meals
+      await loadMealLogs(childId);
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: 'Failed to update meal: ${e.toString()}',
+        ),
+      );
+    }
   }
 }
