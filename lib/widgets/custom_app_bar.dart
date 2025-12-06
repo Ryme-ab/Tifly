@@ -14,8 +14,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appBarConfig = context.watch<AppBarConfig>();
-    final effectiveTitle = title ?? appBarConfig.title;
+    // Try to read AppBarConfig, but make it optional
+    final appBarConfig = context.watch<AppBarConfig?>();
+    final effectiveTitle = title ?? appBarConfig?.title ?? '';
     final canPop = Navigator.of(context).canPop();
 
     return AppBar(
@@ -46,7 +47,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 }
               },
             ),
-      actions: actions ?? appBarConfig.actions,
+      actions: actions ?? appBarConfig?.actions,
     );
   }
 
