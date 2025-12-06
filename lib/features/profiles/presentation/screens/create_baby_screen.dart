@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'create_baby_screen_2.dart';
 
@@ -264,6 +263,8 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                         'birth_date': _selectedDate!.toIso8601String(),
                         'gender': isBoy ? 'male' : 'female',
                         'parent_id': userId,
+                        'born_height': int.parse(_heightController.text),
+                        'born_weight': int.parse(_weightController.text),
                       };
 
                       final insertedRows = await SupabaseClientManager().client
@@ -300,7 +301,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                   }
                 },
                 child: const Text(
-                  "Save Baby",
+                  "Next",
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

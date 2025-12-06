@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
-import 'add_baby_profile_pic.dart'; // ✅ IMPORT PICTURE PAGE
-import 'package:tifli/features/profiles/data/models/baby_model.dart';
+import 'baby_profile_screen.dart';
 
 class AddBabyPage2 extends StatelessWidget {
   final String babyId;
@@ -157,11 +155,11 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                       final response = await SupabaseClientManager().client
                           .from('children')
                           .update({
-                            "circum": double.parse(_circmController.text),
-                            "born_weight": double.parse(
+                            "circum": int.parse(_circmController.text),
+                            "born_weight": int.parse(
                               _bornWeightController.text,
                             ),
-                            "born_height": double.parse(
+                            "born_height": int.parse(
                               _bornHeightController.text,
                             ),
                             "blood_type": _bloodController.text,
@@ -184,19 +182,11 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                       _bornHeightController.clear();
                       _bloodController.clear();
 
-                      // ✅ REDIRECT TO PICTURE PAGE
+                      // ✅ REDIRECT TO BABY PROFILE
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AddBabyProfilePictureScreen(
-                            baby: Baby(
-                              id: widget.babyId,
-                              firstName: '',
-                              birthDate: '',
-                              gender: '',
-                              parentId: '',
-                            ),
-                          ),
+                          builder: (_) => BabyProfileScreen(babyId: widget.babyId),
                         ),
                       );
                     } catch (e) {
