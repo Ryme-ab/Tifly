@@ -135,43 +135,19 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.grey),
-                onPressed: () async {
-                  final logMap = {
-                    'id': log.id,
-                    'type': log.mealType,
-                    'amount': log.amount.toString(),
-                    'time': log.mealTime.toIso8601String(),
-                  };
-                  final updated = await Navigator.push(
+                onPressed: () {
+                  // Navigate to FoodTrackerScreen in edit mode
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => FoodTrackerScreen(
-                        //existingLog: log,
                         showTracker: false,
+                        existingEntry: log.feedingLogToMeal(
+                          log,
+                        ), // <-- pass the existing Meal/FeedingLog here
                       ),
                     ),
                   );
-                  if (updated != null && updated is Map<String, dynamic>) {
-                    // Convert map back to FeedingLog
-                    final updatedLog = FeedingLog(
-                      id: log.id,
-                      userId: log.userId,
-                      childId: log.childId,
-                      mealType: updated['type'] ?? log.mealType,
-                      amount:
-                          int.tryParse(updated['amount'] ?? '0') ?? log.amount,
-                      mealTime:
-                          DateTime.tryParse(updated['time'] ?? '') ??
-                          log.mealTime,
-                      items: log.items,
-                      status: log.status,
-                      createdAt: log.createdAt,
-                    );
-                    context.read<FeedingLogCubit>().updateLog(
-                      log.id,
-                      updatedLog,
-                    );
-                  }
                 },
               ),
             ],

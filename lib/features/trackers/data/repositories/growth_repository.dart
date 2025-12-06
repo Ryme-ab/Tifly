@@ -50,4 +50,12 @@ class GrowthRepository {
       return false;
     }
   }
+
+  Future<void> updateGrowth(GrowthLog log) async {
+    await client
+        .from('growth_logs')
+        .update(log.toMap())
+        .eq('id', log.id)
+        .eq('user_id', log.userId);
+  }
 }

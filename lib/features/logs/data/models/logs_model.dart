@@ -1,3 +1,5 @@
+import 'package:tifli/features/trackers/data/models/meal.dart';
+
 class FeedingLog {
   final String id;
   final String userId;
@@ -89,4 +91,18 @@ class FeedingLog {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  Meal feedingLogToMeal(FeedingLog log) {
+  return Meal(
+    id: log.id,
+    userId: log.userId,
+    childId: log.childId,
+    mealTime: log.mealTime,
+    mealType: log.mealType,
+    items: log.items,
+    amount: log.amount,
+    status: log.status,
+    createdAt: log.createdAt,
+  );
+}
 }
