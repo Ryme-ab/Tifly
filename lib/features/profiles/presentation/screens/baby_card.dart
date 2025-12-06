@@ -5,6 +5,7 @@ class BabyCard extends StatelessWidget {
   final int age;
   final String imageUrl;
   final Color borderColor;
+  final VoidCallback? onDelete;
 
   const BabyCard({
     super.key,
@@ -12,6 +13,7 @@ class BabyCard extends StatelessWidget {
     required this.age,
     required this.imageUrl,
     required this.borderColor,
+    this.onDelete,
   });
 
   @override
@@ -25,7 +27,31 @@ class BabyCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          CircleAvatar(radius: 40, backgroundImage: NetworkImage(imageUrl)),
+          Stack(
+            children: [
+              CircleAvatar(radius: 40, backgroundImage: NetworkImage(imageUrl)),
+              if (onDelete != null)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: onDelete,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
           Text(
             name,

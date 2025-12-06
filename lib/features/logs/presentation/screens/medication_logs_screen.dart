@@ -7,7 +7,6 @@ import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
 import 'package:tifli/features/logs/data/models/medication_log_model.dart';
-import 'package:tifli/core/config/test_config.dart'; // For test child ID
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});

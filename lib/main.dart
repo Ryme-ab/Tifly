@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-<<<<<<< HEAD
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // --- Supabase Core ---
 import 'package:tifli/core/config/supabaseClient.dart';
-=======
-import 'package:provider/provider.dart' as provider;
-// flutter_bloc and local supabase client manager not required here
-import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
-import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
->>>>>>> a029d001b8937ea692e186bbc657b3ac8291b7d1
 
 // --- Test Configuration (REMOVE IN PRODUCTION) ---
 import 'package:tifli/core/config/test_config.dart';
 import 'package:tifli/core/widgets/test_data_loader.dart';
 
 // --- Auth ---
-import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
-import 'package:tifli/features/auth/data/repositories/signin_repository.dart';
+import 'package:tifli/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:tifli/features/auth/data/repositories/auth_repository.dart';
+import 'package:tifli/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 
 // --- Feeding Logs ---
@@ -61,10 +54,13 @@ import 'package:tifli/features/profiles/data/data_sources/children_data_source.d
 import 'package:tifli/features/profiles/data/repositories/children_repository.dart';
 import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 
+// --- Baby ---
+import 'package:tifli/features/profiles/data/data_sources/baby_remote_data_source.dart';
+import 'package:tifli/features/profiles/data/repositories/baby_repo.dart';
+import 'package:tifli/features/profiles/presentation/cubit/baby_cubit.dart';
+
 // --- Navigation ---
 import 'package:tifli/features/navigation/app_router.dart';
-import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
-import 'package:tifli/features/trackers/data/repositories/meal_repository.dart';
 
 // --- Trackers ---
 import 'package:tifli/features/trackers/presentation/cubit/meal_cubit.dart';
@@ -82,7 +78,6 @@ Future<void> main() async {
 
   final supabase = SupabaseClientManager().client;
 
-<<<<<<< HEAD
   runApp(
     MultiBlocProvider(
       providers: [
@@ -91,7 +86,7 @@ Future<void> main() async {
 
         // AUTH SYSTEM
         BlocProvider<AuthCubit>(
-          create: (_) => AuthCubit(AuthRepository(supabase)),
+          create: (_) => AuthCubit(AuthRepository(AuthRemoteDataSource())),
         ),
 
         // FEEDING LOGS SYSTEM
@@ -184,6 +179,12 @@ Future<void> main() async {
           },
         ),
 
+        // BABY SYSTEM
+        BlocProvider<BabyCubit>(
+          create: (_) =>
+              BabyCubit(BabyRepository(BabyRemoteDataSource(supabase))),
+        ),
+
         // TRACKERS SYSTEM
         BlocProvider<MealCubit>(create: (_) => MealCubit()),
         BlocProvider<SleepCubit>(
@@ -199,47 +200,14 @@ Future<void> main() async {
           debugShowCheckedModeBanner: false,
           home: const SplashScreen(),
           onGenerateRoute: AppRouter.generateRoute,
+          onUnknownRoute: (settings) => MaterialPageRoute(
+            builder: (_) => Scaffold(
+              body: Center(
+                child: Text('No route defined for ${settings.name}'),
+              ),
+            ),
+          ),
         ),
-=======
-  // Create shared app-level providers
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  final ValueNotifier<AppBarConfig> appBarNotifier = ValueNotifier(
-    AppBarConfig(
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_none, color: Colors.black87),
-          onPressed: () {},
-        ),
-      ],
-    ),
-  );
-
-  runApp(MyApp(scaffoldKey: scaffoldKey, appBarNotifier: appBarNotifier));
-}
-
-class MyApp extends StatelessWidget {
-  final GlobalKey<ScaffoldState> scaffoldKey;
-  final ValueNotifier<AppBarConfig> appBarNotifier;
-
-  const MyApp({
-    super.key,
-    required this.scaffoldKey,
-    required this.appBarNotifier,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return provider.MultiProvider(
-      providers: [
-        provider.Provider<GlobalKey<ScaffoldState>>.value(value: scaffoldKey),
-        provider.ValueListenableProvider<AppBarConfig>.value(
-          value: appBarNotifier,
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: const ParentProfileScreen(),
->>>>>>> a029d001b8937ea692e186bbc657b3ac8291b7d1
       ),
     ),
   );

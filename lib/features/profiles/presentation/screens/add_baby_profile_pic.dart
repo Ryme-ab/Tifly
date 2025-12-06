@@ -1,12 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/models/baby_model.dart';
-import '../cubit/baby_cubit.dart';
 
 class AddBabyProfilePictureScreen extends StatefulWidget {
   final Baby baby;
@@ -67,9 +65,25 @@ class _AddBabyProfilePictureScreenState
 
       setState(() => uploadedImageUrl = publicUrl);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Image uploaded successfully")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Image uploaded successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to My Babies page after successful upload
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          // Pop back through all the baby creation screens
+          // This goes back: AddBabyProfilePictureScreen -> create_baby_screen_2 -> create_baby_screen -> previous screen
+          int count = 0;
+          Navigator.of(context).popUntil((route) {
+            return count++ >= 4 || route.isFirst;
+          });
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -90,30 +104,33 @@ class _AddBabyProfilePictureScreenState
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: context.read<BabyCubit>(),
-      child: Scaffold(
-        appBar: AppBar(title: const Text("Upload Profile Picture")),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 70,
-                backgroundImage: _getImageProvider(),
-                child: _getImageProvider() == null
-                    ? const Icon(Icons.add_a_photo, size: 40)
-                    : null,
-              ),
-              const SizedBox(height: 20),
-              loading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _pickAndUpload,
-                      child: const Text("Choose & Upload Image"),
-                    ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Upload Profile Picture"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 70,
+              backgroundImage: _getImageProvider(),
+              child: _getImageProvider() == null
+                  ? const Icon(Icons.add_a_photo, size: 40)
+                  : null,
+            ),
+            const SizedBox(height: 20),
+            loading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: _pickAndUpload,
+                    child: const Text("Choose & Upload Image"),
+                  ),
+          ],
         ),
       ),
     );

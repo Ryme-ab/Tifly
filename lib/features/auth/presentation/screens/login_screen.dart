@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
+import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 import 'signin_screen.dart';
 
 class LoginPage extends StatefulWidget {
@@ -36,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       if (user == null) throw Exception("Login failed");
 
       // Fetch profile
+      // ignore: unused_local_variable
       final profile = await supabase
           .from('profiles')
           .select()
@@ -51,12 +51,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      // Navigate to SplashScreen which will determine next route
+      // Navigate directly to home page (MainTabScreen)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const SplashScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const MainTabScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

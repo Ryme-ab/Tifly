@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'create_baby_screen_2.dart';
+import 'my_babies.dart';
 
 class AddBabyPage extends StatelessWidget {
   const AddBabyPage({super.key});
@@ -47,7 +47,16 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(width: 32),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      // Navigate back to my_babies
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MyBabiesPage()),
+                      );
+                    },
+                  ),
                   const Text(
                     "Add Baby",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
@@ -300,7 +309,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                   }
                 },
                 child: const Text(
-                  "Save Baby",
+                  "Next Step ",
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

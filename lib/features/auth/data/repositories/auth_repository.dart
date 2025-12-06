@@ -19,15 +19,34 @@ class AuthRepository {
     }
   }
 
-  Future<String?> signUp(String email, String password) async {
+  Future<String?> signUp(
+    String email,
+    String password, {
+    String? fullName,
+    String? phone,
+  }) async {
     try {
-      final response = await remote.signUp(email, password);
+      final response = await remote.signUp(
+        email,
+        password,
+        fullName: fullName,
+        phone: phone,
+      );
 
       if (response.user != null) {
         return null; // success
       } else {
         return "Signup failed.";
       }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String?> signOut() async {
+    try {
+      await remote.signOut();
+      return null; // success
     } catch (e) {
       return e.toString();
     }

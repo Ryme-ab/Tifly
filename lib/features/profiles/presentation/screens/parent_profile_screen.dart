@@ -6,6 +6,10 @@ import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:tifli/features/navigation/app_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
@@ -36,6 +40,76 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   bool _isEditingEmail = false;
   bool _isEditingPhone = false;
   String? _profileImageUrl;
+  bool _isUploadingImage = false;
+
+  Future<void> _pickAndUploadProfileImage(String userId) async {
+    try {
+      setState(() => _isUploadingImage = true);
+
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery);
+      if (picked == null) {
+        setState(() => _isUploadingImage = false);
+        return;
+      }
+
+      // Read bytes for cross-platform compatibility
+      final bytes = await picked.readAsBytes();
+      final supabase = SupabaseClientManager().client;
+      final bucket = 'profiles';
+      final fileName =
+          "parent_${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+      // Upload to Supabase Storage
+      await supabase.storage
+          .from(bucket)
+          .uploadBinary(
+            fileName,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      // Get public URL
+      String publicUrl = supabase.storage.from(bucket).getPublicUrl(fileName);
+
+      if (publicUrl.isEmpty) {
+        publicUrl = await supabase.storage
+            .from(bucket)
+            .createSignedUrl(fileName, 3600);
+      }
+
+      // Update profile with new image URL
+      if (mounted) {
+        await context.read<ProfileCubit>().updateProfile(userId, {
+          'profile_image': publicUrl,
+        });
+
+        setState(() {
+          _profileImageUrl = publicUrl;
+          _isUploadingImage = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile picture updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() => _isUploadingImage = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to upload image: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -115,12 +189,45 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: AppColors.surfaceLight,
-                          backgroundImage: _profileImageUrl != null
-                              ? NetworkImage(_profileImageUrl!) as ImageProvider
-                              : const AssetImage(AppAssets.babyMom),
+                        Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () => _pickAndUploadProfileImage(userId),
+                              child: CircleAvatar(
+                                radius: 36,
+                                backgroundColor: AppColors.surfaceLight,
+                                backgroundImage: _profileImageUrl != null
+                                    ? NetworkImage(_profileImageUrl!)
+                                          as ImageProvider
+                                    : const AssetImage(AppAssets.babyMom),
+                                child: _isUploadingImage
+                                    ? const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -262,9 +369,49 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   // === Logout Button ===
                   ElevatedButton(
                     onPressed: () async {
-                      await supabase.auth.signOut();
-                      if (mounted) {
-                        Navigator.of(context).pushReplacementNamed('/login');
+                      final shouldLogout = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Logout'),
+                          content: const Text(
+                            'Are you sure you want to logout?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text(
+                                'Logout',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldLogout == true && mounted) {
+                        try {
+                          await context.read<AuthCubit>().signOut();
+                          if (mounted) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRoutes.login,
+                              (route) => false,
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Logout failed: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

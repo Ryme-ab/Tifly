@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
+import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:tifli/features/home/presentation/screens/home_screen.dart';
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/schedules_menu_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointments_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_details_screen.dart';
-
 import 'package:tifli/features/schedules/presentation/screens/meal_planner_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/medicine_schedule_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
@@ -21,16 +23,14 @@ import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dar
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/growth_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/souvenirs_screen.dart';
-
 import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
-
 import 'package:tifli/features/profiles/presentation/screens/create_profile_screen.dart';
-import 'package:tifli/features/profiles/presentation/screens/add_baby_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
+import 'package:tifli/features/profiles/presentation/screens/settings_screen.dart';
+import 'package:tifli/features/profiles/data/models/child_model.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
-import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:tifli/features/logs/data/models/logs_model.dart';
 
 class AppRoutes {
   // Auth
@@ -77,6 +77,7 @@ class AppRoutes {
   static const String createProfile = '/profiles/create-profile';
   static const String myBabies = '/profiles/my-babies';
   static const String parentProfile = '/profiles/parent';
+  static const String settings = '/settings';
 
   // Admin
   static const String adminDashboard = '/admin/dashboard';
@@ -98,7 +99,12 @@ class AppRouter {
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case AppRoutes.home:
-        return MaterialPageRoute(builder: (_) => const HomePage());
+        return MaterialPageRoute(
+          builder: (_) => Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'Home'),
+            child: const HomePage(),
+          ),
+        );
 
       // Schedules
       case AppRoutes.schedules:
@@ -162,29 +168,39 @@ class AppRouter {
 
       // Profiles
       case AppRoutes.babyProfile:
-        return MaterialPageRoute(builder: (_) => const BabyProfileScreen());
+        final childData = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'Baby Profile'),
+            child: BabyProfileScreen(childData: childData as ChildModel?),
+          ),
+        );
       case AppRoutes.createBaby:
-<<<<<<< HEAD
-      // return MaterialPageRoute(builder: (_) => const CreateBabyScreen());
-      case AppRoutes.createProfile:
-        return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
-      case AppRoutes.myBabies:
-      // return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
-=======
         return MaterialPageRoute(builder: (_) => const AddBabyScreen());
       case AppRoutes.createProfile:
         return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
       case AppRoutes.myBabies:
-        final args = settings.arguments as Map<String, dynamic>?;
-        if (args != null && args['parentId'] != null) {
-          return MaterialPageRoute(
-            builder: (_) => MyBabiesPage(parentId: args['parentId']),
-          );
-        }
-        return _errorRoute(settings);
->>>>>>> a029d001b8937ea692e186bbc657b3ac8291b7d1
+        return MaterialPageRoute(
+          builder: (_) => Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'My Babies'),
+            child: const MyBabiesPage(),
+          ),
+        );
       case AppRoutes.parentProfile:
-        return MaterialPageRoute(builder: (_) => const ParentProfileScreen());
+        return MaterialPageRoute(
+          builder: (_) => Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'Parent Profile'),
+            child: const ParentProfileScreen(),
+          ),
+        );
+
+      case AppRoutes.settings:
+        return MaterialPageRoute(
+          builder: (_) => Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'Settings'),
+            child: const SettingsScreen(),
+          ),
+        );
 
       // Admin
       case AppRoutes.adminDashboard:

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
 import 'package:tifli/features/navigation/presentation/widgets/drawer_footer.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
@@ -144,7 +147,10 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.settings_outlined,
                     title: "Settings",
-                    onTap: () => Navigator.pushNamed(context, "/settings"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, AppRoutes.settings);
+                    },
                   ),
 
                   menuItem(
@@ -156,8 +162,51 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.logout,
                     title: "Logout",
-                    onTap: () {
-                      // TODO: Add logout logic
+                    onTap: () async {
+                      final shouldLogout = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Logout'),
+                          content: const Text(
+                            'Are you sure you want to logout?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text(
+                                'Logout',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldLogout == true && context.mounted) {
+                        try {
+                          await context.read<AuthCubit>().signOut();
+                          if (context.mounted) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRoutes.login,
+                              (route) => false,
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Logout failed: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
                     },
                   ),
                 ],

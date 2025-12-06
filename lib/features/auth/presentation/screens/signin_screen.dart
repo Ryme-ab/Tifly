@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/navigation/app_router.dart';
-import '../../data/models/user_model.dart';
-import '../cubit/signin_cubit.dart';
-import '../cubit/signin_state.dart';
+import '../cubit/auth_cubit.dart';
+import '../cubit/auth_state.dart';
 import 'login_screen.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -180,14 +179,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ? null
                                 : () {
                                     if (_formKey.currentState!.validate()) {
-                                      final user = UserModel(
+                                      context.read<AuthCubit>().signUp(
+                                        emailController.text,
+                                        passwordController.text,
                                         fullName: fullNameController.text,
-                                        email: emailController.text,
                                         phone: phoneController.text,
-                                        pwd: passwordController.text,
                                       );
-
-                                      context.read<AuthCubit>().signUp(user);
                                     }
                                   },
                             child: state is AuthLoading

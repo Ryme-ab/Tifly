@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:tifli/core/utils/user_context.dart';
-import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
+import 'package:tifli/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -38,15 +38,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
           .eq('id', userId)
           .maybeSingle();
 
-      if (mounted) {
+      if (mounted && profile != null) {
         setState(() {
           _userProfile = profile;
+          // Load saved preferences
+          _notificationsEnabled = profile['notifications_enabled'] ?? true;
+          _darkModeEnabled = profile['dark_mode_enabled'] ?? false;
+          _soundEnabled = profile['sound_enabled'] ?? true;
           _isLoading = false;
         });
+      } else if (mounted) {
+        setState(() => _isLoading = false);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _updatePreference(String key, bool value) async {
+    try {
+      final userId = UserContext.getCurrentUserId();
+      if (userId == null) return;
+
+      await _supabase.from('profiles').update({key: value}).eq('id', userId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Settings updated'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update settings: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -65,13 +99,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              await context.read<AuthCubit>().signOut();
-              if (context.mounted) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.login,
-                  (route) => false,
-                );
+              try {
+                await context.read<AuthCubit>().signOut();
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.login,
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logout failed: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -147,6 +192,145 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _showChangePasswordDialog() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    bool obscureCurrent = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Change Password'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: currentPasswordController,
+                  obscureText: obscureCurrent,
+                  decoration: InputDecoration(
+                    labelText: 'Current Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscureCurrent
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () =>
+                          setState(() => obscureCurrent = !obscureCurrent),
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: newPasswordController,
+                  obscureText: obscureNew,
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscureNew ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () => setState(() => obscureNew = !obscureNew),
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: confirmPasswordController,
+                  obscureText: obscureConfirm,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm New Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscureConfirm
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () =>
+                          setState(() => obscureConfirm = !obscureConfirm),
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (newPasswordController.text !=
+                    confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Passwords do not match'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (newPasswordController.text.length < 6) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Password must be at least 6 characters'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                try {
+                  await _supabase.auth.updateUser(
+                    UserAttributes(password: newPasswordController.text),
+                  );
+
+                  if (context.mounted) {
+                    Navigator.pop(dialogContext);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Password changed successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error changing password: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFBE185D),
+              ),
+              child: const Text(
+                'Change',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -218,6 +402,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _notificationsEnabled,
                         onChanged: (value) {
                           setState(() => _notificationsEnabled = value);
+                          _updatePreference('notifications_enabled', value);
                         },
                         isDark: isDark,
                       ),
@@ -228,7 +413,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _darkModeEnabled,
                         onChanged: (value) {
                           setState(() => _darkModeEnabled = value);
-                          // TODO: Implement theme switching
+                          _updatePreference('dark_mode_enabled', value);
                         },
                         isDark: isDark,
                       ),
@@ -239,6 +424,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _soundEnabled,
                         onChanged: (value) {
                           setState(() => _soundEnabled = value);
+                          _updatePreference('sound_enabled', value);
+                        },
+                        isDark: isDark,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Security & Privacy Section
+                  _buildSection(
+                    title: 'Security & Privacy',
+                    isDark: isDark,
+                    children: [
+                      _buildSettingTile(
+                        icon: Icons.lock_outline,
+                        title: 'Change Password',
+                        subtitle: 'Update your password',
+                        onTap: () {
+                          _showChangePasswordDialog();
+                        },
+                        isDark: isDark,
+                      ),
+                      _buildSettingTile(
+                        icon: Icons.privacy_tip_outlined,
+                        title: 'Privacy Policy',
+                        subtitle: 'Read our privacy policy',
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Privacy Policy coming soon'),
+                            ),
+                          );
+                        },
+                        isDark: isDark,
+                      ),
+                      _buildSettingTile(
+                        icon: Icons.security_outlined,
+                        title: 'Data Security',
+                        subtitle: 'Your data is encrypted and secure',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Data Security'),
+                              content: const Text(
+                                'Your data is encrypted using industry-standard encryption. '
+                                'We never share your personal information with third parties.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
                         },
                         isDark: isDark,
                       ),

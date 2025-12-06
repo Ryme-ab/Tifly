@@ -7,32 +7,42 @@ class ProfileRemoteDataSource {
   ProfileRemoteDataSource(this.client);
 
   Future<ProfileParent?> fetchProfile(String userId) async {
-    final Map<String, dynamic>? res = await client
-        .from('profiles')
-        .select<Map<String, dynamic>>()
-        .eq('id', userId)
-        .maybeSingle(); // ✅ prevents crash if no row
+    try {
+      final response = await client
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
 
-    if (res == null) return null;
+      if (response == null) return null;
 
-    return ProfileParent.fromMap(res);
+      return ProfileParent.fromMap(response as Map<String, dynamic>);
+    } catch (e) {
+      print('Error fetching profile: $e');
+      return null;
+    }
   }
 
   Future<ProfileParent> updateProfile(
     String userId,
     Map<String, dynamic> data,
   ) async {
-    final Map<String, dynamic>? res = await client
-        .from('profiles')
-        .update(data)
-        .eq('id', userId)
-        .select<Map<String, dynamic>>()
-        .maybeSingle();
+    try {
+      final response = await client
+          .from('profiles')
+          .update(data)
+          .eq('id', userId)
+          .select()
+          .maybeSingle();
 
-    if (res == null) {
-      throw Exception('Failed to update profile for id: $userId');
+      if (response == null) {
+        throw Exception('Failed to update profile for id: $userId');
+      }
+
+      return ProfileParent.fromMap(response as Map<String, dynamic>);
+    } catch (e) {
+      print('Error updating profile: $e');
+      throw Exception('Failed to update profile: $e');
     }
-
-    return ProfileParent.fromMap(res);
   }
 }

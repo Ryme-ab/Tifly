@@ -1,22 +1,103 @@
 // lib/profile/baby_profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
+import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/features/profiles/data/models/child_model.dart';
+import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
+import 'package:tifli/features/profiles/presentation/screens/edit_baby_screen.dart';
+import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
+import 'package:intl/intl.dart';
 
-class BabyProfileScreen extends StatelessWidget {
-  const BabyProfileScreen({super.key});
+class BabyProfileScreen extends StatefulWidget {
+  final ChildModel? childData;
+
+  const BabyProfileScreen({super.key, this.childData});
+
+  @override
+  State<BabyProfileScreen> createState() => _BabyProfileScreenState();
+}
+
+class _BabyProfileScreenState extends State<BabyProfileScreen> {
+  late ChildModel? currentChildData;
+
+  @override
+  void initState() {
+    super.initState();
+    currentChildData = widget.childData;
+  }
+
+  Future<void> _navigateToEdit() async {
+    if (currentChildData == null) return;
+
+    // Get the ChildrenCubit to pass to the edit screen
+    final childrenCubit = context.read<ChildrenCubit>();
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (newContext) => BlocProvider.value(
+          value: childrenCubit,
+          child: Provider<AppBarConfig>(
+            create: (_) => AppBarConfig(title: 'Edit Baby Profile'),
+            child: EditBabyScreen(childData: currentChildData!),
+          ),
+        ),
+      ),
+    );
+
+    // Reload data if edit was successful
+    if (result == true && mounted) {
+      final userId = UserContext.getCurrentUserId();
+      if (userId != null) {
+        await context.read<ChildrenCubit>().loadChildren(userId);
+        // Get updated child data
+        final state = context.read<ChildrenCubit>().state;
+        if (state is ChildrenLoaded) {
+          final updatedChild = state.children.firstWhere(
+            (child) => child.id == currentChildData!.id,
+            orElse: () => currentChildData!,
+          );
+          setState(() {
+            currentChildData = updatedChild;
+          });
+        }
+      }
+    }
+  }
+
+  String _calculateAge(DateTime birthDate) {
+    final now = DateTime.now();
+    final age = now.year - birthDate.year;
+    final months = now.month - birthDate.month;
+
+    if (age < 1) {
+      final totalMonths = (now.year - birthDate.year) * 12 + months;
+      return '$totalMonths months';
+    } else if (months < 0 || (months == 0 && now.day < birthDate.day)) {
+      return '${age - 1} years old';
+    }
+    return '$age years old';
+  }
 
   @override
   Widget build(BuildContext context) {
-    // sample data — in real app, pass a Baby model to this page
-    final String name = "islam";
-    final String subtitle = "happy and healthy";
-    final String dob = "October 15, 2023";
-    final String gender = "Female";
+    // Use current data or fallback to sample data
+    final String name = currentChildData?.firstName ?? "islam";
+    final String subtitle = currentChildData != null
+        ? _calculateAge(currentChildData!.birthDate)
+        : "happy and healthy";
+    final String dob = currentChildData != null
+        ? DateFormat('MMMM dd, yyyy').format(currentChildData!.birthDate)
+        : "October 15, 2023";
+    final String gender = currentChildData?.gender ?? "Female";
+    final String? profileImage = currentChildData?.profileImage;
     final String notes =
-        "Islam loves bright colors and giggles when she sees her favorite soft toy, a pink bunny. She recently started trying solid foods, with a particular fondness for pureed carrots. No known allergies.";
+        "${currentChildData?.firstName ?? 'Baby'} loves bright colors and giggles when seeing favorite toys. Recently started trying solid foods. No known allergies.";
 
     return Scaffold(
       appBar: const CustomAppBar(title: "Baby Profile"),
@@ -41,7 +122,9 @@ class BabyProfileScreen extends StatelessWidget {
                   // avatar
                   CircleAvatar(
                     radius: 36,
-                    backgroundImage: AssetImage(AppAssets.baby1),
+                    backgroundImage: profileImage != null
+                        ? NetworkImage(profileImage)
+                        : AssetImage(AppAssets.baby1) as ImageProvider,
                     backgroundColor: Colors.grey[100],
                   ),
                   const SizedBox(width: 14),
@@ -89,9 +172,9 @@ class BabyProfileScreen extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.edit, size: 18),
-                      onPressed: () {
-                        // open edit profile
-                      },
+                      onPressed: currentChildData != null
+                          ? _navigateToEdit
+                          : null,
                     ),
                   ),
                 ],
@@ -127,7 +210,9 @@ class BabyProfileScreen extends StatelessWidget {
                         style: AppFonts.heading2.copyWith(fontSize: 14),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: currentChildData != null
+                            ? _navigateToEdit
+                            : null,
                         icon: const Icon(Icons.edit, size: 18),
                       ),
                     ],
@@ -181,7 +266,9 @@ class BabyProfileScreen extends StatelessWidget {
                         style: AppFonts.heading2.copyWith(fontSize: 14),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: currentChildData != null
+                            ? _navigateToEdit
+                            : null,
                         icon: const Icon(Icons.edit, size: 18),
                       ),
                     ],
@@ -198,9 +285,7 @@ class BabyProfileScreen extends StatelessWidget {
             SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  // navigate to edit details
-                },
+                onPressed: currentChildData != null ? _navigateToEdit : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(

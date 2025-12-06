@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'add_baby_profile_pic.dart'; // ✅ IMPORT PICTURE PAGE
 import 'package:tifli/features/profiles/data/models/baby_model.dart';
@@ -69,13 +68,16 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  SizedBox(width: 32),
-                  Text(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Text(
                     "Add Baby",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   ),
-                  CircleAvatar(radius: 16, backgroundColor: Colors.grey),
+                  const CircleAvatar(radius: 16, backgroundColor: Colors.grey),
                 ],
               ),
             ),
@@ -184,8 +186,8 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                       _bornHeightController.clear();
                       _bloodController.clear();
 
-                      // ✅ REDIRECT TO PICTURE PAGE
-                      Navigator.pushReplacement(
+                      // ✅ REDIRECT TO PICTURE PAGE (using push to preserve back navigation)
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => AddBabyProfilePictureScreen(
@@ -210,7 +212,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                   }
                 },
                 child: const Text(
-                  "Save Baby",
+                  "Next Step ",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),

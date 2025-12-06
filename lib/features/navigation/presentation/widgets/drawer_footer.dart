@@ -68,9 +68,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Parent Profile
-          Expanded(
-            child: _buildParentProfile(),
-          ),
+          Expanded(child: _buildParentProfile()),
           const SizedBox(width: 12),
           // Baby Selector
           _buildBabySelector(),
@@ -97,37 +95,42 @@ class _DrawerFooterState extends State<DrawerFooter> {
     final fullName = _parentProfile?['full_name'] ?? 'Parent';
     final profileImage = _parentProfile?['profile_image'];
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 14,
-            backgroundImage: profileImage != null
-                ? NetworkImage(profileImage)
-                : null,
-            backgroundColor: Colors.grey.shade300,
-            child: profileImage == null
-                ? Icon(Icons.person, size: 16, color: Colors.grey.shade600)
-                : null,
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              fullName,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/profiles/parent');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 14,
+              backgroundImage: profileImage != null
+                  ? NetworkImage(profileImage)
+                  : null,
+              backgroundColor: Colors.grey.shade300,
+              child: profileImage == null
+                  ? Icon(Icons.person, size: 16, color: Colors.grey.shade600)
+                  : null,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                fullName,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -166,7 +169,8 @@ class _DrawerFooterState extends State<DrawerFooter> {
             );
 
             return GestureDetector(
-              onTap: () => _showBabySelector(context, children, selectedChildId),
+              onTap: () =>
+                  _showBabySelector(context, children, selectedChildId),
               child: CircleAvatar(
                 radius: 20,
                 backgroundImage: selectedChild.profileImage != null
@@ -208,10 +212,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
           children: [
             const Text(
               'Select Baby',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ...children.map((child) {
@@ -236,7 +237,9 @@ class _DrawerFooterState extends State<DrawerFooter> {
                 title: Text(
                   child.firstName,
                   style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
                 trailing: isSelected
@@ -245,11 +248,11 @@ class _DrawerFooterState extends State<DrawerFooter> {
                 onTap: () {
                   // Use the parent context here, not bottomSheetContext
                   context.read<ChildSelectionCubit>().selectChild(
-                        child.id,
-                        child.firstName,
-                      );
+                    child.id,
+                    child.firstName,
+                  );
                   Navigator.pop(bottomSheetContext);
-                  
+
                   // Show confirmation
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

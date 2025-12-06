@@ -7,7 +7,6 @@ import 'package:tifli/features/logs/presentation/cubit/growth_logs_state.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
-import 'package:tifli/core/config/test_config.dart';
 
 class GrowthLogsScreen extends StatefulWidget {
   const GrowthLogsScreen({super.key});
