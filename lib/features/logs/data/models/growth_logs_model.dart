@@ -1,5 +1,6 @@
 class GrowthLog {
   final String id;
+  final String userId;
   final String childId;
   final DateTime date;
   final double height;
@@ -10,6 +11,7 @@ class GrowthLog {
 
   GrowthLog({
     required this.id,
+    required this.userId,
     required this.childId,
     required this.date,
     required this.height,
@@ -22,6 +24,7 @@ class GrowthLog {
   factory GrowthLog.fromJson(Map<String, dynamic> json) {
     return GrowthLog(
       id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
       date: json['date'] != null
           ? DateTime.parse(json['date'])
@@ -46,6 +49,7 @@ class GrowthLog {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'user_id': userId,
       'child_id': childId,
       'date': date.toIso8601String(),
       'height': height,
@@ -58,6 +62,7 @@ class GrowthLog {
 
   GrowthLog copyWith({
     String? id,
+    String? userId,
     String? childId,
     DateTime? date,
     double? height,
@@ -68,6 +73,7 @@ class GrowthLog {
   }) {
     return GrowthLog(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       childId: childId ?? this.childId,
       date: date ?? this.date,
       height: height ?? this.height,

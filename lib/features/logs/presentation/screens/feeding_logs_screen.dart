@@ -155,6 +155,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                     // Convert map back to FeedingLog
                     final updatedLog = FeedingLog(
                       id: log.id,
+                      userId: log.userId,
                       childId: log.childId,
                       mealType: updated['type'] ?? log.mealType,
                       amount:

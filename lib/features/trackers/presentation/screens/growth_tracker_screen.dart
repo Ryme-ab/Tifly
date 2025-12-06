@@ -5,6 +5,7 @@ import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 
 class GrowthPage extends StatefulWidget {
   const GrowthPage({super.key, this.showTracker = true});
@@ -90,6 +91,10 @@ class _GrowthPageState extends State<GrowthPage> {
         bmiController.clear();
         notesController.clear();
       });
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.growthLogs);
+      }
     } catch (e) {
       if (e.toString().contains("already exists")) {
         ScaffoldMessenger.of(context).showSnackBar(
