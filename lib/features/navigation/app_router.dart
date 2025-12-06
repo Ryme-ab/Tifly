@@ -161,7 +161,14 @@ class AppRouter {
 
       // Profiles
       case AppRoutes.babyProfile:
-        return MaterialPageRoute(builder: (_) => const BabyProfileScreen());
+        final args = settings.arguments as Map<String, dynamic>?;
+        final babyId = args?['babyId'] as String?;
+        if (babyId == null) {
+          return _errorRoute(settings);
+        }
+        return MaterialPageRoute(
+          builder: (_) => BabyProfileScreen(babyId: babyId),
+        );
       case AppRoutes.createBaby:
       // return MaterialPageRoute(builder: (_) => const CreateBabyScreen());
       case AppRoutes.createProfile:
