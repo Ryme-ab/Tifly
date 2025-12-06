@@ -1,24 +1,20 @@
-import '../../data/models/baby_model.dart';
+abstract class ProfileState {}
 
-abstract class BabyState {}
+class ProfileInitial extends ProfileState {}
 
-class BabyInitial extends BabyState {}
+class ProfileLoading extends ProfileState {}
 
-class BabyLoading extends BabyState {}
-
-/// ✅ For fetching list of babies
-class BabyLoaded extends BabyState {
-  final List<Baby> babies;
-  BabyLoaded(this.babies);
+class ProfileLoaded extends ProfileState {
+  final Map<String, dynamic> profile;
+  ProfileLoaded(this.profile);
 }
 
-/// ✅ For successful image upload / update
-class BabySuccess extends BabyState {
-  final Baby baby;
-  BabySuccess(this.baby);
+class ProfileUpdated extends ProfileState {
+  final Map<String, dynamic> profile;
+  ProfileUpdated(this.profile);
 }
 
-class BabyError extends BabyState {
+class ProfileError extends ProfileState {
   final String message;
-  BabyError(this.message);
+  ProfileError(this.message);
 }

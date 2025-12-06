@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+<<<<<<< HEAD
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // --- Supabase Core ---
 import 'package:tifli/core/config/supabaseClient.dart';
+=======
+import 'package:provider/provider.dart' as provider;
+// flutter_bloc and local supabase client manager not required here
+import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
+import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
+>>>>>>> a029d001b8937ea692e186bbc657b3ac8291b7d1
 
 // --- Test Configuration (REMOVE IN PRODUCTION) ---
 import 'package:tifli/core/config/test_config.dart';
@@ -75,6 +82,7 @@ Future<void> main() async {
 
   final supabase = SupabaseClientManager().client;
 
+<<<<<<< HEAD
   runApp(
     MultiBlocProvider(
       providers: [
@@ -192,6 +200,46 @@ Future<void> main() async {
           home: const SplashScreen(),
           onGenerateRoute: AppRouter.generateRoute,
         ),
+=======
+  // Create shared app-level providers
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final ValueNotifier<AppBarConfig> appBarNotifier = ValueNotifier(
+    AppBarConfig(
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_none, color: Colors.black87),
+          onPressed: () {},
+        ),
+      ],
+    ),
+  );
+
+  runApp(MyApp(scaffoldKey: scaffoldKey, appBarNotifier: appBarNotifier));
+}
+
+class MyApp extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  final ValueNotifier<AppBarConfig> appBarNotifier;
+
+  const MyApp({
+    super.key,
+    required this.scaffoldKey,
+    required this.appBarNotifier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return provider.MultiProvider(
+      providers: [
+        provider.Provider<GlobalKey<ScaffoldState>>.value(value: scaffoldKey),
+        provider.ValueListenableProvider<AppBarConfig>.value(
+          value: appBarNotifier,
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const ParentProfileScreen(),
+>>>>>>> a029d001b8937ea692e186bbc657b3ac8291b7d1
       ),
     ),
   );
