@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'package:tifli/features/schedules/presentation/cubit/checklist_state.dart';
 import 'package:tifli/features/schedules/presentation/cubit/schedules_cubit.dart';
 import 'package:tifli/features/schedules/data/models/schedules_model.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
@@ -25,7 +28,7 @@ class _ChecklistPageState extends State<ChecklistPage> {
     });
   }
 
-  void addItem() {
+  void addItem() async {
     if (newItemController.text.trim().isEmpty) return;
     context.read<ChecklistCubit>().addItem(newItemController.text.trim() as ChecklistItem);
     newItemController.clear();
