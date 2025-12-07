@@ -8,13 +8,13 @@ import 'package:tifli/features/logs/presentation/cubit/baby_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/baby_logs_state.dart';
 import 'package:tifli/features/logs/data/models/baby_log_model.dart';
 
-import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
-// import 'package:tifli/features/profiles/presentation/cubit/children_state.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+// import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 
 import 'feeding_logs_screen.dart';
 import 'sleeping_logs_screen.dart';
 import 'medication_logs_screen.dart';
-import 'package:tifli/core/config/test_config.dart'; // For test child ID
+// For test child ID
 
 class BabyLogsReportsPage extends StatefulWidget {
   const BabyLogsReportsPage({super.key});
@@ -24,18 +24,27 @@ class BabyLogsReportsPage extends StatefulWidget {
 }
 
 class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
-  String? selectedChildId;
-
   @override
   void initState() {
     super.initState();
-    // Load baby logs data when screen is initialized
-    // Using test child ID - replace with actual child ID in production
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (selectedChildId != null) {
-        context.read<BabyLogsCubit>().loadAllLogs(selectedChildId!);
-      }
+      _initializeFromCubit();
     });
+  }
+
+  void _initializeFromCubit() {
+    final cubit = context.read<ChildSelectionCubit>();
+    cubit.stream.listen(_handleChildSelectionState);
+    _handleChildSelectionState(cubit.state);
+  }
+
+  void _handleChildSelectionState(ChildSelectionState state) {
+    if (!mounted) return;
+    if (state is ChildSelected) {
+      context.read<BabyLogsCubit>().loadAllLogs(state.childId);
+    }
+    // If NoChildSelected, the BabyLogsCubit builder in the body will handle showing an empty/prompt state if needed,
+    // or we can clear logs here. For now, the builder handles the view.
   }
 
   @override
@@ -51,66 +60,6 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
       body: Column(
         children: [
           const SizedBox(height: 12),
-
-          // ---------------------
-          // BABY DROPDOWN
-          // ---------------------
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: BlocBuilder<ChildrenCubit, ChildrenState>(
-              builder: (context, state) {
-                if (state is ChildrenLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is ChildrenError) {
-                  return Text("Error loading children: ${state.message}");
-                }
-
-                if (state is ChildrenLoaded) {
-                  final babies = state.children;
-
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Select Baby",
-                      ),
-                      value: selectedChildId,
-                      items: babies
-                          .map(
-                            (child) => DropdownMenuItem(
-                              value: child.id,
-                              child: Text(child.firstName),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() => selectedChildId = value);
-
-                        if (value != null) {
-                          context.read<BabyLogsCubit>().loadAllLogs(value);
-                        }
-                      },
-                    ),
-                  );
-                }
-
-                return Container();
-              },
-            ),
-          ),
 
           const SizedBox(height: 16),
 
@@ -217,6 +166,21 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
                             if (state is BabyLogsLoaded) {
                               return LogTable(logs: state.logs);
+                            }
+
+                            // Check global selection state if waiting
+                            final selectionState = context
+                                .watch<ChildSelectionCubit>()
+                                .state;
+                            if (selectionState is NoChildSelected) {
+                              return const Padding(
+                                padding: EdgeInsets.all(32.0),
+                                child: Center(
+                                  child: Text(
+                                    "Please select a baby from the drawer to view logs",
+                                  ),
+                                ),
+                              );
                             }
 
                             return const Padding(

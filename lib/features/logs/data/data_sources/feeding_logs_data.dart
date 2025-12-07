@@ -23,7 +23,7 @@ class FeedingLogDataSource {
         .insert(log.toJson())
         .select()
         .single();
-    
+
     return FeedingLog.fromJson(response);
   }
 
@@ -35,7 +35,7 @@ class FeedingLogDataSource {
         .eq('user_id', userId)
         .select()
         .single();
-    
+
     return FeedingLog.fromJson(response);
   }
 

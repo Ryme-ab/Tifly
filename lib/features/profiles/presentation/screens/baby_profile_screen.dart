@@ -1,18 +1,17 @@
 // lib/profile/baby_profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
-import 'package:tifli/core/constants/app_assets.dart';
-import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:intl/intl.dart';
 import 'edit_baby_screen.dart';
 import 'package:tifli/features/navigation/presentation/screens/drawer.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
 
 class BabyProfileScreen extends StatefulWidget {
-  final String babyId;
-  
-  const BabyProfileScreen({super.key, required this.babyId});
+  const BabyProfileScreen({super.key});
 
   @override
   State<BabyProfileScreen> createState() => _BabyProfileScreenState();
@@ -26,30 +25,63 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBabyData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeFromCubit();
+    });
   }
 
-  Future<void> _fetchBabyData() async {
-    try {
-      final response = await SupabaseClientManager()
-          .client
-          .from('children')
-          .select()
-          .eq('id', widget.babyId)
-          .single();
-      
+  void _initializeFromCubit() {
+    final cubit = context.read<ChildSelectionCubit>();
+    cubit.stream.listen(_handleChildSelectionState);
+    _handleChildSelectionState(cubit.state);
+  }
+
+  void _handleChildSelectionState(ChildSelectionState state) {
+    if (!mounted) return;
+
+    if (state is ChildSelected) {
+      _fetchBabyData(state.childId);
+    } else if (state is NoChildSelected) {
       setState(() {
-        _babyData = response;
+        _babyData = null;
         _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
+        _error = "No baby selected. Please select a baby from the drawer.";
       });
     }
   }
 
+  Future<void> _fetchBabyData(String babyId) async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final response = await SupabaseClientManager().client
+          .from('children')
+          .select()
+          .eq('id', babyId)
+          .single();
+
+      if (mounted) {
+        setState(() {
+          _babyData = response;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // ---------- UI Helpers ----------
   String _formatDate(String? dateString) {
     if (dateString == null) return 'Unknown';
     try {
@@ -65,10 +97,26 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
     return text[0].toUpperCase() + text.substring(1);
   }
 
+  // ---------- MAIN BUILD ----------
   @override
   Widget build(BuildContext context) {
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
+    return Provider.value(
+      value: scaffoldKey,
+      child: _buildPage(context, scaffoldKey),
+    );
+  }
+
+  // ---------- PAGE CONTENT ----------
+  Widget _buildPage(
+    BuildContext context,
+    GlobalKey<ScaffoldState> scaffoldKey,
+  ) {
     if (_isLoading) {
       return Scaffold(
+        key: scaffoldKey,
+        drawer: const Tiflidrawer(),
         appBar: const CustomAppBar(title: "Baby Profile"),
         backgroundColor: Colors.white,
         body: const Center(child: CircularProgressIndicator()),
@@ -77,6 +125,8 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
 
     if (_error != null) {
       return Scaffold(
+        key: scaffoldKey,
+        drawer: const Tiflidrawer(),
         appBar: const CustomAppBar(title: "Baby Profile"),
         backgroundColor: Colors.white,
         body: Center(
@@ -95,10 +145,29 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
                     _isLoading = true;
                     _error = null;
                   });
-                  _fetchBabyData();
+                  final state = context.read<ChildSelectionCubit>().state;
+                  if (state is ChildSelected) {
+                    _fetchBabyData(state.childId);
+                  } else {
+                    setState(() {
+                      _isLoading = false;
+                      _error =
+                          "No baby selected. Please select a baby from the drawer.";
+                    });
+                  }
                 },
                 child: const Text('Retry'),
               ),
+              if (_error ==
+                  "No baby selected. Please select a baby from the drawer.") ...[
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    scaffoldKey.currentState!.openDrawer();
+                  },
+                  child: const Text('Open Drawer'),
+                ),
+              ],
             ],
           ),
         ),
@@ -114,267 +183,115 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
     final circum = _babyData?['circum']?.toString() ?? 'Not specified';
 
     return Scaffold(
-      appBar: const CustomAppBar(title: "Baby Profile"),
-      backgroundColor: Colors.white,
+      key: scaffoldKey,
       drawer: const Tiflidrawer(),
+      appBar: const CustomAppBar(title: "Baby Profile"),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // top card with avatar and name
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
-              decoration: BoxDecoration(
-                color: const Color(
-                  0xFFEFFAFB,
-                ), // very light aqua from screenshot
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.08)),
-              ),
-              child: Row(
+            // PROFILE IMAGE & NAME CENTERED
+            Center(
+              child: Column(
                 children: [
-                  // avatar
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundImage: _babyData?['profile_image'] != null
-                        ? NetworkImage(_babyData!['profile_image'])
-                        : null,
-                    backgroundColor: Colors.grey[200],
-                    child: _babyData?['profile_image'] == null
-                        ? Icon(Icons.child_care, size: 36, color: Colors.grey[400])
-                        : null,
-                  ),
-                  const SizedBox(width: 14),
-                  // name & subtitle
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: AppFonts.heading2.copyWith(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimaryLight,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Happy and healthy',
-                          style: AppFonts.body.copyWith(
-                            fontSize: 13,
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // edit icon (floating small)
                   Container(
-                    width: 36,
-                    height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.grey.withValues(alpha: 0.12),
-                      ),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.edit, size: 18),
-                      onPressed: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EditBabyScreen(babyData: _babyData!),
-                          ),
-                        );
-                        if (result == true) {
-                          // Refresh data after edit
-                          _fetchBabyData();
-                        }
-                      },
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _babyData?['profile_image'] != null
+                          ? NetworkImage(_babyData!['profile_image'])
+                          : null,
+                      backgroundColor: Colors.grey[200],
+                      child: _babyData?['profile_image'] == null
+                          ? Icon(
+                              Icons.child_care,
+                              size: 50,
+                              color: Colors.grey[400],
+                            )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    name,
+                    style: AppFonts.heading2.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_calculateAge(_babyData?['birth_date'] ?? '')} ',
+                    style: AppFonts.body.copyWith(
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 32),
 
-            // Basic Information card
+            // UNIFIED DETAILS CARD
             Container(
-              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.12)),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // header row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Basic Information",
-                        style: AppFonts.heading2.copyWith(fontSize: 14),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EditBabyScreen(babyData: _babyData!),
-                            ),
-                          );
-                          if (result == true) {
-                            _fetchBabyData();
-                          }
-                        },
-                        icon: const Icon(Icons.edit, size: 18),
-                      ),
-                    ],
+                  _buildDetailTile(Icons.cake, "Date of Birth", dob),
+                  _buildDivider(),
+                  _buildDetailTile(Icons.wc, "Gender", gender),
+                  _buildDivider(),
+                  _buildDetailTile(Icons.bloodtype, "Blood Type", bloodType),
+                  _buildDivider(),
+                  _buildDetailTile(
+                    Icons.monitor_weight,
+                    "Birth Weight",
+                    "$bornWeight kg",
                   ),
-                  const SizedBox(height: 8),
-                  // row: dob
-                  Row(
-                    children: [
-                      const Icon(Icons.cake, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text("Date of birth", style: AppFonts.small),
-                      ),
-                      Text(dob, style: AppFonts.body),
-                    ],
+                  _buildDivider(),
+                  _buildDetailTile(
+                    Icons.height,
+                    "Birth Height",
+                    "$bornHeight cm",
                   ),
-                  const SizedBox(height: 12),
-                  // row: gender
-                  Row(
-                    children: [
-                      const Icon(Icons.wc, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text("Gender", style: AppFonts.small)),
-                      Text(gender, style: AppFonts.body),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // row: blood type
-                  Row(
-                    children: [
-                      const Icon(Icons.bloodtype, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text("Blood Type", style: AppFonts.small)),
-                      Text(bloodType, style: AppFonts.body),
-                    ],
+                  _buildDivider(),
+                  _buildDetailTile(
+                    Icons.circle_outlined,
+                    "Head Circumference",
+                    "$circum cm",
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
-            // Birth Details card
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.14),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Birth Details",
-                        style: AppFonts.heading2.copyWith(fontSize: 14),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EditBabyScreen(babyData: _babyData!),
-                            ),
-                          );
-                          if (result == true) {
-                            _fetchBabyData();
-                          }
-                        },
-                        icon: const Icon(Icons.edit, size: 18),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.monitor_weight, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text("Birth Weight", style: AppFonts.small)),
-                      Text('$bornWeight kg', style: AppFonts.body),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.height, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text("Birth Height", style: AppFonts.small)),
-                      Text('$bornHeight cm', style: AppFonts.body),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.radio_button_unchecked, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text("Head Circumference", style: AppFonts.small)),
-                      Text('$circum cm', style: AppFonts.body),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Label for edit button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                'Quick Actions',
-                style: AppFonts.heading2.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Edit baby details button (full width)
+            // EDIT BUTTON
             SizedBox(
-              height: 48,
+              width: double.infinity,
+              height: 54,
               child: ElevatedButton.icon(
                 onPressed: () async {
                   final result = await Navigator.push(
@@ -383,29 +300,134 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
                       builder: (_) => EditBabyScreen(babyData: _babyData!),
                     ),
                   );
-                  if (result == true) {
-                    _fetchBabyData();
+                  if (result == true && _babyData != null) {
+                    _fetchBabyData(_babyData!['id']);
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
+                  elevation: 2,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  elevation: 0,
                 ),
-                icon: const Icon(Icons.edit, size: 20),
+                icon: const Icon(Icons.edit_outlined, color: Colors.white),
                 label: const Text(
-                  "Edit baby details",
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  "Edit Profile",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-
-            const SizedBox(height: 18),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildDetailTile(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: Colors.grey.withOpacity(0.08),
+      indent: 20,
+      endIndent: 20,
+    );
+  }
+
+  String _calculateAge(String dobString) {
+    if (dobString.isEmpty) return 'Unknown age';
+    try {
+      // Assuming dobString is in a parseable format (e.g. "MMMM dd, yyyy" from _formatDate,
+      // but better to use original ISO string.
+      // However _formatDate returns formatted string.
+      // Let's re-parse from _babyData directly if possible or parse the formatted string if we trust format.
+      // Better conceptual approach: Pass the raw ISO string to this helper.
+
+      // Let's use _babyData directly in the build method, but here we can try to parse.
+      // If we passed the formatted string "MMMM dd, yyyy", we can parse that back.
+      // But let's assume we pass the raw string to this function in updated build call?
+      // Wait, in build we passed `dob` which is formatted.
+      // Strategy: Let's parse the original `_babyData['birth_date']` in build and pass result here.
+      // Actually, let's just use _babyData['birth_date'] inside this function if available,
+      // or change call site.
+
+      // Simpler: Let's make this function take DateTime or ISO string.
+      // But for this patch, let's fix the call site in next step.
+      // For now, I will write generic logic that takes ISO string.
+
+      final dob = DateTime.parse(dobString);
+      final now = DateTime.now();
+
+      int years = now.year - dob.year;
+      int months = now.month - dob.month;
+      int days = now.day - dob.day;
+
+      if (months < 0 || (months == 0 && days < 0)) {
+        years--;
+        months += 12;
+      }
+      if (days < 0) {
+        months--;
+        final previousMonth = DateTime(now.year, now.month, 0);
+        days += previousMonth.day;
+      }
+
+      if (years > 0) {
+        return '$years ${years == 1 ? "year" : "years"} old';
+      } else if (months > 0) {
+        return '$months ${months == 1 ? "month" : "months"} old';
+      } else {
+        return '$days ${days == 1 ? "day" : "days"} old';
+      }
+    } catch (e) {
+      return 'Unknown age';
+    }
   }
 }

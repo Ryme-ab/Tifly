@@ -101,16 +101,16 @@ class BabyLog {
     final weight = json['weight'] ?? 0.0;
     final height = json['height'] ?? 0.0;
     final headcir = json['head_circumference'] ?? 0.0;
-    final unit_height = json['unit_height'] ?? 0.0;
-    final unit_weight = json['unit_weight'] ?? 0.0;
-    final unit_head_circ = json['unit_head_circ'] ?? 0.0;
+    final unitHeight = json['unit_height'] ?? 0.0;
+    final unitWeight = json['unit_weight'] ?? 0.0;
+    final unitHeadCirc = json['unit_head_circ'] ?? 0.0;
     return BabyLog(
       id: json['id'] ?? '',
       type: LogType.growth,
       timestamp: recordDate,
       title: 'Growth Check',
       details:
-          'Weight: ${weight}${unit_height}\nHeight: ${height}${unit_weight} \nCircumenference: ${headcir}${unit_head_circ}',
+          'Weight: $weight$unitHeight\nHeight: $height$unitWeight \nCircumenference: $headcir$unitHeadCirc',
       metadata: json,
     );
   }

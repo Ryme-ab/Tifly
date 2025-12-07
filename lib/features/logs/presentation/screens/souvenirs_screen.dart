@@ -8,9 +8,7 @@ class SouvenirsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Souvenirs'),
-      body: const Center(
-        child: Text('Souvenirs Screen - Coming Soon'),
-      ),
+      body: const Center(child: Text('Souvenirs Screen - Coming Soon')),
     );
   }
 }

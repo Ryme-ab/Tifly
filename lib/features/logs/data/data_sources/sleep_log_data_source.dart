@@ -23,7 +23,7 @@ class SleepLogDataSource {
         .insert(log.toJson())
         .select()
         .single();
-    
+
     return SleepLog.fromJson(response);
   }
 
@@ -35,7 +35,7 @@ class SleepLogDataSource {
         .eq('user_id', userId)
         .select()
         .single();
-    
+
     return SleepLog.fromJson(response);
   }
 

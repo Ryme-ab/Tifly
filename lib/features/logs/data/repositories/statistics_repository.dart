@@ -6,5 +6,6 @@ class StatisticsRepository {
 
   StatisticsRepository({required this.dataSource});
 
-  Future<Statistics> getStatistics(String childId) => dataSource.getStatistics(childId);
+  Future<Statistics> getStatistics(String childId) =>
+      dataSource.getStatistics(childId);
 }

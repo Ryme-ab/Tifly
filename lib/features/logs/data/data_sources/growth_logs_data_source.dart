@@ -12,7 +12,7 @@ class GrowthLogDataSource {
         .select()
         .eq('user_id', userId)
         .eq('child_id', childId)
-        .order('created_at', ascending: false);
+        .order('date', ascending: false);
 
     return data.map<GrowthLog>((row) => GrowthLog.fromJson(row)).toList();
   }
@@ -40,10 +40,6 @@ class GrowthLogDataSource {
   }
 
   Future<void> deleteLog(String id, String userId) async {
-    await client
-        .from('growth')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+    await client.from('growth').delete().eq('id', id).eq('user_id', userId);
   }
 }

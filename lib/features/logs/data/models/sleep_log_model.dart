@@ -24,16 +24,16 @@ class SleepLog {
       id: json['id'] ?? '',
       userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
-      startTime: json['start_time'] != null 
-          ? DateTime.parse(json['start_time']) 
+      startTime: json['start_time'] != null
+          ? DateTime.parse(json['start_time'])
           : DateTime.now(),
-      endTime: json['end_time'] != null 
-          ? DateTime.parse(json['end_time']) 
+      endTime: json['end_time'] != null
+          ? DateTime.parse(json['end_time'])
           : DateTime.now(),
       quality: json['quality'] ?? '',
       description: json['descp'] ?? '',
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : DateTime.now(),
     );
   }

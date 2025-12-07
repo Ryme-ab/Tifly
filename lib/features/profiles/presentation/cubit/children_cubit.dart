@@ -20,4 +20,14 @@ class ChildrenCubit extends Cubit<ChildrenState> {
       emit(ChildrenError("Failed to load children"));
     }
   }
+
+  Future<void> deleteChild(String childId, String parentId) async {
+    try {
+      await repository.deleteChild(childId);
+      // Reload the list to reflect changes
+      await loadChildren(parentId);
+    } catch (e) {
+      emit(ChildrenError("Failed to delete child: $e"));
+    }
+  }
 }

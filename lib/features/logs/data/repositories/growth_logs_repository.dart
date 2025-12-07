@@ -14,5 +14,6 @@ class GrowthLogRepository {
   Future<GrowthLog> updateLog(String id, String userId, GrowthLog log) =>
       dataSource.updateLog(id, userId, log);
 
-  Future<void> deleteLog(String id, String userId) => dataSource.deleteLog(id, userId);
+  Future<void> deleteLog(String id, String userId) =>
+      dataSource.deleteLog(id, userId);
 }

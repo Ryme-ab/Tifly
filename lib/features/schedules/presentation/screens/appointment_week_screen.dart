@@ -138,13 +138,10 @@ class WeekAppointmentsView extends StatelessWidget {
         const SizedBox(height: 10),
 
         // appointment cards
-        ...appointmentsForDate(selected)
-            .map(
-              (a) => AppointmentCard(
-                time: a['time'] ?? '',
-                title: a['title'] ?? '',
-              ),
-            ),
+        ...appointmentsForDate(selected).map(
+          (a) =>
+              AppointmentCard(time: a['time'] ?? '', title: a['title'] ?? ''),
+        ),
       ],
     );
   }

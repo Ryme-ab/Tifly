@@ -24,11 +24,11 @@ class ChecklistItem {
       childId: json['child_id'] ?? '',
       title: json['title'] ?? '',
       done: json['done'] ?? false,
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : DateTime.now(),
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
           : DateTime.now(),
     );
   }
@@ -41,17 +41,17 @@ class ChecklistItem {
       'done': done,
       'updated_at': updatedAt.toIso8601String(),
     };
-    
+
     // Only include id if it's not empty (for updates)
     if (id.isNotEmpty) {
       json['id'] = id;
     }
-    
+
     // Only include created_at if it's not a new item
     if (id.isNotEmpty) {
       json['created_at'] = createdAt.toIso8601String();
     }
-    
+
     return json;
   }
 

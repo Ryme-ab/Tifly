@@ -4,21 +4,21 @@ class Statistics {
   final int todayMeals;
   final double avgMealsPerDay;
   final Map<String, int> mealTypeDistribution;
-  
+
   // Sleep statistics
   final int totalSleepSessions;
   final double avgSleepHoursPerDay;
   final double totalSleepHoursThisWeek;
   final Map<String, int> sleepQualityDistribution;
-  
+
   // Health/Medication statistics
   final int totalMedications;
   final int activeMedications;
-  
+
   // Growth statistics (if available)
   final double? latestWeight;
   final double? latestHeight;
-  
+
   Statistics({
     required this.totalMeals,
     required this.todayMeals,
@@ -72,8 +72,10 @@ class Statistics {
       mealTypeDistribution: mealTypeDistribution ?? this.mealTypeDistribution,
       totalSleepSessions: totalSleepSessions ?? this.totalSleepSessions,
       avgSleepHoursPerDay: avgSleepHoursPerDay ?? this.avgSleepHoursPerDay,
-      totalSleepHoursThisWeek: totalSleepHoursThisWeek ?? this.totalSleepHoursThisWeek,
-      sleepQualityDistribution: sleepQualityDistribution ?? this.sleepQualityDistribution,
+      totalSleepHoursThisWeek:
+          totalSleepHoursThisWeek ?? this.totalSleepHoursThisWeek,
+      sleepQualityDistribution:
+          sleepQualityDistribution ?? this.sleepQualityDistribution,
       totalMedications: totalMedications ?? this.totalMedications,
       activeMedications: activeMedications ?? this.activeMedications,
       latestWeight: latestWeight ?? this.latestWeight,

@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
       }
     } catch (e) {
       if (!mounted) return;
-      
+
       // On error, go to onboarding
       Navigator.pushReplacement(
         context,
@@ -134,7 +134,9 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 30,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
                   ),
                 ),
               ],

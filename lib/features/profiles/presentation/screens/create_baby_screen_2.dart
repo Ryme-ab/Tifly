@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'baby_profile_screen.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class AddBabyPage2 extends StatelessWidget {
   final String babyId;
@@ -8,30 +11,7 @@ class AddBabyPage2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFFBE185D);
-    const backgroundLight = Color(0xFFF8FAFC);
-    const backgroundDark = Color(0xFF1E293B);
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
-      theme: ThemeData(
-        fontFamily: 'Poppins',
-        colorScheme: const ColorScheme.light(
-          primary: primaryColor,
-          background: backgroundLight,
-        ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        fontFamily: 'Poppins',
-        colorScheme: const ColorScheme.dark(
-          primary: primaryColor,
-          background: backgroundDark,
-        ),
-      ),
-      home: AddBabyScreen(babyId: babyId),
-    );
+    return AddBabyScreen(babyId: babyId);
   }
 }
 
@@ -58,25 +38,12 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     const primaryColor = Color(0xFFBE185D);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      appBar: const CustomAppBar(title: "Add Baby"),
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            // HEADER
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  SizedBox(width: 32),
-                  Text(
-                    "Add Baby",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                  ),
-                  CircleAvatar(radius: 16, backgroundColor: Colors.grey),
-                ],
-              ),
-            ),
+            // HEADER removed
 
             // FORM
             Expanded(
@@ -182,12 +149,21 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                       _bornHeightController.clear();
                       _bloodController.clear();
 
+                      // Update global selection
+                      final updatedBaby = response.first;
+                      final firstName = updatedBaby['first_name'] ?? 'Baby';
+                      context.read<ChildSelectionCubit>().selectChild(
+                        widget.babyId,
+                        firstName,
+                      );
+
                       // ✅ REDIRECT TO BABY PROFILE
-                      Navigator.pushReplacement(
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => BabyProfileScreen(babyId: widget.babyId),
+                          builder: (_) => const BabyProfileScreen(),
                         ),
+                        (route) => route.isFirst,
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(

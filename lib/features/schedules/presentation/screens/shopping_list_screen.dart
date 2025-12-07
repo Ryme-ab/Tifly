@@ -241,7 +241,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-        appBar: const CustomAppBar(title: 'Shopping List'),
+      appBar: const CustomAppBar(title: 'Shopping List'),
       body: SafeArea(
         child: Stack(
           children: [
@@ -257,8 +257,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                   children: [
                     _buildSearchBar(),
                     const SizedBox(height: 12),
-                    ..._categories
-                        .map((cat) => _buildCategoryCard(cat)),
+                    ..._categories.map((cat) => _buildCategoryCard(cat)),
                   ],
                 ),
               ),
@@ -352,8 +351,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            ...items
-                .map((item) => _buildItemTile(category['id'], item)),
+            ...items.map((item) => _buildItemTile(category['id'], item)),
           ],
         ),
       ),

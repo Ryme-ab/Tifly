@@ -46,12 +46,25 @@ class ChecklistCubit extends Cubit<ChecklistState> {
     }
   }
 
-  Future<void> addItem(ChecklistItem item) async {
+  Future<void> addItem(String title) async {
     try {
       final userId = supabase.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
+      final childState = childSelectionCubit.state;
 
-      await repository.addChecklistItem(item);
+      if (userId == null) throw Exception('User not authenticated');
+      if (childState is! ChildSelected) throw Exception('No child selected');
+
+      final newItem = ChecklistItem(
+        id: '',
+        userId: userId,
+        childId: childState.childId,
+        title: title,
+        done: false,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      await repository.addChecklistItem(newItem);
       await loadChecklist();
     } catch (e) {
       emit(ChecklistError(e.toString()));

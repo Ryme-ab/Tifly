@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 
-
 class MedicineApp extends StatelessWidget {
   const MedicineApp({super.key});
 
@@ -21,8 +20,10 @@ class MedicineApp extends StatelessWidget {
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(12),
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 10,
+          ),
         ),
       ),
       home: const MedicineSchedulePage(),
@@ -53,19 +54,18 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
     'Everyday',
     'Every other day',
     'Weekdays',
-    'Custom'
+    'Custom',
   ];
 
   final List<String> _timeFreqOptions = [
     'Twice a day',
     'Once a day',
-    'Three times a day'
+    'Three times a day',
   ];
 
   @override
   Widget build(BuildContext context) {
     const primary = Color(0xFFC21E56);
-
 
     Widget filledDropdown<T>({
       required T value,
@@ -115,15 +115,15 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
           // Medicine Name
           TextField(
             controller: _medicineController,
-            decoration: const InputDecoration(
-              labelText: "Medicine Name",
-            ),
+            decoration: const InputDecoration(labelText: "Medicine Name"),
           ),
 
           const SizedBox(height: 20),
 
-          const Text("Dosage",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+          const Text(
+            "Dosage",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -167,8 +167,10 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
           const SizedBox(height: 20),
 
           // Duration
-          const Text("Duration",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+          const Text(
+            "Duration",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -197,15 +199,18 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.remove, color: primary),
-                        onPressed: () =>
-                            setState(() => durationValue = (durationValue > 1)
-                                ? durationValue - 1
-                                : durationValue),
+                        onPressed: () => setState(
+                          () => durationValue = (durationValue > 1)
+                              ? durationValue - 1
+                              : durationValue,
+                        ),
                       ),
                       Text(
                         "$durationValue",
                         style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add, color: primary),
@@ -222,8 +227,10 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
           const SizedBox(height: 20),
 
           // Frequency (styled as filled rounded dropdown to match design)
-          const Text("Frequency",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+          const Text(
+            "Frequency",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
           const SizedBox(height: 8),
           filledDropdown<String>(
             value: frequency,
@@ -236,8 +243,10 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
           const SizedBox(height: 20),
 
           // Appearance
-          const Text("Appearance",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+          const Text(
+            "Appearance",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -257,26 +266,31 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey.shade300),
                   ),
-                )
+                ),
             ],
           ),
 
           const SizedBox(height: 20),
 
           // Time of taking medication
-          const Text("Time of taking medication",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+          const Text(
+            "Time of taking medication",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
           const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                      color: Colors.pink.shade50,
-                      borderRadius: BorderRadius.circular(12)),
+                    color: Colors.pink.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: const Text("8:30"),
                 ),
               ),
@@ -318,8 +332,10 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
               const Text("Hours  Start:"),
               Container(
                 width: 70,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: Colors.pink.shade50,
@@ -357,7 +373,8 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
                   backgroundColor: primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),
@@ -374,7 +391,8 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
                   side: const BorderSide(color: primary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),

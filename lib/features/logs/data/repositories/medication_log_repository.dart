@@ -14,5 +14,6 @@ class MedicationRepository {
   Future<Medication> updateMedicine(String id, String userId, Medication med) =>
       dataSource.updateMedicine(id, userId, med);
 
-  Future<void> deleteMedicine(String id, String userId) => dataSource.deleteMedicine(id, userId);
+  Future<void> deleteMedicine(String id, String userId) =>
+      dataSource.deleteMedicine(id, userId);
 }

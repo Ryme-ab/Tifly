@@ -6,12 +6,14 @@ class SleepLogRepository {
 
   SleepLogRepository({required this.dataSource});
 
-  Future<List<SleepLog>> getLogs(String userId, String childId) => dataSource.getLogs(userId, childId);
+  Future<List<SleepLog>> getLogs(String userId, String childId) =>
+      dataSource.getLogs(userId, childId);
 
   Future<SleepLog> addLog(SleepLog log) => dataSource.addLog(log);
 
   Future<SleepLog> updateLog(String id, String userId, SleepLog log) =>
       dataSource.updateLog(id, userId, log);
 
-  Future<void> deleteLog(String id, String userId) => dataSource.deleteLog(id, userId);
+  Future<void> deleteLog(String id, String userId) =>
+      dataSource.deleteLog(id, userId);
 }

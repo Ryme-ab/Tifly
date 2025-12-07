@@ -29,12 +29,18 @@ class Meal {
       id: json['id']?.toString() ?? '',
       childId: json['child_id']?.toString() ?? '',
       userId: json['user_id']?.toString() ?? '',
-      mealTime: DateTime.parse(json['meal_time']?.toString() ?? DateTime.now().toIso8601String()),
+      mealTime: DateTime.parse(
+        json['meal_time']?.toString() ?? DateTime.now().toIso8601String(),
+      ),
       mealType: json['meal_type']?.toString() ?? '',
       items: json['items']?.toString() ?? '',
-      amount: json['amount'] is int ? json['amount'] as int : int.tryParse(json['amount']?.toString() ?? '0') ?? 0,
+      amount: json['amount'] is int
+          ? json['amount'] as int
+          : int.tryParse(json['amount']?.toString() ?? '0') ?? 0,
       status: json['status']?.toString(),
-      createdAt: DateTime.parse(json['created_at']?.toString() ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at']?.toString() ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 

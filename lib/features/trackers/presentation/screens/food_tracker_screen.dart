@@ -6,7 +6,6 @@ import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import '../cubit/meal_cubit.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/trackers/data/models/meal.dart'; // Adjust this import to your MealEntry/Model
 
@@ -46,6 +45,11 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     // If editing, pre-fill the form
     if (widget.existingEntry != null) {
       _selectedFeeding = widget.existingEntry!.mealType;
+      if (!_feedingOptions.contains(_selectedFeeding)) {
+         // If the loaded value isn't in our list, add it temporarily so it displays correctly
+         _feedingOptions.add(_selectedFeeding);
+      }
+      
       _quantity = widget.existingEntry!.amount;
       _selectedTime = TimeOfDay(
         hour: widget.existingEntry!.mealTime.hour,
@@ -117,14 +121,14 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     if (widget.existingEntry != null) {
       // EDIT MODE
       await context.read<MealCubit>().updateMeal(
-            id: widget.existingEntry!.id,
-            childId: childId,
-            mealTime: mealTime,
-            mealType: _selectedFeeding,
-            items: _notes.isNotEmpty ? _notes : _selectedFeeding,
-            amount: _quantity,
-            status: 'completed',
-          );
+        id: widget.existingEntry!.id,
+        childId: childId,
+        mealTime: mealTime,
+        mealType: _selectedFeeding,
+        items: _notes.isNotEmpty ? _notes : _selectedFeeding,
+        amount: _quantity,
+        status: 'completed',
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -135,13 +139,13 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     } else {
       // CREATE MODE
       await context.read<MealCubit>().addMeal(
-            childId: childId,
-            mealTime: mealTime,
-            mealType: _selectedFeeding,
-            items: _notes.isNotEmpty ? _notes : _selectedFeeding,
-            amount: _quantity,
-            status: 'completed',
-          );
+        childId: childId,
+        mealTime: mealTime,
+        mealType: _selectedFeeding,
+        items: _notes.isNotEmpty ? _notes : _selectedFeeding,
+        amount: _quantity,
+        status: 'completed',
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -152,7 +156,8 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     }
 
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, AppRoutes.feedingLogs);
+    if (!mounted) return;
+    Navigator.pop(context, widget.existingEntry != null ? true : null); // Return something to indicate change
   }
 
   @override
@@ -166,7 +171,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
         centerTitle: true,
         title: Text(
           widget.existingEntry != null ? "Edit Food Tracker" : "Food Tracker",
-          style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: SafeArea(
@@ -185,7 +193,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF7FBF8),
                   borderRadius: BorderRadius.circular(12),
@@ -194,7 +205,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Feeding Type
-                    const Text("Feeding Name", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                    const Text(
+                      "Feeding Name",
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -207,18 +221,25 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                         isExpanded: true,
                         underline: const SizedBox(),
                         items: _feedingOptions
-                            .map((option) => DropdownMenuItem(
-                                  value: option,
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.local_drink, color: Colors.black54, size: 20),
-                                      const SizedBox(width: 8),
-                                      Text(option),
-                                    ],
-                                  ),
-                                ))
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option,
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.local_drink,
+                                      color: Colors.black54,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(option),
+                                  ],
+                                ),
+                              ),
+                            )
                             .toList(),
-                        onChanged: (val) => setState(() => _selectedFeeding = val!),
+                        onChanged: (val) =>
+                            setState(() => _selectedFeeding = val!),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -227,8 +248,14 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: const [
-                        Text("Quantity (ml)", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                        Text("Time", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        Text(
+                          "Quantity (ml)",
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        ),
+                        Text(
+                          "Time",
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -245,16 +272,28 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                           child: Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.remove, color: Color(0xFFA41639)),
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: Color(0xFFA41639),
+                                ),
                                 onPressed: () {
                                   setState(() {
                                     if (_quantity > 0) _quantity--;
                                   });
                                 },
                               ),
-                              Text('$_quantity', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text(
+                                '$_quantity',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               IconButton(
-                                icon: const Icon(Icons.add, color: Color(0xFFA41639)),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Color(0xFFA41639),
+                                ),
                                 onPressed: () => setState(() => _quantity++),
                               ),
                             ],
@@ -264,14 +303,21 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                         GestureDetector(
                           onTap: _pickTime,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF9ECEE),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(
                               _formatTime(_selectedTime),
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black87),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
                         ),
@@ -280,14 +326,19 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                     const SizedBox(height: 20),
 
                     // Notes
-                    const Text('Notes', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                    const Text(
+                      'Notes',
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       maxLines: 3,
                       controller: TextEditingController(text: _notes),
                       decoration: InputDecoration(
                         hintText: 'Add any notes...',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         isDense: true,
                         contentPadding: const EdgeInsets.all(10),
                       ),
@@ -302,11 +353,20 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _saveFoodTracker,
                         icon: const Icon(Icons.fastfood, color: Colors.white),
-                        label: Text(widget.existingEntry != null ? 'Update Meal' : 'Save Meal',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        label: Text(
+                          widget.existingEntry != null
+                              ? 'Update Meal'
+                              : 'Save Meal',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFA41639),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
@@ -346,7 +406,10 @@ class TrackerButtonsRow extends StatelessWidget {
           activeColor: Colors.blue,
           isActive: currentPage == 'sleep',
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SleepPage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const SleepPage()),
+            );
           },
         ),
         const SizedBox(width: 20),
@@ -356,7 +419,10 @@ class TrackerButtonsRow extends StatelessWidget {
           activeColor: Colors.green,
           isActive: currentPage == 'growth',
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GrowthPage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const GrowthPage()),
+            );
           },
         ),
       ],

@@ -39,20 +39,22 @@ class _MedicineScreenState extends State<MedicineScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   const Text(
-                    "☀️ Morning",
+                    "Morning",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  ...morningMedicines
-                      .map((m) => _medicineCard(m, isMorning: true)),
+                  ...morningMedicines.map(
+                    (m) => _medicineCard(m, isMorning: true),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
-                    "🌙 Night",
+                    "Night",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  ...nightMedicines
-                      .map((m) => _medicineCard(m, isMorning: false)),
+                  ...nightMedicines.map(
+                    (m) => _medicineCard(m, isMorning: false),
+                  ),
                   const SizedBox(height: 40),
                 ],
               ),

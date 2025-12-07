@@ -7,7 +7,7 @@ class ChildModel extends Equatable {
   final String? gender;
   final String? profileImage;
 
-  ChildModel({
+  const ChildModel({
     required this.id,
     required this.firstName,
     required this.birthDate,

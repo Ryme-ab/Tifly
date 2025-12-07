@@ -11,10 +11,10 @@ import 'package:tifli/features/logs/data/models/logs_model.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 // If you have a custom app bar widget import it or replace with AppBar
 import 'package:tifli/widgets/custom_app_bar.dart'; // optional
-import 'package:tifli/core/config/test_config.dart'; // For test child ID
+// For test child ID
 
 class FeedingLogsScreen extends StatefulWidget {
-  const FeedingLogsScreen({Key? key}) : super(key: key);
+  const FeedingLogsScreen({super.key});
 
   @override
   State<FeedingLogsScreen> createState() => _FeedingLogsScreenState();
@@ -147,7 +147,10 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                         ), // <-- pass the existing Meal/FeedingLog here
                       ),
                     ),
-                  );
+                  ).then((_) {
+                    // Reload logs when coming back from edit
+                    context.read<FeedingLogCubit>().loadLogs();
+                  });
                 },
               ),
             ],
@@ -201,8 +204,9 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                       showTitles: true,
                       getTitlesWidget: (value, _) {
                         final idx = value.toInt();
-                        if (idx < 0 || idx >= barData.length)
+                        if (idx < 0 || idx >= barData.length) {
                           return const SizedBox.shrink();
+                        }
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
@@ -274,7 +278,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                       }
                       return ListView(
                         children: [
-                          ...logs.map((log) => _logCard(log, context)).toList(),
+                          ...logs.map((log) => _logCard(log, context)),
                           const SizedBox(height: 20),
                           _summaryCard(logs),
                         ],

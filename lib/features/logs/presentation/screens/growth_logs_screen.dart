@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_cubit.dart';
@@ -36,17 +35,35 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          CircleAvatar(backgroundColor: color.withOpacity(0.15), child: Icon(icon, color: color)),
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.15),
+            child: Icon(icon, color: color),
+          ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontSize: 13, color: Colors.black54)),
-              Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ],
@@ -61,7 +78,10 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
         key: Key(log.id),
         direction: DismissDirection.endToStart,
         background: Container(
-          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(14)),
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: BorderRadius.circular(14),
+          ),
           padding: const EdgeInsets.only(right: 20),
           alignment: Alignment.centerRight,
           child: const Icon(Icons.delete, color: Colors.white),
@@ -74,19 +94,38 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 5, offset: const Offset(0, 2))],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12.withOpacity(0.05),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
-              const Icon(Icons.monitor_weight, size: 30, color: Color(0xffb03a57)),
+              const Icon(
+                Icons.monitor_weight,
+                size: 30,
+                color: Color(0xffb03a57),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Growth Log", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const Text(
+                      "Growth Log",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(DateFormat("dd MMM, hh:mm a").format(log.date), style: const TextStyle(color: Colors.black54)),
+                    Text(
+                      DateFormat("dd MMM, hh:mm a").format(log.date),
+                      style: const TextStyle(color: Colors.black54),
+                    ),
                   ],
                 ),
               ),
@@ -96,7 +135,8 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
                   final updated = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => GrowthPage(showTracker: false, existingLog: log),
+                      builder: (_) =>
+                          GrowthPage(showTracker: false, existingLog: log),
                     ),
                   );
                   if (updated is GrowthLog) {
@@ -122,7 +162,9 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
         onPressed: () async {
           final added = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const GrowthPage(showTracker: true)),
+            MaterialPageRoute(
+              builder: (_) => const GrowthPage(showTracker: true),
+            ),
           );
           if (added is GrowthLog) {
             context.read<GrowthLogCubit>().addLog(added);
@@ -134,10 +176,15 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
           padding: const EdgeInsets.all(16),
           child: BlocBuilder<GrowthLogCubit, GrowthLogState>(
             builder: (context, state) {
-              if (state is GrowthLogLoading) return const Center(child: CircularProgressIndicator());
-              if (state is GrowthLogError) return Center(child: Text("Error: ${state.message}"));
+              if (state is GrowthLogLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is GrowthLogError) {
+                return Center(child: Text("Error: ${state.message}"));
+              }
               if (state is GrowthLogLoaded) {
-                final logs = [...state.logs]..sort((a, b) => a.date.compareTo(b.date));
+                final logs = [...state.logs]
+                  ..sort((a, b) => a.date.compareTo(b.date));
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,22 +192,64 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Growth Dashboard", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                          CircleAvatar(backgroundImage: const AssetImage("assets/profile.jpg"), backgroundColor: Colors.grey[200]),
+                          const Text(
+                            "Growth Dashboard",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          CircleAvatar(
+                            backgroundImage: const AssetImage(
+                              "assets/profile.jpg",
+                            ),
+                            backgroundColor: Colors.grey[200],
+                          ),
                         ],
                       ),
                       const SizedBox(height: 18),
                       Row(
                         children: [
-                          Expanded(child: _summaryCard(label: "Height", value: logs.isNotEmpty ? "${logs.last.height} cm" : "--", icon: Icons.height, color: Colors.blue)),
+                          Expanded(
+                            child: _summaryCard(
+                              label: "Height",
+                              value: logs.isNotEmpty
+                                  ? "${logs.last.height} cm"
+                                  : "--",
+                              icon: Icons.height,
+                              color: Colors.blue,
+                            ),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: _summaryCard(label: "Weight", value: logs.isNotEmpty ? "${logs.last.weight} kg" : "--", icon: Icons.monitor_weight, color: Colors.pink)),
+                          Expanded(
+                            child: _summaryCard(
+                              label: "Weight",
+                              value: logs.isNotEmpty
+                                  ? "${logs.last.weight} kg"
+                                  : "--",
+                              icon: Icons.monitor_weight,
+                              color: Colors.pink,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _summaryCard(label: "Head Circumference", value: logs.isNotEmpty ? "${logs.last.headCircumference} cm" : "--", icon: Icons.circle_outlined, color: Colors.green),
+                      _summaryCard(
+                        label: "Head Circumference",
+                        value: logs.isNotEmpty
+                            ? "${logs.last.headCircumference} cm"
+                            : "--",
+                        icon: Icons.circle_outlined,
+                        color: Colors.green,
+                      ),
                       const SizedBox(height: 20),
-                      const Text("Growth Logs", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Text(
+                        "Growth Logs",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       ...logs.map((log) => _logCard(log)),
                     ],

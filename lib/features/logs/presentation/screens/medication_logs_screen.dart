@@ -7,7 +7,7 @@ import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
 import 'package:tifli/features/logs/data/models/medication_log_model.dart';
-import 'package:tifli/core/config/test_config.dart'; // For test child ID
+// For test child ID
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -207,7 +207,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.grey),
                 onPressed: () {
-                  // TODO: Navigate to edit medication screen
+                  // Edit action
                 },
               ),
             ],
@@ -265,8 +265,9 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                 showTitles: true,
                 getTitlesWidget: (value, _) {
                   final index = value.toInt();
-                  if (index < 0 || index >= barData.length)
+                  if (index < 0 || index >= barData.length) {
                     return const SizedBox.shrink();
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(

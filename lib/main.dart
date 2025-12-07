@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // --- Supabase Core ---
 import 'package:tifli/core/config/supabaseClient.dart';
 
-// --- Test Configuration (REMOVE IN PRODUCTION) ---
 import 'package:tifli/core/config/test_config.dart';
 import 'package:tifli/core/widgets/test_data_loader.dart';
 
 // --- Auth ---
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/data/repositories/signin_repository.dart';
-import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 
 // --- Feeding Logs ---
 import 'package:tifli/features/logs/data/data_sources/feeding_logs_data.dart';
@@ -56,8 +53,6 @@ import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 
 // --- Navigation ---
 import 'package:tifli/features/navigation/app_router.dart';
-import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
-import 'package:tifli/features/trackers/data/repositories/meal_repository.dart';
 
 // --- Trackers ---
 import 'package:tifli/features/trackers/presentation/cubit/meal_cubit.dart';
@@ -65,6 +60,11 @@ import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
 import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/trackers/data/repositories/sleep_repository.dart';
 import 'package:tifli/features/trackers/data/repositories/growth_repository.dart';
+
+// --- Gallery System ---
+import 'package:tifli/features/souvenires/data/data_sources/gallery_remote_data_source.dart';
+import 'package:tifli/features/souvenires/data/repositories/gallery_repository.dart';
+import 'package:tifli/features/souvenires/presentation/cubit/gallery_cubit.dart';
 
 // --- Child Selection ---
 import 'package:tifli/core/state/child_selection_cubit.dart';
@@ -184,12 +184,18 @@ Future<void> main() async {
         BlocProvider<GrowthCubit>(
           create: (_) => GrowthCubit(GrowthRepository(supabase)),
         ),
+
+        // GALLERY SYSTEM
+        BlocProvider<GalleryCubit>(
+          create: (_) =>
+              GalleryCubit(GalleryRepositoryImpl(GalleryRemoteDataSource())),
+        ),
       ],
 
       child: TestDataLoader(
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: const SplashScreen(),
+          initialRoute: AppRoutes.splash,
           onGenerateRoute: AppRouter.generateRoute,
         ),
       ),
