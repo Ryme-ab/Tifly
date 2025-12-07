@@ -39,18 +39,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     const primaryColor = Color(0xFFBE185D);
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: "Add Baby",
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const MainTabScreen()),
-              (route) => false,
-            );
-          },
-        ),
-      ),
+      appBar: CustomAppBar(title: "Add Baby"),
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Column(
@@ -270,13 +259,6 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                       }
 
                       final babyId = insertedRows[0]['id'];
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Baby added successfully!"),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
 
                       Navigator.push(
                         context,

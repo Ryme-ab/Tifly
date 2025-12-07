@@ -6,7 +6,7 @@ import 'package:tifli/features/navigation/presentation/screens/drawer.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import '../cubit/home_cubit.dart';
 import '../../data/repositories/home_repository.dart';
-import '../widgets/header_section.dart';
+import '../widgets/header_section.dart' hide AppColors;
 import '../widgets/logs_section.dart';
 import '../widgets/schedule_section.dart';
 import '../widgets/memories_section.dart';
@@ -14,6 +14,7 @@ import '../widgets/growth_section.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   final String? childId; // optional override for testing/switching
@@ -99,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       child: BlocProvider.value(
         value: cubit,
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.backgroundLight,
           appBar: const CustomAppBar(),
           drawer: const Tiflidrawer(),
           body: SafeArea(
@@ -125,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     if (!data.hasChildren) {
                       return const _NoChildrenView();
                     }
+
                     return SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                         horizontal: HomeScreen.horizontalPadding,

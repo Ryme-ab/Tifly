@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
@@ -30,7 +31,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5f4f8),
+     backgroundColor: AppColors.backgroundLight,
       appBar: const CustomAppBar(title: "Medication Tracker"),
       body: SafeArea(
         child: BlocBuilder<MedicationLogCubit, MedicationState>(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/logs/presentation/cubit/feeding_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/feeding_logs_state.dart';
 import 'package:tifli/features/logs/data/models/logs_model.dart';
@@ -242,7 +243,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5f4f8),
+      backgroundColor: AppColors.backgroundLight,
       appBar: const CustomAppBar(
         title: 'Feeding Tracker',
       ), // replace or use normal AppBar
@@ -258,11 +259,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
                     'Feeding Logs',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundImage: const AssetImage('assets/profile.jpg'),
-                    backgroundColor: Colors.grey[200],
-                  ),
+                  CircleAvatar(radius: 18, backgroundColor: Colors.grey[200]),
                 ],
               ),
               const SizedBox(height: 16),

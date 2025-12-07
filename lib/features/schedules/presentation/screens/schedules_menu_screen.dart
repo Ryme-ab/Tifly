@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointments_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/medicine_schedule_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/meal_planner_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/widgets/hovercard.dart';
 
 class SchedMenuScreen extends StatelessWidget {
   const SchedMenuScreen({super.key});
@@ -11,109 +13,80 @@ class SchedMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Schedule'),
-      backgroundColor: const Color(0xfff5f4f8),
+        backgroundColor: AppColors.backgroundLight,
 
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 40,
-            runSpacing: 30,
-            children: [
-              _buildTrackerButton(
-                context,
-                icon: Icons.calendar_today,
-                label: "Appointments",
-                color: const Color(0xffffcdd2),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AppointmentsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildTrackerButton(
-                context,
-                icon: Icons.medication,
-                label: "Medicine",
-                color: const Color(0xfff8bbd0),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MedicineScreen()),
-                  );
-                },
-              ),
-              _buildTrackerButton(
-                context,
-                icon: Icons.local_drink,
-                label: "Meal",
-                color: const Color(0xfffff9c4),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MealPlannerScreenV2(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 30),
+
+            HoverCard(
+              label: "Appointments",
+              icon: Icons.calendar_month_rounded,
+              gradient: const [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AppointmentsScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+
+            HoverCard(
+              label: "Medicine Schedule",
+              icon: Icons.medication_rounded,
+              gradient: const [Color(0xFFFBC2EB), Color(0xFFA6C1EE)],
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MedicineScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+
+            HoverCard(
+              label: "Meal Planner",
+              icon: Icons.restaurant_menu_rounded,
+              gradient: const [Color(0xFFFFF1A4), Color(0xFFFFD59E)],
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MealPlannerScreenV2(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTrackerButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 120,
-        height: 120,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
+  // HEADER
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text(
+          "Your Baby's Schedule",
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            color: Color(0xff2e2e2e),
+          ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.all(10),
-              child: Icon(icon, color: const Color(0xffb03a57), size: 30),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
+        SizedBox(height: 6),
+        Text(
+          "Manage doctor visits, medication reminders and daily meals.",
+          style: TextStyle(fontSize: 15, color: Colors.black54),
         ),
-      ),
+      ],
     );
   }
 }

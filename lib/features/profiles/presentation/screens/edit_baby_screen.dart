@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:typed_data';
 
+import 'package:tifli/core/constants/app_colors.dart';
+
 class EditBabyScreen extends StatefulWidget {
   final Map<String, dynamic> babyData;
 
@@ -221,7 +223,7 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
       appBar: AppBar(
         title: const Text('Edit Baby Profile'),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.backgroundLight,
         foregroundColor: Colors.black,
         elevation: 0,
       ),

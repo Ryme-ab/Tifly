@@ -52,20 +52,9 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
             child: Column(
               children: [
-                const Icon(
-                  Icons.child_care,
-                  color: Color(0xFFC21E56),
-                  size: 50,
-                ),
+                Image.asset("assets/images/logo1.png", width: 250),
                 const SizedBox(height: 10),
-                const Text(
-                  "TIFLI",
-                  style: TextStyle(
-                    color: Color(0xFFC21E56),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
-                ),
+
                 const SizedBox(height: 40),
                 const Text(
                   "Get back to Your Account",
@@ -136,7 +125,10 @@ class _LoginPageState extends State<LoginPage> {
                                 )
                               : const Text(
                                   "Log in",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                         ),
                       ),
