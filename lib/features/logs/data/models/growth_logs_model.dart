@@ -6,7 +6,7 @@ class GrowthLog {
   final double height;
   final double weight;
   final double headCircumference;
-  final String notes;
+  final String? notes;
   final DateTime createdAt;
 
   GrowthLog({
@@ -17,7 +17,7 @@ class GrowthLog {
     required this.height,
     required this.weight,
     required this.headCircumference,
-    required this.notes,
+    this.notes,
     required this.createdAt,
   });
 

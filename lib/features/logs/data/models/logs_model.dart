@@ -28,15 +28,15 @@ class FeedingLog {
       id: json['id'] ?? '',
       userId: json['user_id'] ?? '',
       childId: json['child_id'] ?? '',
-      mealTime: json['meal_time'] != null 
-          ? DateTime.parse(json['meal_time']) 
+      mealTime: json['meal_time'] != null
+          ? DateTime.parse(json['meal_time'])
           : DateTime.now(),
       mealType: json['meal_type'] ?? '',
       items: json['items'] ?? '',
       amount: json['amount'] ?? 0,
       status: json['status'] ?? '',
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : DateTime.now(),
     );
   }
@@ -93,16 +93,16 @@ class FeedingLog {
   }
 
   Meal feedingLogToMeal(FeedingLog log) {
-  return Meal(
-    id: log.id,
-    userId: log.userId,
-    childId: log.childId,
-    mealTime: log.mealTime,
-    mealType: log.mealType,
-    items: log.items,
-    amount: log.amount,
-    status: log.status,
-    createdAt: log.createdAt,
-  );
-}
+    return Meal(
+      id: log.id,
+      userId: log.userId,
+      childId: log.childId,
+      mealTime: log.mealTime,
+      mealType: log.mealType,
+      items: log.items,
+      amount: log.amount,
+      status: log.status,
+      createdAt: log.createdAt,
+    );
+  }
 }

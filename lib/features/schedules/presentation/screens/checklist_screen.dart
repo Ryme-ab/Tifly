@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/schedules/presentation/cubit/schedules_cubit.dart';
 import 'package:tifli/features/schedules/data/models/schedules_model.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
-import 'package:tifli/core/config/test_config.dart';
 
 class ChecklistPage extends StatefulWidget {
   const ChecklistPage({super.key});
@@ -29,7 +26,7 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   void addItem() async {
     if (newItemController.text.trim().isEmpty) return;
-    context.read<ChecklistCubit>().addItem(newItemController.text.trim() as ChecklistItem);
+    context.read<ChecklistCubit>().addItem(newItemController.text.trim());
     newItemController.clear();
   }
 
@@ -151,64 +148,64 @@ class _ChecklistPageState extends State<ChecklistPage> {
                   child: state is ChecklistLoading
                       ? const Center(child: CircularProgressIndicator())
                       : state is ChecklistError
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline,
-                                    size: 48,
-                                    color: Colors.red,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    "Error: ${state.message}",
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
-                                ],
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                size: 48,
+                                color: Colors.red,
                               ),
-                            )
-                          : items.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.checklist,
-                                        size: 64,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        "No tasks yet",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Add your first task above",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ListView.builder(
-                                  itemCount: items.length,
-                                  itemBuilder: (context, index) {
-                                    final item = items[index];
-                                    return checklistItem(
-                                      item: item,
-                                      onToggle: () => toggleItem(item),
-                                      onDelete: () => deleteItem(item),
-                                    );
-                                  },
+                              const SizedBox(height: 16),
+                              Text(
+                                "Error: ${state.message}",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        )
+                      : items.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.checklist,
+                                size: 64,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                "No tasks yet",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey.shade600,
                                 ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Add your first task above",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return checklistItem(
+                              item: item,
+                              onToggle: () => toggleItem(item),
+                              onDelete: () => deleteItem(item),
+                            );
+                          },
+                        ),
                 ),
               ],
             );

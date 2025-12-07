@@ -7,22 +7,43 @@ import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
-import 'package:tifli/features/trackers/data/models/sleep.dart';
+import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 
 class SleepPage extends StatefulWidget {
-  const SleepPage({super.key, this.showTracker = true});
+  const SleepPage({super.key, this.showTracker = true, this.existingEntry});
   final bool showTracker;
+  final SleepLog? existingEntry;
   @override
   State<SleepPage> createState() => _SleepPageState();
 }
 
 class _SleepPageState extends State<SleepPage> {
-  TimeOfDay? startTime = const TimeOfDay(hour: 8, minute: 30);
-  TimeOfDay? endTime = const TimeOfDay(hour: 8, minute: 30);
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
   final notesController = TextEditingController();
   String? selectedQuality; // Will store: 'not_good', 'good', or 'excellent'
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingEntry != null) {
+      startTime = TimeOfDay.fromDateTime(widget.existingEntry!.startTime);
+      endTime = TimeOfDay.fromDateTime(widget.existingEntry!.endTime);
+      notesController.text = widget.existingEntry!.description;
+      selectedQuality = widget.existingEntry!.quality;
+      
+      // Validate that the quality exists in our options
+      final bool qualityExists = qualityOptions.any((q) => q['value'] == selectedQuality);
+      if (!qualityExists) {
+        selectedQuality = null; // Reset if invalid/unknown value to prevent crash
+      }
+    } else {
+      startTime = const TimeOfDay(hour: 8, minute: 30);
+      endTime = const TimeOfDay(hour: 8, minute: 30);
+    }
+  }
 
   // Quality options
   final List<Map<String, dynamic>> qualityOptions = [
@@ -124,39 +145,66 @@ class _SleepPageState extends State<SleepPage> {
         );
         return;
       }
-      final sleepLog = SleepLog(
-        id: '',
-        userId: userId,
-        childId: selectedChildId,
-        startTime: startDateTime,
-        endTime: endDateTime,
-        quality: quality,
-        notes: notes,
-      );
+      if (widget.existingEntry != null) {
+        // UPDATE MODE
+        final updatedLog = SleepLog(
+          id: widget.existingEntry!.id,
+          userId: userId,
+          childId: widget.existingEntry!.childId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          quality: quality,
+          description: notes,
+          createdAt: widget.existingEntry!.createdAt, // Preserve creation time
+        );
 
-      await context.read<SleepCubit>().addSleepLog(
-        sleepLog: sleepLog,
-        childId: selectedChildId,
-        startTime: startDateTime,
-        endTime: endDateTime,
-      );
+        await context.read<SleepCubit>().updateSleepLog(updatedLog);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Sleep logged successfully!"),
-          backgroundColor: Colors.green,
-        ),
-      );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Sleep log updated successfully!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context, updatedLog); // Return updated log
+        }
+      } else {
+        // ADD MODE
+        final sleepLog = SleepLog(
+          id: '',
+          userId: userId,
+          childId: selectedChildId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          quality: quality,
+          description: notes,
+          createdAt: DateTime.now(),
+        );
+
+        await context.read<SleepCubit>().addSleepLog(
+              sleepLog: sleepLog,
+              childId: selectedChildId,
+              startTime: startDateTime,
+              endTime: endDateTime,
+            );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Sleep logged successfully!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.sleepingLogs);
+        }
+      }
 
       // Clear form
       notesController.clear();
       setState(() {
         selectedQuality = null;
       });
-
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.sleepingLogs);
-      }
     } catch (e) {
       print("ERROR logging sleep: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -177,8 +225,8 @@ class _SleepPageState extends State<SleepPage> {
         backgroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
-        title: const Text(
-          'Add Trackers',
+        title: Text(
+          widget.existingEntry != null ? 'Edit Sleep Log' : 'Add Trackers',
           style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
         ),
         actions: [
@@ -225,6 +273,8 @@ class _SleepPageState extends State<SleepPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TimePickerRow(
+                      initialStartTime: startTime,
+                      initialEndTime: endTime,
                       onStartChanged: (value) => startTime = value,
                       onEndChanged: (value) => endTime = value,
                     ),
@@ -312,17 +362,19 @@ class _SleepPageState extends State<SleepPage> {
                           Icons.nightlight_round,
                           color: Colors.white,
                         ),
-                        label: const Text(
-                          'Log Sleep Time',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFA41639),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        label: Text(
+                          widget.existingEntry != null
+                              ? 'Update Sleep Log'
+                              : 'Log Sleep Time',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -390,11 +442,15 @@ class TrackerButtonsRow extends StatelessWidget {
 class TimePickerRow extends StatefulWidget {
   final Function(TimeOfDay) onStartChanged;
   final Function(TimeOfDay) onEndChanged;
+  final TimeOfDay? initialStartTime;
+  final TimeOfDay? initialEndTime;
 
   const TimePickerRow({
     super.key,
     required this.onStartChanged,
     required this.onEndChanged,
+    this.initialStartTime,
+    this.initialEndTime,
   });
 
   @override
@@ -402,8 +458,15 @@ class TimePickerRow extends StatefulWidget {
 }
 
 class _TimePickerRowState extends State<TimePickerRow> {
-  TimeOfDay startTime = const TimeOfDay(hour: 8, minute: 30);
-  TimeOfDay endTime = const TimeOfDay(hour: 8, minute: 30);
+  late TimeOfDay startTime;
+  late TimeOfDay endTime;
+
+  @override
+  void initState() {
+    super.initState();
+    startTime = widget.initialStartTime ?? const TimeOfDay(hour: 8, minute: 30);
+    endTime = widget.initialEndTime ?? const TimeOfDay(hour: 8, minute: 30);
+  }
 
   @override
   Widget build(BuildContext context) {

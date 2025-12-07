@@ -8,9 +8,9 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
   String? currentChildId;
   LogType? currentFilter;
 
-  BabyLogsCubit({required BabyLogsRepository repository}) 
-      : repo = repository, 
-        super(BabyLogsInitial());
+  BabyLogsCubit({required BabyLogsRepository repository})
+    : repo = repository,
+      super(BabyLogsInitial());
 
   Future<void> loadAllLogs(String childId) async {
     currentChildId = childId;

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
+import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
 import 'package:tifli/features/navigation/presentation/widgets/drawer_footer.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
@@ -64,7 +67,10 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.home_outlined,
                     title: "Home",
-                    onTap: () => Navigator.pushNamed(context, "/home"),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MainTabScreen()),
+                    ),
                   ),
 
                   menuItem(
@@ -156,8 +162,14 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.logout,
                     title: "Logout",
-                    onTap: () {
-                      // TODO: Add logout logic
+                    onTap: () async {
+                      await context.read<AuthCubit>().signOut();
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const LoginPage()),
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                 ],

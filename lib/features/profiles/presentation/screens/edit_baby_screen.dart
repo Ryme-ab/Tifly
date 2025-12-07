@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:typed_data';
 
 class EditBabyScreen extends StatefulWidget {
   final Map<String, dynamic> babyData;
@@ -19,7 +22,7 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
   late TextEditingController _heightController;
   late TextEditingController _circController;
   late TextEditingController _bloodTypeController;
-  
+
   bool _isBoy = true;
   DateTime? _selectedDate;
   bool _isLoading = false;
@@ -27,13 +30,25 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.babyData['first_name']);
-    _dateController = TextEditingController(text: _formatDate(widget.babyData['birth_date']));
-    _weightController = TextEditingController(text: widget.babyData['born_weight']?.toString() ?? '');
-    _heightController = TextEditingController(text: widget.babyData['born_height']?.toString() ?? '');
-    _circController = TextEditingController(text: widget.babyData['circum']?.toString() ?? '');
-    _bloodTypeController = TextEditingController(text: widget.babyData['blood_type'] ?? '');
-    
+    _nameController = TextEditingController(
+      text: widget.babyData['first_name'],
+    );
+    _dateController = TextEditingController(
+      text: _formatDate(widget.babyData['birth_date']),
+    );
+    _weightController = TextEditingController(
+      text: widget.babyData['born_weight']?.toString() ?? '',
+    );
+    _heightController = TextEditingController(
+      text: widget.babyData['born_height']?.toString() ?? '',
+    );
+    _circController = TextEditingController(
+      text: widget.babyData['circum']?.toString() ?? '',
+    );
+    _bloodTypeController = TextEditingController(
+      text: widget.babyData['blood_type'] ?? '',
+    );
+
     _isBoy = widget.babyData['gender'] == 'male';
     if (widget.babyData['birth_date'] != null) {
       _selectedDate = DateTime.parse(widget.babyData['birth_date']);
@@ -88,6 +103,10 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
         'gender': _isBoy ? 'male' : 'female',
       };
 
+      if (_uploadedImageUrl != null) {
+        updateData['profile_image'] = _uploadedImageUrl;
+      }
+
       if (_selectedDate != null) {
         updateData['birth_date'] = _selectedDate!.toIso8601String();
       }
@@ -108,8 +127,7 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
         updateData['blood_type'] = _bloodTypeController.text.trim();
       }
 
-      await SupabaseClientManager()
-          .client
+      await SupabaseClientManager().client
           .from('children')
           .update(updateData)
           .eq('id', widget.babyData['id']);
@@ -139,6 +157,62 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
     }
   }
 
+  // NEW: Image Upload Variables
+  Uint8List? _imageBytes;
+  String? _uploadedImageUrl;
+  bool _isUploadingImage = false;
+
+  // NEW: Image Picker Logic
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      final bytes = await picked.readAsBytes();
+      final bucket = 'baby_profiles';
+      final fileName = "baby_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+      // Upload
+      await Supabase.instance.client.storage
+          .from(bucket)
+          .uploadBinary(
+            fileName,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      // Get URL
+      String publicUrl = Supabase.instance.client.storage
+          .from(bucket)
+          .getPublicUrl(fileName);
+
+      if (publicUrl.isEmpty) {
+        publicUrl = await Supabase.instance.client.storage
+            .from(bucket)
+            .createSignedUrl(fileName, 3600);
+      }
+
+      setState(() {
+        _imageBytes = bytes;
+        _uploadedImageUrl = publicUrl;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Image upload failed: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFFBE185D);
@@ -159,6 +233,68 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // NEW: Profile Picture Upload Section
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: _imageBytes != null
+                          ? MemoryImage(_imageBytes!)
+                          : (_uploadedImageUrl != null
+                                    ? NetworkImage(_uploadedImageUrl!)
+                                    : (widget.babyData['profile_image'] != null
+                                          ? NetworkImage(
+                                              widget.babyData['profile_image'],
+                                            )
+                                          : null))
+                                as ImageProvider?,
+                      child:
+                          (_imageBytes == null &&
+                              _uploadedImageUrl == null &&
+                              widget.babyData['profile_image'] == null)
+                          ? Icon(
+                              Icons.child_care,
+                              size: 50,
+                              color: Colors.grey[400],
+                            )
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: _isUploadingImage
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
               _buildTextField(
                 controller: _nameController,
                 label: 'Baby Name',
@@ -197,8 +333,12 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
                       icon: const Icon(Icons.child_care, size: 18),
                       label: const Text('Boy'),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: _isBoy ? Colors.cyan[700] : Colors.cyan[300],
-                        backgroundColor: _isBoy ? Colors.cyan[100] : Colors.grey[100],
+                        foregroundColor: _isBoy
+                            ? Colors.cyan[700]
+                            : Colors.cyan[300],
+                        backgroundColor: _isBoy
+                            ? Colors.cyan[100]
+                            : Colors.grey[100],
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -211,8 +351,12 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
                       icon: const Icon(Icons.face_3, size: 18),
                       label: const Text('Girl'),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: !_isBoy ? primaryColor : Colors.pink[300],
-                        backgroundColor: !_isBoy ? const Color(0xFFFFE4E9) : Colors.grey[100],
+                        foregroundColor: !_isBoy
+                            ? primaryColor
+                            : Colors.pink[300],
+                        backgroundColor: !_isBoy
+                            ? const Color(0xFFFFE4E9)
+                            : Colors.grey[100],
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -268,7 +412,9 @@ class _EditBabyScreenState extends State<EditBabyScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text(

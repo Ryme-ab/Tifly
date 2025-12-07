@@ -10,10 +10,7 @@ class ChildSelected extends ChildSelectionState {
   final String childId;
   final String childName;
 
-  ChildSelected({
-    required this.childId,
-    required this.childName,
-  });
+  ChildSelected({required this.childId, required this.childName});
 }
 
 class NoChildSelected extends ChildSelectionState {}

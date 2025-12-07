@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import '../../data/models/growth.dart';
+import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import '../../data/repositories/growth_repository.dart';
 import 'package:tifli/core/utils/user_context.dart';
 
@@ -73,26 +73,25 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
   }
 
   Future<void> updateGrowthLog(GrowthLog updatedLog) async {
-  try {
-    // User must exist
-    final userId = await _getUserId();
-    if (userId == null) {
-      throw Exception("User not authenticated");
+    try {
+      // User must exist
+      final userId = await _getUserId();
+      if (userId == null) {
+        throw Exception("User not authenticated");
+      }
+
+      // Ensure the log belongs to this user
+      if (updatedLog.userId != userId) {
+        throw Exception("You cannot edit a log that doesn't belong to you.");
+      }
+
+      await repository.updateGrowth(updatedLog);
+
+      // Refresh logs
+      await loadGrowthLogs(updatedLog.childId);
+    } catch (e) {
+      print("Error updating growth log: $e");
+      rethrow;
     }
-
-    // Ensure the log belongs to this user
-    if (updatedLog.userId != userId) {
-      throw Exception("You cannot edit a log that doesn't belong to you.");
-    }
-
-    await repository.updateGrowth(updatedLog);
-
-    // Refresh logs
-    await loadGrowthLogs(updatedLog.childId);
-  } catch (e) {
-    print("Error updating growth log: $e");
-    rethrow;
   }
-}
-
 }

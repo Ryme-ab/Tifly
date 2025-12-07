@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/core/config/test_config.dart';
 import 'package:tifli/features/logs/presentation/cubit/feeding_logs_cubit.dart';
-import 'package:tifli/features/logs/presentation/cubit/baby_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/sleep_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
-import 'package:tifli/features/logs/presentation/cubit/statistics_cubit.dart';
 
 /// Auto-loads test data for all cubits when test mode is enabled
 ///
@@ -16,7 +14,7 @@ import 'package:tifli/features/logs/presentation/cubit/statistics_cubit.dart';
 class TestDataLoader extends StatefulWidget {
   final Widget child;
 
-  const TestDataLoader({Key? key, required this.child}) : super(key: key);
+  const TestDataLoader({super.key, required this.child});
 
   @override
   State<TestDataLoader> createState() => _TestDataLoaderState();
@@ -39,7 +37,7 @@ class _TestDataLoaderState extends State<TestDataLoader> {
   void _loadAllTestData() {
     // All cubits now auto-load based on ChildSelectionCubit
     // Just trigger the loads without parameters
-    
+
     // Load Feeding Logs
     context.read<FeedingLogCubit>().loadLogs();
 

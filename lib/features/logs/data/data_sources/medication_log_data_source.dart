@@ -30,7 +30,11 @@ class MedicationDataSource {
   }
 
   // Update an existing medicine
-  Future<Medication> updateMedicine(String id, String userId, Medication medicine) async {
+  Future<Medication> updateMedicine(
+    String id,
+    String userId,
+    Medication medicine,
+  ) async {
     final response = await client
         .from('medicines')
         .update(medicine.toJson())

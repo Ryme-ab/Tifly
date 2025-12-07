@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'create_baby_screen_2.dart';
 
+import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
+
 class AddBabyPage extends StatelessWidget {
   const AddBabyPage({super.key});
 
@@ -36,39 +39,23 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     const primaryColor = Color(0xFFBE185D);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      appBar: CustomAppBar(
+        title: "Add Baby",
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const MainTabScreen()),
+              (route) => false,
+            );
+          },
+        ),
+      ),
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 32),
-                  const Text(
-                    "Add Baby",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      ),
-                      const SizedBox(width: 8),
-                      const CircleAvatar(
-                        radius: 16,
-                        backgroundImage: NetworkImage(
-                          "https://lh3.googleusercontent.com/aida-public/AB6AXuDuMey8NecJDultkiB-RGmzAohd7zpgs7Ircr0W7Zo9NfVmEybQ3HvahZne72Mz5W_8n9_5VB744gIq9VbRxkQrfMxA2uAnYQz4fQlu5PKasUmKxEqpkC12liu9_KfXXeDohbLOdTqic1mOYVEXiDSuAqMV3MwfCGF_Bux2W5oMxJFKxVmFG4vH68wY5cue7AkqxxkwZzTQV3MwzCn_BM4iKtrUxpXJ_S1gtnBOa0g96o8sHxrJLGjfyqi9KbnlUnv5_fd0Lszyml8",
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            // Header removed (replaced by AppBar)
 
             // Form
             Expanded(
@@ -143,8 +130,9 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                           isDark: isDark,
                           validator: (v) {
                             if (v!.isEmpty) return "Please enter height";
-                            if (!_isNumeric(v))
+                            if (!_isNumeric(v)) {
                               return "Please enter numbers only";
+                            }
                             return null;
                           },
                         ),
@@ -157,8 +145,9 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                           isDark: isDark,
                           validator: (v) {
                             if (v!.isEmpty) return "Please enter weight";
-                            if (!_isNumeric(v))
+                            if (!_isNumeric(v)) {
                               return "Please enter numbers only";
+                            }
                             return null;
                           },
                         ),
@@ -256,8 +245,12 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                   if (_formKey.currentState!.validate() &&
                       _selectedDate != null) {
                     try {
-                      final userId =
-                          "36264fb0-3622-4342-bd06-332e6639da32"; // Testing
+                      final currentUser =
+                          SupabaseClientManager().client.auth.currentUser;
+                      if (currentUser == null) {
+                        throw Exception("User not logged in");
+                      }
+                      final userId = currentUser.id;
                       final babyData = {
                         'first_name': _nameController.text,
                         'birth_date': _selectedDate!.toIso8601String(),
@@ -272,8 +265,9 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                           .insert([babyData])
                           .select();
 
-                      if (insertedRows.isEmpty)
+                      if (insertedRows.isEmpty) {
                         throw Exception("Failed to insert baby");
+                      }
 
                       final babyId = insertedRows[0]['id'];
 

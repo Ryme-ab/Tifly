@@ -8,9 +8,7 @@ class AdminDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Admin Dashboard'),
-      body: const Center(
-        child: Text('Admin Dashboard - Coming Soon'),
-      ),
+      body: const Center(child: Text('Admin Dashboard - Coming Soon')),
     );
   }
 }

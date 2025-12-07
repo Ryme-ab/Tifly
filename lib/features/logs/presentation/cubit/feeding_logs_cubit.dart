@@ -10,7 +10,7 @@ class FeedingLogCubit extends Cubit<FeedingLogState> {
   final FeedingLogRepository repository;
   final SupabaseClient supabase;
   final ChildSelectionCubit childSelectionCubit;
-  
+
   late final StreamSubscription _childSelectionSubscription;
 
   FeedingLogCubit({
@@ -31,7 +31,7 @@ class FeedingLogCubit extends Cubit<FeedingLogState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       final childState = childSelectionCubit.state;
-      
+
       if (userId == null || childState is! ChildSelected) {
         emit(FeedingLogError('No user or child selected'));
         return;
@@ -49,7 +49,7 @@ class FeedingLogCubit extends Cubit<FeedingLogState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.addLog(log);
       await loadLogs();
     } catch (e) {
@@ -61,7 +61,7 @@ class FeedingLogCubit extends Cubit<FeedingLogState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.updateLog(id, userId, log);
       await loadLogs();
     } catch (e) {
@@ -73,7 +73,7 @@ class FeedingLogCubit extends Cubit<FeedingLogState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.deleteLog(id, userId);
       await loadLogs();
     } catch (e) {

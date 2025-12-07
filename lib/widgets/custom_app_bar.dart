@@ -5,12 +5,9 @@ import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final List<Widget>? actions;
+  final Widget? leading;
 
-  const CustomAppBar({
-    super.key,
-    this.title,
-    this.actions,
-  });
+  const CustomAppBar({super.key, this.title, this.actions, this.leading});
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +28,26 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: canPop
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          : IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-                final scaffoldKey = context.read<GlobalKey<ScaffoldState>?>();
-                if (scaffoldKey != null && scaffoldKey.currentState != null) {
-                  scaffoldKey.currentState!.openDrawer();
-                } else {
-                  Scaffold.of(context).openDrawer();
-                }
-              },
-            ),
+      leading:
+          leading ??
+          (canPop
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.black),
+                  onPressed: () {
+                    final scaffoldKey = context
+                        .read<GlobalKey<ScaffoldState>?>();
+                    if (scaffoldKey != null &&
+                        scaffoldKey.currentState != null) {
+                      scaffoldKey.currentState!.openDrawer();
+                    } else {
+                      Scaffold.of(context).openDrawer();
+                    }
+                  },
+                )),
       actions: actions ?? appBarConfig?.actions,
     );
   }

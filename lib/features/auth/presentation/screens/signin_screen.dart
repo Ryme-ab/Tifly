@@ -37,14 +37,16 @@ class _SignUpPageState extends State<SignUpPage> {
               const SnackBar(content: Text('Sign Up Successful!')),
             );
 
-            // NAVIGATE TO HOME
             Navigator.pushReplacementNamed(context, AppRoutes.maintabscreen);
           }
 
           if (state is AuthError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -59,21 +61,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   Center(
                     child: Column(
                       children: [
-                        Image.asset("assets/logo.png", height: 60),
+                        Image.asset("assets/images/logo1.png", height: 200),
                         const SizedBox(height: 10),
-                        const Text(
-                          "TIFLI",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFE91E63),
-                          ),
-                        ),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 40),
 
                   /// TITLE
                   const Text(

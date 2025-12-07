@@ -161,7 +161,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 elevation: 0,
               ),
               child: Text(
-                "👶 Check your babies list",
+                "Check your babies list",
                 style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
               ),
             ),

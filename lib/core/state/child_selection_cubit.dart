@@ -15,7 +15,7 @@ class ChildSelectionCubit extends Cubit<ChildSelectionState> {
   Future<void> loadPersistedChild() async {
     try {
       emit(ChildSelectionLoading());
-      
+
       final prefs = await SharedPreferences.getInstance();
       final childId = prefs.getString(_selectedChildIdKey);
       final childName = prefs.getString(_selectedChildNameKey);

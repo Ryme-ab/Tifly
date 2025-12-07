@@ -6,9 +6,9 @@ class BabyLogsRepository {
 
   BabyLogsRepository({required this.dataSource});
 
-  Future<List<BabyLog>> getAllLogs(String childId) => 
+  Future<List<BabyLog>> getAllLogs(String childId) =>
       dataSource.getAllLogs(childId);
 
-  Future<List<BabyLog>> getLogsByType(String childId, LogType type) => 
+  Future<List<BabyLog>> getLogsByType(String childId, LogType type) =>
       dataSource.getLogsByType(childId, type);
 }

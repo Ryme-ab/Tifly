@@ -10,7 +10,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
   final MedicationRepository repository;
   final SupabaseClient supabase;
   final ChildSelectionCubit childSelectionCubit;
-  
+
   late final StreamSubscription _childSelectionSubscription;
 
   MedicationLogCubit({
@@ -31,14 +31,17 @@ class MedicationLogCubit extends Cubit<MedicationState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       final childState = childSelectionCubit.state;
-      
+
       if (userId == null || childState is! ChildSelected) {
         emit(MedicationError('No user or child selected'));
         return;
       }
 
       emit(MedicationLoading());
-      final medicines = await repository.getMedicines(userId, childState.childId);
+      final medicines = await repository.getMedicines(
+        userId,
+        childState.childId,
+      );
       emit(MedicationLoaded(medicines));
     } catch (e) {
       emit(MedicationError(e.toString()));
@@ -49,7 +52,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.addMedicine(medicine);
       await loadMedicines();
     } catch (e) {
@@ -61,7 +64,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.updateMedicine(id, userId, medicine);
       await loadMedicines();
     } catch (e) {
@@ -73,7 +76,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
-      
+
       await repository.deleteMedicine(id, userId);
       await loadMedicines();
     } catch (e) {

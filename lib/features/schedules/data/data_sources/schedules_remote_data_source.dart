@@ -6,7 +6,10 @@ class ChecklistDataSource {
 
   ChecklistDataSource({required this.client});
 
-  Future<List<ChecklistItem>> getChecklists(String userId, String childId) async {
+  Future<List<ChecklistItem>> getChecklists(
+    String userId,
+    String childId,
+  ) async {
     final data = await client
         .from('checklist')
         .select()
@@ -23,7 +26,7 @@ class ChecklistDataSource {
         .insert(item.toJson())
         .select()
         .single();
-    
+
     return ChecklistItem.fromJson(response);
   }
 

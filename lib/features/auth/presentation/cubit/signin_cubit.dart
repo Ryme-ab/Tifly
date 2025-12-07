@@ -12,12 +12,27 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signUp(UserModel user) async {
     try {
       emit(AuthLoading());
-      final result = await repository.signUp(user); // Returns Supabase.User
-      if (result != null) {
-        emit(AuthSuccess(user)); // <-- pass your UserModel
-      } else {
-        emit(AuthError("Sign up failed"));
-      }
+      final loggedInUser = await repository.signUp(user);
+      emit(AuthSuccess(loggedInUser));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> signIn(String email, String pwd) async {
+    try {
+      emit(AuthLoading());
+      final loggedInUser = await repository.signIn(email, pwd);
+      emit(AuthSuccess(loggedInUser));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await repository.signOut();
+      emit(AuthInitial());
     } catch (e) {
       emit(AuthError(e.toString()));
     }

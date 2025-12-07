@@ -5,16 +5,16 @@ class GrowthChart extends StatelessWidget {
   const GrowthChart({super.key});
 
   BoxDecoration _chartBoxDecoration() => BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.15),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      );
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.withValues(alpha: 0.15),
+        blurRadius: 5,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,8 @@ class GrowthChart extends StatelessWidget {
     final labels = List.generate(heightData.length, (i) => "M${i + 1}");
 
     final allValues = [...heightData, ...weightData];
-    final minY = (allValues.reduce((a, b) => a < b ? a : b) - 3).floorToDouble();
+    final minY = (allValues.reduce((a, b) => a < b ? a : b) - 3)
+        .floorToDouble();
     final maxY = (allValues.reduce((a, b) => a > b ? a : b) + 3).ceilToDouble();
 
     return Container(
@@ -49,8 +50,9 @@ class GrowthChart extends StatelessWidget {
                 },
               ),
             ),
-            leftTitles:
-                AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+            ),
           ),
           lineBarsData: [
             LineChartBarData(

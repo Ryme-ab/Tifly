@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/growth.dart';
+import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 
 class GrowthRepository {
   final SupabaseClient client;
@@ -14,12 +14,12 @@ class GrowthRepository {
         .order('date', ascending: false);
 
     return (data as List)
-        .map((e) => GrowthLog.fromMap(e as Map<String, dynamic>))
+        .map((e) => GrowthLog.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
   Future<void> addGrowth(GrowthLog log) async {
-    await client.from('growth').insert(log.toMap());
+    await client.from('growth').insert(log.toJson());
   }
 
   Future<void> deleteGrowth(String id) async {
@@ -53,8 +53,8 @@ class GrowthRepository {
 
   Future<void> updateGrowth(GrowthLog log) async {
     await client
-        .from('growth_logs')
-        .update(log.toMap())
+        .from('growth')
+        .update(log.toJson())
         .eq('id', log.id)
         .eq('user_id', log.userId);
   }

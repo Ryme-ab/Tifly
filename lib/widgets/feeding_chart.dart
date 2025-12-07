@@ -72,8 +72,7 @@ class FeedingChart extends StatelessWidget {
             ),
           ),
         ),
-      swapAnimationDuration: const Duration(milliseconds: 600),
-
+        swapAnimationDuration: const Duration(milliseconds: 600),
       ),
     );
   }

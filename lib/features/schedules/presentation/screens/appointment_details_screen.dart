@@ -418,7 +418,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
               Expanded(child: Text('Enable Reminders', style: AppFonts.body)),
               Switch(
                 value: _remindersEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: (v) => setState(() => _remindersEnabled = v),
               ),
             ],

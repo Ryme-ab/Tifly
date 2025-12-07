@@ -24,12 +24,9 @@ import 'package:tifli/features/logs/presentation/screens/souvenirs_screen.dart';
 
 import 'package:tifli/features/profiles/presentation/screens/baby_profile_screen.dart';
 
-import 'package:tifli/features/profiles/presentation/screens/create_profile_screen.dart';
-import 'package:tifli/features/profiles/presentation/screens/add_baby_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:tifli/features/logs/data/models/logs_model.dart';
 
 class AppRoutes {
   // Auth
@@ -82,6 +79,9 @@ class AppRoutes {
 }
 
 class AppRouter {
+  static final RouteObserver<PageRoute<dynamic>> routeObserver =
+      RouteObserver<PageRoute<dynamic>>();
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.splash:
@@ -97,7 +97,7 @@ class AppRouter {
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case AppRoutes.home:
-        return MaterialPageRoute(builder: (_) => const HomePage());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
 
       // Schedules
       case AppRoutes.schedules:
@@ -105,18 +105,13 @@ class AppRouter {
       case AppRoutes.appointments:
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case AppRoutes.appointmentForm:
-        return MaterialPageRoute(
-          builder: (_) => const AppointmentScreen(),
-        ); // Note: Class name is AppointmentScreen
+        return MaterialPageRoute(builder: (_) => const AppointmentScreen());
       case AppRoutes.appointmentDetails:
         return MaterialPageRoute(
           builder: (_) => const AppointmentDetailsScreen(),
         );
       case AppRoutes.appointmentMonth:
-        // Note: MonthAppointmentsView requires arguments, might need wrapper or arguments passing
-        // For now, assuming it's a standalone screen or part of AppointmentsScreen
-        // But I moved appointment_month.dart to appointment_month_screen.dart
-        // Let's check the class name in appointment_month.dart
+        // Month View Placeholder
         return MaterialPageRoute(
           builder: (_) =>
               const Scaffold(body: Center(child: Text('Month View'))),
@@ -131,9 +126,7 @@ class AppRouter {
       case AppRoutes.medicineSchedule:
         return MaterialPageRoute(builder: (_) => const MedicineScreen());
       case AppRoutes.addMedicine:
-        return MaterialPageRoute(
-          builder: (_) => const MedicineSchedulePage(),
-        ); // Note: Class name is MedicineSchedulePage
+        return MaterialPageRoute(builder: (_) => const MedicineSchedulePage());
       case AppRoutes.shoppingList:
         return MaterialPageRoute(builder: (_) => const ShoppingListScreen());
 
@@ -161,18 +154,11 @@ class AppRouter {
 
       // Profiles
       case AppRoutes.babyProfile:
-        final args = settings.arguments as Map<String, dynamic>?;
-        final babyId = args?['babyId'] as String?;
-        if (babyId == null) {
-          return _errorRoute(settings);
-        }
-        return MaterialPageRoute(
-          builder: (_) => BabyProfileScreen(babyId: babyId),
-        );
+        return MaterialPageRoute(builder: (_) => const BabyProfileScreen());
       case AppRoutes.createBaby:
       // return MaterialPageRoute(builder: (_) => const CreateBabyScreen());
       case AppRoutes.createProfile:
-        return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
+      // return MaterialPageRoute(builder: (_) => const CreateProfileScreen());
       case AppRoutes.myBabies:
       // return MaterialPageRoute(builder: (_) => const MyBabiesScreen());
       case AppRoutes.parentProfile:

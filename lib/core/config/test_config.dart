@@ -1,9 +1,10 @@
 /// Test Configuration
-/// 
+///
 /// This file contains test IDs for backend testing.
 /// To disable test mode, set [enableTestMode] to false.
-/// 
+///
 /// IMPORTANT: Remove this file and all references when moving to production!
+library;
 
 class TestConfig {
   /// Enable or disable test mode
@@ -22,7 +23,7 @@ class TestConfig {
     if (enableTestMode) {
       return testChildId;
     }
-    // TODO: Replace with actual logic to get current child from session
+    // Placeholder for production logic
     throw UnimplementedError('Production child ID retrieval not implemented');
   }
 
@@ -32,7 +33,7 @@ class TestConfig {
     if (enableTestMode) {
       return testParentId;
     }
-    // TODO: Replace with actual logic to get current parent from auth
+    // Placeholder for production logic
     throw UnimplementedError('Production parent ID retrieval not implemented');
   }
 }

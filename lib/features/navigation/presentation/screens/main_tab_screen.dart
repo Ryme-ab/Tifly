@@ -48,22 +48,21 @@ class _MainTabScreenState extends State<MainTabScreen> {
       onGenerateRoute: (settings) {
         switch (index) {
           case 0: // Home
-            return AppRouter.generateRoute(
-                RouteSettings(name: AppRoutes.home));
+            return AppRouter.generateRoute(RouteSettings(name: AppRoutes.home));
           case 1: // Schedule
             return AppRouter.generateRoute(
-                RouteSettings(name: AppRoutes.schedules));
+              RouteSettings(name: AppRoutes.schedules),
+            );
           case 2: // Track
             return AppRouter.generateRoute(
-                RouteSettings(name: AppRoutes.trackers));
+              RouteSettings(name: AppRoutes.trackers),
+            );
           case 3: // Logs
-            return AppRouter.generateRoute(
-                RouteSettings(name: AppRoutes.logs));
+            return AppRouter.generateRoute(RouteSettings(name: AppRoutes.logs));
           default:
             return MaterialPageRoute(
-              builder: (_) => const Scaffold(
-                body: Center(child: Text('Unknown Tab')),
-              ),
+              builder: (_) =>
+                  const Scaffold(body: Center(child: Text('Unknown Tab'))),
             );
         }
       },

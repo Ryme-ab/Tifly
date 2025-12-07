@@ -16,4 +16,8 @@ class ChildrenDataSource {
         .map((child) => ChildModel.fromJson(child))
         .toList();
   }
+
+  Future<void> deleteChild(String childId) async {
+    await client.from('children').delete().eq('id', childId);
+  }
 }

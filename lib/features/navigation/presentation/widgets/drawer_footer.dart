@@ -50,9 +50,13 @@ class _DrawerFooterState extends State<DrawerFooter> {
   }
 
   Future<void> _loadChildren() async {
+    print('DrawerFooter: _loadChildren called');
     final userId = UserContext.getCurrentUserId();
+    print('DrawerFooter: userId = $userId');
     if (userId != null) {
       context.read<ChildrenCubit>().loadChildren(userId);
+    } else {
+      print('DrawerFooter: userId is null, cannot load children');
     }
   }
 
@@ -68,9 +72,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Parent Profile
-          Expanded(
-            child: _buildParentProfile(),
-          ),
+          Expanded(child: _buildParentProfile()),
           const SizedBox(width: 12),
           // Baby Selector
           _buildBabySelector(),
@@ -120,10 +122,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
           Flexible(
             child: Text(
               fullName,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -135,8 +134,48 @@ class _DrawerFooterState extends State<DrawerFooter> {
   Widget _buildBabySelector() {
     return BlocBuilder<ChildrenCubit, ChildrenState>(
       builder: (context, childrenState) {
+        print('DrawerFooter: ChildrenState = ${childrenState.runtimeType}');
+
         return BlocBuilder<ChildSelectionCubit, ChildSelectionState>(
           builder: (context, selectionState) {
+            // Handle loading state
+            if (childrenState is ChildrenLoading) {
+              return const SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              );
+            }
+
+            // Handle error state
+            if (childrenState is ChildrenError) {
+              return GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text((childrenState).message),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+                child: const CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.red,
+                  child: Icon(Icons.error, color: Colors.white, size: 20),
+                ),
+              );
+            }
+
+            // Handle initial state (not loaded yet)
+            if (childrenState is ChildrenInitial) {
+              return const CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.child_care, color: Colors.white, size: 20),
+              );
+            }
+
+            // Handle loaded state
             if (childrenState is! ChildrenLoaded) {
               return const CircleAvatar(
                 radius: 20,
@@ -146,11 +185,24 @@ class _DrawerFooterState extends State<DrawerFooter> {
             }
 
             final children = childrenState.children;
+            print('DrawerFooter: Loaded ${children.length} children');
+
             if (children.isEmpty) {
-              return const CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.add, color: Colors.white, size: 20),
+              return GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'No babies found. Please add a baby first.',
+                      ),
+                    ),
+                  );
+                },
+                child: const CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.add, color: Colors.white, size: 20),
+                ),
               );
             }
 
@@ -165,8 +217,11 @@ class _DrawerFooterState extends State<DrawerFooter> {
               orElse: () => children.first,
             );
 
+            print('DrawerFooter: Selected child = ${selectedChild.firstName}');
+
             return GestureDetector(
-              onTap: () => _showBabySelector(context, children, selectedChildId),
+              onTap: () =>
+                  _showBabySelector(context, children, selectedChildId),
               child: CircleAvatar(
                 radius: 20,
                 backgroundImage: selectedChild.profileImage != null
@@ -208,10 +263,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
           children: [
             const Text(
               'Select Baby',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ...children.map((child) {
@@ -236,7 +288,9 @@ class _DrawerFooterState extends State<DrawerFooter> {
                 title: Text(
                   child.firstName,
                   style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
                 trailing: isSelected
@@ -245,11 +299,11 @@ class _DrawerFooterState extends State<DrawerFooter> {
                 onTap: () {
                   // Use the parent context here, not bottomSheetContext
                   context.read<ChildSelectionCubit>().selectChild(
-                        child.id,
-                        child.firstName,
-                      );
+                    child.id,
+                    child.firstName,
+                  );
                   Navigator.pop(bottomSheetContext);
-                  
+
                   // Show confirmation
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -259,7 +313,7 @@ class _DrawerFooterState extends State<DrawerFooter> {
                   );
                 },
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

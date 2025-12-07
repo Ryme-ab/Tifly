@@ -439,7 +439,9 @@ class MealCardV2 extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.backgroundLight,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                ),
               ),
               child: IconButton(
                 icon: Icon(Icons.more_horiz, color: AppColors.primary),

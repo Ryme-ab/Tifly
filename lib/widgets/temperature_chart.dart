@@ -5,16 +5,16 @@ class TemperatureChart extends StatelessWidget {
   const TemperatureChart({super.key});
 
   BoxDecoration _chartBoxDecoration() => BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.15),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      );
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.withValues(alpha: 0.15),
+        blurRadius: 5,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +51,12 @@ class TemperatureChart extends StatelessWidget {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: true, reservedSize: 36),
             ),
-            topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           lineBarsData: [
             LineChartBarData(

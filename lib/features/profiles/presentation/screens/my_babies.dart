@@ -6,6 +6,7 @@ import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'baby_card.dart';
+import 'baby_profile_screen.dart';
 
 class MyBabiesPage extends StatefulWidget {
   const MyBabiesPage({super.key});
@@ -111,30 +112,92 @@ class _MyBabiesPageState extends State<MyBabiesPage> {
                 spacing: 20,
                 runSpacing: 20,
                 children: state.children.map((child) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Select this child in ChildSelectionCubit
-                      context.read<ChildSelectionCubit>().selectChild(
-                        child.id,
-                        child.firstName,
-                      );
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          // Select this child in ChildSelectionCubit
+                          context.read<ChildSelectionCubit>().selectChild(
+                            child.id,
+                            child.firstName,
+                          );
 
-                      // Show snackbar confirmation
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Selected ${child.firstName}'),
-                          duration: const Duration(seconds: 2),
+                          // Show snackbar confirmation
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected ${child.firstName}'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+
+                          // Navigate to Baby Profile
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const BabyProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: BabyCard(
+                          name: child.firstName,
+                          age: calculateAgeInYears(child.birthDate),
+                          imageUrl:
+                              child.profileImage ??
+                              'https://via.placeholder.com/150',
+                          borderColor: const Color.fromARGB(0, 255, 255, 255),
                         ),
-                      );
-                    },
-                    child: BabyCard(
-                      name: child.firstName,
-                      age: calculateAgeInYears(child.birthDate),
-                      imageUrl:
-                          child.profileImage ??
-                          'https://via.placeholder.com/150',
-                      borderColor: Colors.pinkAccent,
-                    ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Delete Baby'),
+                                content: Text(
+                                  'Are you sure you want to delete ${child.firstName}? This action cannot be undone.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(ctx);
+                                      final userId =
+                                          UserContext.getCurrentUserId();
+                                      if (userId != null) {
+                                        context
+                                            .read<ChildrenCubit>()
+                                            .deleteChild(child.id, userId);
+                                      }
+                                    },
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Color.fromARGB(255, 11, 11, 11),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }).toList(),
               ),

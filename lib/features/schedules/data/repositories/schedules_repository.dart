@@ -15,5 +15,6 @@ class ChecklistRepository {
   Future<void> updateChecklistItem(ChecklistItem item, String userId) =>
       dataSource.updateItem(item, userId);
 
-  Future<void> deleteChecklistItem(String id, String userId) => dataSource.deleteItem(id, userId);
+  Future<void> deleteChecklistItem(String id, String userId) =>
+      dataSource.deleteItem(id, userId);
 }
