@@ -30,7 +30,6 @@ class SupabaseHomeRepository implements HomeRepository {
     final safeProfileResp =
         profileResp ?? {'full_name': 'My Parent Profile', 'avatar_url': ''};
 
-    // 2) Get primary child for this parent (first child or your own selection logic)
     final childResp = await client
         .from('children')
         .select()
@@ -41,6 +40,7 @@ class SupabaseHomeRepository implements HomeRepository {
 
     // FIX: Return empty data instead of throwing if no child exists
     if (childResp == null) {
+      print('no child');
       return HomeData(
         profile: Profile(
           name: safeProfileResp['full_name'] ?? 'User',
@@ -332,12 +332,6 @@ class SupabaseHomeRepository implements HomeRepository {
         .maybeSingle();
 
     if (childResp == null) {
-      // If the specific child is not found (deleted, bad ID, or RLS blocked),
-      // fallback to the default view (current user's primary child or empty state).
-      // This prevents the app from getting stuck in a crash loop.
-      print(
-        '[home] Child $childId not found, falling back to current user default.',
-      );
       return getHomeDataForCurrentUser(parentId: userId);
     }
 

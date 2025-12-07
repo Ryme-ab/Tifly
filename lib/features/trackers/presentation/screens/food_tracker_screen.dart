@@ -6,7 +6,6 @@ import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import '../cubit/meal_cubit.dart';
-import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/trackers/data/models/meal.dart'; // Adjust this import to your MealEntry/Model
 
 class FoodTrackerScreen extends StatefulWidget {

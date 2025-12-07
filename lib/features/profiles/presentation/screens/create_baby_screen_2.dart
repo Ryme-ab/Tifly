@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'baby_profile_screen.dart';
@@ -39,7 +40,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
 
     return Scaffold(
       appBar: const CustomAppBar(title: "Add Baby"),
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
         child: Column(
           children: [

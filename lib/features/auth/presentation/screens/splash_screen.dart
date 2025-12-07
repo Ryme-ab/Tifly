@@ -117,16 +117,9 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset("assets/images/logo_notext.png", width: 230),
+                Image.asset("assets/images/logo1.png", width: 300),
                 const SizedBox(height: 20),
-                Text(
-                  "Tifli",
-                  style: AppFonts.heading1.copyWith(
-                    fontSize: 30,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                
                 const SizedBox(height: 40),
                 // Loading indicator
                 const SizedBox(

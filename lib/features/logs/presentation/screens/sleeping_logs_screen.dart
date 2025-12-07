@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
 import 'package:tifli/features/logs/presentation/cubit/sleep_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/sleep_log_state.dart';
@@ -110,7 +111,8 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                   final updated = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SleepPage(showTracker: false, existingEntry: log),
+                      builder: (_) =>
+                          SleepPage(showTracker: false, existingEntry: log),
                     ),
                   );
                   if (updated is SleepLog) {
@@ -128,7 +130,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5f4f8),
+      backgroundColor: AppColors.backgroundLight,
       appBar: const CustomAppBar(title: 'Sleeping Tracker'),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),

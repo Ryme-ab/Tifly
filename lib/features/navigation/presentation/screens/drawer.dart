@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/admin/presentation/screens/settings.dart';
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +38,7 @@ class Tiflidrawer extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.child_care, size: 28, color: primary),
+                      Image.asset("assets/images/logo_notext.png", width: 50),
                       const SizedBox(width: 8),
                       Text(
                         "Tifli",
@@ -150,7 +151,15 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.settings_outlined,
                     title: "Settings",
-                    onTap: () => Navigator.pushNamed(context, "/settings"),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const SettingsPage(),
+                        ),
+                      ),
+                    ),
                   ),
 
                   menuItem(

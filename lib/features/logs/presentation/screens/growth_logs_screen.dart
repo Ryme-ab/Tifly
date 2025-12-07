@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_state.dart';
@@ -154,7 +155,7 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5f4f8),
+       backgroundColor: AppColors.backgroundLight,
       appBar: const CustomAppBar(title: "Growth Tracker"),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
