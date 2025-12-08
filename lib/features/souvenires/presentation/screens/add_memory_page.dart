@@ -141,7 +141,7 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
     final dateText = DateFormat.yMMMd().format(_selectedDate);
     final isEdit = widget.existing != null;
     return Scaffold(
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
           isEdit ? 'Edit Memory' : 'Add Memory',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
@@ -45,7 +46,7 @@ class _MyBabiesPageState extends State<MyBabiesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F4F8),
+       backgroundColor: AppColors.backgroundLight,
       appBar: const CustomAppBar(title: 'My Babies'),
       body: BlocBuilder<ChildrenCubit, ChildrenState>(
         builder: (context, state) {
