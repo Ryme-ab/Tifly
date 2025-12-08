@@ -47,7 +47,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 15),
 
             _SettingItem(
-              icon: Icons.color_lens,
+              icon: Icons.language_outlined,
               label: "Language",
               onTap: () {},
             ),
