@@ -118,7 +118,7 @@ class _BabyProfileScreenState extends State<BabyProfileScreen> {
         key: scaffoldKey,
         drawer: const Tiflidrawer(),
         appBar: const CustomAppBar(title: "Baby Profile"),
-        backgroundColor: Colors.white,
+        backgroundColor:   AppColors.backgroundLight,
         body: const Center(child: CircularProgressIndicator()),
       );
     }

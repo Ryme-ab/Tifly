@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             const SizedBox(height: 30),
 
-            // Next / Get Started button
+    
             Padding(
               padding: const EdgeInsets.all(20),
               child: SizedBox(
