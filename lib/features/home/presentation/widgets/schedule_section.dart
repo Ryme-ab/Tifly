@@ -3,6 +3,7 @@ import '../../data/models/home_model.dart';
 import 'package:tifli/core/constants/icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/features/schedules/presentation/screens/checklist_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class ScheduleItemWidget extends StatelessWidget {
   final ScheduleEntry entry;
@@ -160,6 +161,7 @@ class _ScheduleSectionState extends State<ScheduleSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasItems = _today.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,9 +169,9 @@ class _ScheduleSectionState extends State<ScheduleSection> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Today's Schedule",
-              style: TextStyle(
+            Text(
+              l10n.todaysSchedule,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 fontFamily: "Poppins",
@@ -184,9 +186,9 @@ class _ScheduleSectionState extends State<ScheduleSection> {
                     MaterialPageRoute(builder: (_) => const ChecklistPage()),
                   );
                 },
-                child: const Text(
-                  "View All  >",
-                  style: TextStyle(
+                child: Text(
+                  "${l10n.viewAll}  >",
+                  style: const TextStyle(
                     fontSize: 15,
                     color: Color(0xFF9B003D),
                     fontWeight: FontWeight.w600,
@@ -199,9 +201,9 @@ class _ScheduleSectionState extends State<ScheduleSection> {
         const SizedBox(height: 20),
         if (!hasItems)
           _EmptyState(
-            title: "No plans for today",
+            title: l10n.noScheduledItems,
             subtitle: "Add a checklist item to keep track",
-            buttonText: "Open Checklist",
+            buttonText: l10n.checklist,
             icon: Icons.event_note,
             onTap: () {
               // Navigate to the same Checklist screen as the drawer

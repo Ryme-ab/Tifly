@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/home_model.dart';
 import 'package:tifli/core/constants/icons.dart';
 import 'package:tifli/features/navigation/app_router.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class AppColors {
   static const Color pink = Color(0xFFb03a57);
@@ -22,6 +23,7 @@ class HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final avatar =
         (profile.avatarUrl.isNotEmpty && profile.avatarUrl.startsWith('http'))
         ? NetworkImage(profile.avatarUrl)
@@ -79,9 +81,9 @@ class HeaderCard extends StatelessWidget {
                         // Navigate to Baby Profile screen (same as drawer link)
                         Navigator.of(context).pushNamed(AppRoutes.babyProfile);
                       },
-                      child: const Text(
-                        'View Profile',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.viewProfile,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
