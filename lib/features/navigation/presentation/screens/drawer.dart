@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/features/admin/presentation/screens/settings.dart';
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
@@ -11,6 +12,7 @@ import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/schedules/presentation/screens/checklist_screen.dart';
+import 'package:tifli/core/widgets/language_selector.dart';
 
 class Tiflidrawer extends StatelessWidget {
   static const Color primary = Color(0xFFBA224D);
@@ -19,6 +21,8 @@ class Tiflidrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Drawer(
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -50,9 +54,14 @@ class Tiflidrawer extends StatelessWidget {
                       ),
                     ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 26),
-                    onPressed: () => Navigator.pop(context),
+                  Row(
+                    children: [
+                      const LanguageSelector(),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 26),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -67,7 +76,7 @@ class Tiflidrawer extends StatelessWidget {
                 children: [
                   menuItem(
                     icon: Icons.home_outlined,
-                    title: "Home",
+                    title: l10n.home,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const MainTabScreen()),
@@ -76,7 +85,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.person_outline,
-                    title: "Baby Profiles",
+                    title: l10n.babyProfiles,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -90,7 +99,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.local_drink_outlined,
-                    title: "Feeding Log",
+                    title: l10n.feedingLog,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -104,7 +113,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.nights_stay_outlined,
-                    title: "Sleep Log",
+                    title: l10n.sleepLog,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -118,7 +127,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.show_chart_outlined,
-                    title: "Medication Tracking",
+                    title: l10n.medicationTracking,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -132,7 +141,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.check_circle_outline,
-                    title: "Checklist",
+                    title: l10n.checklist,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -150,7 +159,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.settings_outlined,
-                    title: "Settings",
+                    title: l10n.settings,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -164,13 +173,13 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.help_outline,
-                    title: "Help & About",
+                    title: l10n.helpAndAbout,
                     onTap: () => Navigator.pushNamed(context, "/help"),
                   ),
 
                   menuItem(
                     icon: Icons.logout,
-                    title: "Logout",
+                    title: l10n.logout,
                     onTap: () async {
                       await context.read<AuthCubit>().signOut();
                       if (context.mounted) {

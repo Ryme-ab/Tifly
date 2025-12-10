@@ -3,6 +3,7 @@ import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/navigation/presentation/screens/drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -54,6 +55,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return MultiProvider(
       providers: [
         Provider<GlobalKey<ScaffoldState>>.value(value: _scaffoldKey),
@@ -73,17 +76,17 @@ class _MainTabScreenState extends State<MainTabScreen> {
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFFD93B63),
           unselectedItemColor: Colors.grey,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: l10n.home),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),
-              label: 'Schedule',
+              label: l10n.schedule,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.track_changes),
-              label: 'Track',
+              label: l10n.track,
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Logs'),
+            BottomNavigationBarItem(icon: Icon(Icons.list), label: l10n.logs),
           ],
         ),
       ),

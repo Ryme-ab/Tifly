@@ -3,6 +3,7 @@ import '../../data/models/home_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/souvenires/presentation/screens/gallery_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class MemoryCard extends StatelessWidget {
   final Memory memory;
@@ -91,6 +92,7 @@ class MemoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasItems = memories.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,9 +100,9 @@ class MemoriesSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Precious Memories',
-              style: TextStyle(
+            Text(
+              l10n.memories,
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -114,8 +116,8 @@ class MemoriesSection extends StatelessWidget {
                       context.read<ChildSelectionCubit>().selectedChildId ?? '';
                   if (childId.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please select a baby first'),
+                      SnackBar(
+                        content: Text(l10n.pleaseSelectBaby),
                       ),
                     );
                     return;
@@ -127,9 +129,9 @@ class MemoriesSection extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text(
-                  'See All',
-                  style: TextStyle(
+                child: Text(
+                  l10n.viewAll,
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

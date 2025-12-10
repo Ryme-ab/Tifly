@@ -5,6 +5,7 @@ import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
 import 'package:tifli/features/logs/presentation/cubit/sleep_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/sleep_log_state.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
@@ -26,6 +27,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
   }
 
   Widget _buildSleepCard(SleepLog log) {
+    final l10n = AppLocalizations.of(context)!;
     final color = switch (log.quality.toLowerCase()) {
       "good" => const Color(0xffe0f7fa),
       "fair" => const Color(0xfffff9c4),
@@ -89,7 +91,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                       ),
                     ),
                     Text(
-                      "Duration: ${log.getFormattedDuration()}",
+                      "${l10n.duration}: ${log.getFormattedDuration()}",
                       style: const TextStyle(color: Colors.pinkAccent),
                     ),
                     if (log.description.isNotEmpty)
@@ -129,9 +131,10 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: 'Sleeping Tracker'),
+      appBar: CustomAppBar(title: l10n.sleepingTracker),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
         onPressed: () async {
@@ -154,26 +157,26 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (state is SleepLogError) {
-                return Center(child: Text("Error: ${state.message}"));
+                return Center(child: Text("${l10n.error}: ${state.message}"));
               }
               if (state is SleepLogLoaded) {
                 final logs = state.logs
                   ..sort((a, b) => a.startTime.compareTo(b.startTime));
                 return ListView(
                   children: [
-                    const Text(
-                      "Sleep Logs",
-                      style: TextStyle(
+                    Text(
+                      l10n.sleepLog,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
                     const SizedBox(height: 16),
                     if (logs.isEmpty)
-                      const Center(
+                      Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32.0),
-                          child: Text('No sleep logs yet'),
+                          padding: const EdgeInsets.all(32.0),
+                          child: Text(l10n.noSleepLogsYet),
                         ),
                       )
                     else
@@ -181,7 +184,7 @@ class _SleepingLogsScreenState extends State<SleepingLogsScreen> {
                   ],
                 );
               }
-              return const Center(child: Text("No data"));
+              return Center(child: Text(l10n.noData));
             },
           ),
         ),
