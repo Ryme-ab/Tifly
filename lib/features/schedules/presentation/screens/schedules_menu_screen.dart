@@ -5,14 +5,17 @@ import 'package:tifli/features/schedules/presentation/screens/medicine_schedule_
 import 'package:tifli/features/schedules/presentation/screens/meal_planner_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/widgets/hovercard.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class SchedMenuScreen extends StatelessWidget {
   const SchedMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Schedule'),
+      appBar: CustomAppBar(title: l10n.schedule),
         backgroundColor: AppColors.backgroundLight,
 
       body: Padding(
@@ -20,11 +23,11 @@ class SchedMenuScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const SizedBox(height: 30),
 
             HoverCard(
-              label: "Appointments",
+              label: l10n.appointments,
               icon: Icons.calendar_month_rounded,
               gradient: const [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
               onTap: () {
@@ -37,7 +40,7 @@ class SchedMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             HoverCard(
-              label: "Medicine Schedule",
+              label: l10n.medicineSchedule,
               icon: Icons.medication_rounded,
               gradient: const [Color(0xFFFBC2EB), Color(0xFFA6C1EE)],
               onTap: () {
@@ -50,7 +53,7 @@ class SchedMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             HoverCard(
-              label: "Meal Planner",
+              label: l10n.mealPlanner,
               icon: Icons.restaurant_menu_rounded,
               gradient: const [Color(0xFFFFF1A4), Color(0xFFFFD59E)],
               onTap: () {
@@ -69,22 +72,22 @@ class SchedMenuScreen extends StatelessWidget {
   }
 
   // HEADER
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
-          "Your Baby's Schedule",
-          style: TextStyle(
+          l10n.yourBabysSchedule,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
             color: Color(0xff2e2e2e),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
-          "Manage doctor visits, medication reminders and daily meals.",
-          style: TextStyle(fontSize: 15, color: Colors.black54),
+          l10n.manageDoctorVisits,
+          style: const TextStyle(fontSize: 15, color: Colors.black54),
         ),
       ],
     );

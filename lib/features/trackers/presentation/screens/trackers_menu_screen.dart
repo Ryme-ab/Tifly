@@ -5,13 +5,16 @@ import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_scree
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/widgets/hovercard.dart';
 import 'package:tifli/core/constants/app_colors.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 class TrackersMenuScreen extends StatelessWidget {
   const TrackersMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Track'),
+      appBar: CustomAppBar(title: l10n.track),
       backgroundColor: AppColors.backgroundLight,
 
       body: Padding(
@@ -22,20 +25,20 @@ class TrackersMenuScreen extends StatelessWidget {
             // ---------- HEADER ----------
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Track Your Baby Easily",
-                  style: TextStyle(
+                  l10n.trackYourBabyEasily,
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
                     color: Color(0xff2e2e2e),
                   ),
                 ),
 
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
-                  "Monitor sleep, growth, and feeding in one place.",
-                  style: TextStyle(fontSize: 15, color: Colors.black54),
+                  l10n.monitorSleepGrowthFeeding,
+                  style: const TextStyle(fontSize: 15, color: Colors.black54),
                 ),
               ],
             ),
@@ -49,7 +52,7 @@ class TrackersMenuScreen extends StatelessWidget {
                 children: [
                   HoverCard(
                     icon: Icons.bedtime,
-                    label: "Sleep",
+                    label: l10n.sleep,
                     gradient: const [Color(0xfffde2e4), Color(0xffffb5c2)],
                     onTap: () => Navigator.push(
                       context,
@@ -59,7 +62,7 @@ class TrackersMenuScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   HoverCard(
                     icon: Icons.fitness_center,
-                    label: "Growth",
+                    label: l10n.growth,
                     gradient: const [Color(0xffe8def8), Color(0xffd2b5f0)],
                     onTap: () => Navigator.push(
                       context,
@@ -69,7 +72,7 @@ class TrackersMenuScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   HoverCard(
                     icon: Icons.local_drink,
-                    label: "Feeding",
+                    label: l10n.feeding,
                     gradient: const [Color(0xfffff4c2), Color(0xfffce69f)],
                     onTap: () => Navigator.push(
                       context,

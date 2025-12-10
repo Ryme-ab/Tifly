@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Settings'),
+      appBar: CustomAppBar(title: l10n.settings),
       backgroundColor: AppColors.backgroundLight,
 
       body: Padding(
@@ -16,49 +18,49 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Settings",
-              style: TextStyle(
+            Text(
+              l10n.settings,
+              style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
                 color: Color(0xff2e2e2e),
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              "Manage your preferences and app settings.",
-              style: TextStyle(fontSize: 15, color: Colors.black54),
+            Text(
+              l10n.managePreferences,
+              style: const TextStyle(fontSize: 15, color: Colors.black54),
             ),
 
             const SizedBox(height: 30),
 
             // Settings Items
-            _SettingItem(icon: Icons.person, label: "Account", onTap: () {}),
+            _SettingItem(icon: Icons.person, label: l10n.account, onTap: () {}),
             const SizedBox(height: 15),
 
             _SettingItem(
               icon: Icons.notifications,
-              label: "Notifications",
+              label: l10n.notifications,
               onTap: () {},
             ),
             const SizedBox(height: 15),
 
-            _SettingItem(icon: Icons.lock, label: "Privacy", onTap: () {}),
+            _SettingItem(icon: Icons.lock, label: l10n.privacy, onTap: () {}),
             const SizedBox(height: 15),
 
             _SettingItem(
               icon: Icons.language_outlined,
-              label: "Language",
+              label: l10n.language,
               onTap: () {},
             ),
             const SizedBox(height: 15),
 
-            _SettingItem(icon: Icons.color_lens, label: "Theme", onTap: () {}),
+            _SettingItem(icon: Icons.color_lens, label: l10n.theme, onTap: () {}),
             const SizedBox(height: 15),
 
             _SettingItem(
               icon: Icons.help_outline,
-              label: "Help & Support",
+              label: l10n.helpAndSupport,
               onTap: () {},
             ),
 

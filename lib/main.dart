@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 // --- Supabase Core ---
 import 'package:tifli/core/config/supabaseClient.dart';
@@ -72,6 +74,8 @@ import 'package:tifli/core/state/child_selection_cubit.dart';
 // --- Parent Profile ---
 import 'package:tifli/features/profiles/data/repositories/profiles_repository.dart';
 import 'package:tifli/features/profiles/presentation/cubit/profiles_cubit.dart';
+// --- Localization ---
+import 'package:tifli/core/state/locale_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,6 +86,9 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
+        // LOCALIZATION
+        BlocProvider<LocaleCubit>(create: (_) => LocaleCubit()),
+
         // CHILD SELECTION (FIRST - REQUIRED BY OTHER CUBITS)
         BlocProvider<ChildSelectionCubit>(create: (_) => ChildSelectionCubit()),
 
@@ -201,12 +208,24 @@ Future<void> main() async {
         ),
       ],
 
-      child: TestDataLoader(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.splash,
-          onGenerateRoute: AppRouter.generateRoute,
-        ),
+      child: BlocBuilder<LocaleCubit, Locale>(
+        builder: (context, locale) {
+          return TestDataLoader(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [Locale('en'), Locale('fr')],
+              initialRoute: AppRoutes.splash,
+              onGenerateRoute: AppRouter.generateRoute,
+            ),
+          );
+        },
       ),
     ),
   );
