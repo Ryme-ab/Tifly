@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/icons.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'header_section.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.dart';
@@ -11,33 +12,34 @@ class LogsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final items = [
       _LogCard(
         icon: AppIcons.sleep,
         bgColor: const Color(0xFFF3E9FF),
-        title: "Sleep",
-        value: "Tap to log",
+        title: l10n.sleep,
+        value: l10n.tapToLog,
         onTap: () => _goSleep(context),
       ),
       _LogCard(
         icon: AppIcons.feedingBottle,
         bgColor: const Color(0xFFEAF3FF),
-        title: "Feeding",
-        value: "Tap to log",
+        title: l10n.feeding,
+        value: l10n.tapToLog,
         onTap: () => _goFeeding(context),
       ),
       _LogCard(
         icon: Icons.show_chart_outlined,
         bgColor: const Color(0xFFFFF8E1),
-        title: "Growth",
-        value: "Tap to log",
+        title: l10n.growth,
+        value: l10n.tapToLog,
         onTap: () => _goGrowth(context),
       ),
       _LogCard(
         icon: Icons.medication_outlined,
         bgColor: const Color(0xFFFFE8E8),
-        title: "Medication",
-        value: "Tap to log",
+        title: l10n.medication,
+        value: l10n.tapToLog,
         onTap: () => _goMedication(context),
       ),
     ];
@@ -45,9 +47,9 @@ class LogsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
+        Text(
+          l10n.quickActions,
+          style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 20,
             fontWeight: FontWeight.w700,

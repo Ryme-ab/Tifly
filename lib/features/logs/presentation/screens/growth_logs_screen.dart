@@ -5,6 +5,7 @@ import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/growth_logs_state.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
@@ -73,6 +74,7 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
   }
 
   Widget _logCard(GrowthLog log) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Dismissible(
@@ -115,9 +117,9 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Growth Log",
-                      style: TextStyle(
+                    Text(
+                      l10n.growthLog,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -154,9 +156,10 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
        backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: "Growth Tracker"),
+      appBar: CustomAppBar(title: l10n.growthTracker),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
         child: const Icon(Icons.add),
@@ -181,7 +184,7 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (state is GrowthLogError) {
-                return Center(child: Text("Error: ${state.message}"));
+                return Center(child: Text("${l10n.error}: ${state.message}"));
               }
               if (state is GrowthLogLoaded) {
                 final logs = [...state.logs]
@@ -193,9 +196,9 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Growth Dashboard",
-                            style: TextStyle(
+                          Text(
+                            l10n.growthDashboard,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),

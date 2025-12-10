@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
 import 'package:tifli/features/navigation/presentation/screens/drawer.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import '../cubit/home_cubit.dart';
 import '../../data/repositories/home_repository.dart';
 import '../widgets/header_section.dart' hide AppColors;
@@ -95,8 +96,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Provider<AppBarConfig>(
-      create: (_) => AppBarConfig(title: 'Home'),
+      create: (_) => AppBarConfig(title: l10n.home),
       child: BlocProvider.value(
         value: cubit,
         child: Scaffold(
@@ -167,20 +169,21 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Failed to load home data',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            Text(
+              l10n.failedToLoadHomeData,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(error, textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.retry)),
           ],
         ),
       ),
@@ -193,6 +196,7 @@ class _NoChildrenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -207,13 +211,13 @@ class _NoChildrenView extends StatelessWidget {
               color: Colors.pinkAccent.shade200,
             ),
             const SizedBox(height: 12),
-            const Text(
-              "No little ones yet",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            Text(
+              l10n.noLittleOnesYet,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "You haven't added any children yet. Want to add one?",
+            Text(
+              l10n.noChildrenAddedYet,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -224,7 +228,7 @@ class _NoChildrenView extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const AddBabyPage()),
                 );
               },
-              child: const Text("Add Baby"),
+              child: Text(l10n.addBaby),
             ),
           ],
         ),

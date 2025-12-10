@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/home_model.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 class GrowthSection extends StatelessWidget {
   final GrowthSummary? summary;
@@ -7,15 +8,16 @@ class GrowthSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (summary == null) {
       return const SizedBox.shrink();
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Growth',
-          style: TextStyle(
+        Text(
+          l10n.growth,
+          style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -26,19 +28,19 @@ class GrowthSection extends StatelessWidget {
         Row(
           children: [
             _MetricCard(
-              title: 'Height',
+              title: l10n.height,
               value: summary!.height ?? '--',
               icon: Icons.height,
             ),
             const SizedBox(width: 12),
             _MetricCard(
-              title: 'Weight',
+              title: l10n.weight,
               value: summary!.weight ?? '--',
               icon: Icons.scale,
             ),
             const SizedBox(width: 12),
             _MetricCard(
-              title: 'Head',
+              title: l10n.head,
               value: summary!.headCircumference ?? '--',
               icon: Icons.straighten,
             ),
@@ -46,7 +48,7 @@ class GrowthSection extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Last update: ${summary!.date}',
+          '${l10n.lastUpdate}: ${summary!.date}',
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 12,

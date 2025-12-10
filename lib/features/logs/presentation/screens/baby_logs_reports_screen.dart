@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tifli/core/constants/app_colors.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 import 'package:tifli/features/logs/presentation/screens/growth_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
@@ -48,6 +49,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final bgColor = isDark ? const Color(0xFF0F1113) : const Color(0xFFF6F4F8);
@@ -55,7 +57,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: "Logs & Reports"),
+      appBar: CustomAppBar(title: l10n.logsAndReports),
       body: Column(
         children: [
           const SizedBox(height: 12),
@@ -72,7 +74,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                       Expanded(
                         child: _LogButton(
                           icon: Icons.local_drink,
-                          title: "Feeding Logs",
+                          title: l10n.feedingLogs,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -85,7 +87,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                       Expanded(
                         child: _LogButton(
                           icon: Icons.child_care,
-                          title: "Growth Logs",
+                          title: l10n.growthLogs,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -104,7 +106,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                       Expanded(
                         child: _LogButton(
                           icon: Icons.bedtime,
-                          title: "Sleeping Logs",
+                          title: l10n.sleepingLogs,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -117,7 +119,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                       Expanded(
                         child: _LogButton(
                           icon: Icons.medication_liquid,
-                          title: "Medication Logs",
+                          title: l10n.medicationLogs,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -162,7 +164,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "Activity Logs",
+                                    l10n.activityLogs,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800,
@@ -184,7 +186,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      "Recent",
+                                      l10n.recent,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: isDark
