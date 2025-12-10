@@ -1,9 +1,13 @@
 // lib/profile/parent_profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/features/profiles/presentation/cubit/profiles_cubit.dart';
+import 'package:tifli/features/profiles/presentation/cubit/profiles_state.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -20,20 +24,21 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   bool darkMode = false;
 
   // === User Data Controllers ===
-  final TextEditingController _nameController = TextEditingController(
-    text: "Eleanor Vance",
-  );
-  final TextEditingController _emailController = TextEditingController(
-    text: "eleanor.vance@example.com",
-  );
-  final TextEditingController _phoneController = TextEditingController(
-    text: "+1 (555) 123-4567",
-  );
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   // === Edit States ===
   bool _isEditingName = false;
   bool _isEditingEmail = false;
   bool _isEditingPhone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load profile on start
+    context.read<ProfilesCubit>().loadProfile();
+  }
 
   @override
   void dispose() {
@@ -43,154 +48,214 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     super.dispose();
   }
 
+  void _updateProfile() {
+    context.read<ProfilesCubit>().updateProfile(
+          fullName: _nameController.text,
+          email: _emailController.text,
+          phone: _phoneController.text,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: "Parent Profile"),
       backgroundColor: AppColors.backgroundLight,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // === Profile Header ===
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundImage: AssetImage(AppAssets.babyMom),
-                    backgroundColor: AppColors.surfaceLight,
+      body: BlocConsumer<ProfilesCubit, ProfilesState>(
+        listener: (context, state) {
+          if (state is ProfilesLoaded) {
+            // Only update controllers if not editing to avoid overwriting user input
+            if (!_isEditingName) {
+              _nameController.text = state.profile.fullName;
+            }
+            if (!_isEditingEmail) {
+              _emailController.text = state.profile.email;
+            }
+            if (!_isEditingPhone) {
+              _phoneController.text = state.profile.phone;
+            }
+          } else if (state is ProfilesError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ProfilesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // Even if error, we might show the form (empty or previously loaded)
+          // For simplicty, let's show form if loaded or error (assuming error handles empty state gracefully or shows empty form)
+          // Ideally, handle initial loading vs refresh loading
+          
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // === Profile Header ===
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _nameController.text,
-                    style: AppFonts.heading2.copyWith(
-                      fontSize: 18,
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 36,
+                        backgroundImage: AssetImage(AppAssets.babyMom),
+                         // TODO: Use NetworkImage if state.profile.avatarUrl is available
+                        backgroundColor: AppColors.surfaceLight,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _nameController.text.isNotEmpty ? _nameController.text : "Loading...",
+                        style: AppFonts.heading2.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _emailController.text,
+                        style: AppFonts.small.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // === Personal Information ===
+                _buildSectionTitle("Personal Information"),
+                const SizedBox(height: 8),
+                _buildEditableField(
+                  "Full Name",
+                  _nameController,
+                  _isEditingName,
+                  onEditTap: () {
+                    setState(() {
+                      if (_isEditingName) {
+                         // Save when toggling off
+                        _updateProfile();
+                      }
+                      _isEditingName = !_isEditingName;
+                    });
+                  },
+                ),
+                _buildEditableField(
+                  "Email Address",
+                  _emailController,
+                  _isEditingEmail,
+                  onEditTap: () {
+                     setState(() {
+                      if (_isEditingEmail) {
+                        _updateProfile();
+                      }
+                      _isEditingEmail = !_isEditingEmail;
+                    });
+                  },
+                ),
+                _buildEditableField(
+                  "Phone Number",
+                  _phoneController,
+                  _isEditingPhone,
+                  onEditTap: () {
+                    setState(() {
+                      if (_isEditingPhone) {
+                        _updateProfile();
+                      }
+                      _isEditingPhone = !_isEditingPhone;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                // === Account Preferences ===
+                _buildSectionTitle("Account Preferences"),
+                const SizedBox(height: 8),
+                _buildToggle(
+                  "Enable Notifications",
+                  enableNotifications,
+                  (value) => setState(() => enableNotifications = value),
+                ),
+                _buildToggle(
+                  "Daily Summary Emails",
+                  dailySummaryEmails,
+                  (value) => setState(() => dailySummaryEmails = value),
+                ),
+                _buildToggle(
+                  "Share Activity Data",
+                  shareActivityData,
+                  (value) => setState(() => shareActivityData = value),
+                ),
+                _buildToggle(
+                  "Dark Mode (Coming Soon)",
+                  darkMode,
+                  (value) => setState(() => darkMode = value),
+                  enabled: false,
+                ),
+
+                const SizedBox(height: 24),
+
+                // === Buttons ===
+                // button to check babies list (light variant)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.myBabies);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.10),
+                    foregroundColor: AppColors.primary,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    "Check your babies list",
+                    style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<ProfilesCubit>().signOut();
+                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.surfaceLight,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    "Logout",
+                    style: AppFonts.body.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.surfaceLight,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _emailController.text,
-                    style: AppFonts.small.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // === Personal Information ===
-            _buildSectionTitle("Personal Information"),
-            const SizedBox(height: 8),
-            _buildEditableField(
-              "Full Name",
-              _nameController,
-              _isEditingName,
-              onEditTap: () => setState(() => _isEditingName = !_isEditingName),
-            ),
-            _buildEditableField(
-              "Email Address",
-              _emailController,
-              _isEditingEmail,
-              onEditTap: () =>
-                  setState(() => _isEditingEmail = !_isEditingEmail),
-            ),
-            _buildEditableField(
-              "Phone Number",
-              _phoneController,
-              _isEditingPhone,
-              onEditTap: () =>
-                  setState(() => _isEditingPhone = !_isEditingPhone),
-            ),
-
-            const SizedBox(height: 20),
-
-            // === Account Preferences ===
-            _buildSectionTitle("Account Preferences"),
-            const SizedBox(height: 8),
-            _buildToggle(
-              "Enable Notifications",
-              enableNotifications,
-              (value) => setState(() => enableNotifications = value),
-            ),
-            _buildToggle(
-              "Daily Summary Emails",
-              dailySummaryEmails,
-              (value) => setState(() => dailySummaryEmails = value),
-            ),
-            _buildToggle(
-              "Share Activity Data",
-              shareActivityData,
-              (value) => setState(() => shareActivityData = value),
-            ),
-            _buildToggle(
-              "Dark Mode (Coming Soon)",
-              darkMode,
-              (value) => setState(() => darkMode = value),
-              enabled: false,
-            ),
-
-            const SizedBox(height: 24),
-
-            // === Buttons ===
-            // button to check babies list (light variant)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).pushNamed('/parentProfile'); // adjust route
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary.withValues(alpha: 0.10),
-                foregroundColor: AppColors.primary,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 0,
-              ),
-              child: Text(
-                "Check your babies list",
-                style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
-              ),
+              ],
             ),
-
-            const SizedBox(height: 12),
-
-            ElevatedButton(
-              onPressed: () {
-                // perform logout
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.surfaceLight,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                "Logout",
-                style: AppFonts.body.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.surfaceLight,
-                ),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

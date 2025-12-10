@@ -27,7 +27,7 @@ class HeaderCard extends StatelessWidget {
     final avatar =
         (profile.avatarUrl.isNotEmpty && profile.avatarUrl.startsWith('http'))
         ? NetworkImage(profile.avatarUrl)
-        : const AssetImage('assets/images/baby3.jpg') as ImageProvider;
+        : const AssetImage('assets/images/baby_placeholder.jpg') as ImageProvider;
 
     return Container(
       height: 240,
