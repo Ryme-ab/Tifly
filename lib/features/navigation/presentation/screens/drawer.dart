@@ -185,7 +185,7 @@ class Tiflidrawer extends StatelessWidget {
               ),
             ),
 
-            // ---------- BOTTOM AREA ----------
+         
             const DrawerFooter(),
           ],
         ),

@@ -20,24 +20,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
   void initState() {
     super.initState();
     _appBarNotifier = ValueNotifier(
-      AppBarConfig(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black87),
-            onPressed: () {},
-          ),
-          GestureDetector(
-            onTap: () {},
-            child: const Padding(
-              padding: EdgeInsets.only(right: 12.0),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage('https://i.pravatar.cc/100'),
-                radius: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
+      AppBarConfig(),
     );
   }
 

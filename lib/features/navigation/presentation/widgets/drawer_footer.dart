@@ -5,6 +5,7 @@ import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/features/profiles/presentation/cubit/children_cubit.dart';
 import 'package:tifli/features/profiles/data/models/child_model.dart';
+import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 
 class DrawerFooter extends StatefulWidget {
   const DrawerFooter({super.key});
@@ -105,28 +106,40 @@ class _DrawerFooterState extends State<DrawerFooter> {
         color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 14,
-            backgroundImage: profileImage != null
-                ? NetworkImage(profileImage)
-                : null,
-            backgroundColor: Colors.grey.shade300,
-            child: profileImage == null
-                ? Icon(Icons.person, size: 16, color: Colors.grey.shade600)
-                : null,
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              fullName,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-              overflow: TextOverflow.ellipsis,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ParentProfileScreen()),
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 14,
+              backgroundImage: profileImage != null
+                  ? NetworkImage(profileImage)
+                  : null,
+              backgroundColor: Colors.grey.shade300,
+              child: profileImage == null
+                  ? Icon(Icons.person, size: 16, color: Colors.grey.shade600)
+                  : null,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                fullName,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
