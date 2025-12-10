@@ -71,6 +71,9 @@ import 'package:tifli/features/souvenires/presentation/cubit/gallery_cubit.dart'
 // --- Child Selection ---
 import 'package:tifli/core/state/child_selection_cubit.dart';
 
+// --- Parent Profile ---
+import 'package:tifli/features/profiles/data/repositories/profiles_repository.dart';
+import 'package:tifli/features/profiles/presentation/cubit/profiles_cubit.dart';
 // --- Localization ---
 import 'package:tifli/core/state/locale_cubit.dart';
 
@@ -197,6 +200,11 @@ Future<void> main() async {
         BlocProvider<GalleryCubit>(
           create: (_) =>
               GalleryCubit(GalleryRepositoryImpl(GalleryRemoteDataSource())),
+        ),
+
+        // PARENT PROFILE SYSTEM
+        BlocProvider<ProfilesCubit>(
+          create: (_) => ProfilesCubit(ProfilesRepository()),
         ),
       ],
 
