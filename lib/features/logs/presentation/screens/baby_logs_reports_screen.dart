@@ -17,6 +17,8 @@ import 'package:tifli/features/logs/data/models/baby_log_model.dart';
 
 import 'package:tifli/core/state/child_selection_cubit.dart';
 
+/// -----------------------------------------
+/// BabyLogsReportsPage - redesigned logs & reports screen
 class BabyLogsReportsPage extends StatefulWidget {
   const BabyLogsReportsPage({super.key});
 
