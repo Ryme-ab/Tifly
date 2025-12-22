@@ -216,10 +216,7 @@ class _NoChildrenView extends StatelessWidget {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            Text(
-              l10n.noChildrenAddedYet,
-              textAlign: TextAlign.center,
-            ),
+            Text(l10n.noChildrenAddedYet, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
