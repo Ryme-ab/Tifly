@@ -13,10 +13,10 @@ class SchedMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: CustomAppBar(title: l10n.schedule),
-        backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.backgroundLight,
 
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),

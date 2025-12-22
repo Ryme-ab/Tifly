@@ -20,9 +20,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   void initState() {
     super.initState();
-    _appBarNotifier = ValueNotifier(
-      AppBarConfig(),
-    );
+    _appBarNotifier = ValueNotifier(AppBarConfig());
   }
 
   /// Builds a new Navigator for the selected tab
@@ -56,7 +54,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return MultiProvider(
       providers: [
         Provider<GlobalKey<ScaffoldState>>.value(value: _scaffoldKey),

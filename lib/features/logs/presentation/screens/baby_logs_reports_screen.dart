@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/l10n/app_localizations.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:tifli/features/logs/presentation/screens/growth_logs_screen.dart';
 import 'package:tifli/features/logs/presentation/screens/feeding_logs_screen.dart';
@@ -45,6 +49,404 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
     if (state is ChildSelected) {
       context.read<BabyLogsCubit>().loadAllLogs(state.childId);
     }
+  }
+
+  void _showExportDialog(BuildContext context, List<BabyLog> logs) {
+    bool includeFeeding = true;
+    bool includeGrowth = true;
+    bool includeSleeping = true;
+    bool includeMedication = true;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.picture_as_pdf, color: Color(0xFFF56587)),
+                SizedBox(width: 12),
+                Text('Export PDF Report'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Select which logs to include:',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                CheckboxListTile(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.local_drink, size: 20, color: Color(0xFF6B6BFF)),
+                      SizedBox(width: 8),
+                      Text('Feeding Logs'),
+                    ],
+                  ),
+                  value: includeFeeding,
+                  onChanged: (value) => setState(() => includeFeeding = value ?? true),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.child_care, size: 20, color: Color(0xFF8E44AD)),
+                      SizedBox(width: 8),
+                      Text('Growth Logs'),
+                    ],
+                  ),
+                  value: includeGrowth,
+                  onChanged: (value) => setState(() => includeGrowth = value ?? true),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.bedtime, size: 20, color: Color(0xFF4FB783)),
+                      SizedBox(width: 8),
+                      Text('Sleeping Logs'),
+                    ],
+                  ),
+                  value: includeSleeping,
+                  onChanged: (value) => setState(() => includeSleeping = value ?? true),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                CheckboxListTile(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.medication_liquid, size: 20, color: Color(0xFFE74C3C)),
+                      SizedBox(width: 8),
+                      Text('Medication Logs'),
+                    ],
+                  ),
+                  value: includeMedication,
+                  onChanged: (value) => setState(() => includeMedication = value ?? true),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.download, size: 18),
+                label: const Text('Export PDF'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF56587),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _generatePdfReport(
+                    context,
+                    logs,
+                    includeFeeding,
+                    includeGrowth,
+                    includeSleeping,
+                    includeMedication,
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _generatePdfReport(
+    BuildContext context,
+    List<BabyLog> logs,
+    bool includeFeeding,
+    bool includeGrowth,
+    bool includeSleeping,
+    bool includeMedication,
+  ) async {
+    try {
+      // Show loading
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              ),
+              SizedBox(width: 12),
+              Text('Generating PDF...'),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      final pdf = pw.Document();
+
+      // Filter logs based on selection
+      final filteredLogs = logs.where((log) {
+        if (log.type == LogType.feeding && !includeFeeding) return false;
+        if (log.type == LogType.growth && !includeGrowth) return false;
+        if (log.type == LogType.sleep && !includeSleeping) return false;
+        if (log.type == LogType.medication && !includeMedication) return false;
+        return true;
+      }).toList();
+
+      // Calculate statistics
+      final feedingLogs = filteredLogs.where((l) => l.type == LogType.feeding).toList();
+      final growthLogs = filteredLogs.where((l) => l.type == LogType.growth).toList();
+      final sleepLogs = filteredLogs.where((l) => l.type == LogType.sleep).toList();
+      final medicationLogs = filteredLogs.where((l) => l.type == LogType.medication).toList();
+
+      // Get child info
+      final childState = context.read<ChildSelectionCubit>().state;
+      String childName = 'Baby';
+      if (childState is ChildSelected) {
+        childName = childState.childName;
+      }
+
+      // Add page
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+          build: (context) => [
+            // Header
+            pw.Header(
+              level: 0,
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'Baby Logs Report',
+                    style: pw.TextStyle(
+                      fontSize: 28,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.pink700,
+                    ),
+                  ),
+                  pw.SizedBox(height: 8),
+                  pw.Text(
+                    'Child: $childName',
+                    style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800),
+                  ),
+                  pw.Text(
+                    'Generated: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}',
+                    style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+                  ),
+                  pw.Divider(thickness: 2),
+                ],
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // Summary Statistics
+            pw.Text(
+              'Summary Statistics',
+              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 12),
+            
+            _buildStatisticsGrid(
+              feedingLogs.length,
+              growthLogs.length,
+              sleepLogs.length,
+              medicationLogs.length,
+              includeFeeding,
+              includeGrowth,
+              includeSleeping,
+              includeMedication,
+            ),
+
+            pw.SizedBox(height: 30),
+
+            // Detailed Logs
+            if (includeFeeding && feedingLogs.isNotEmpty) ...[
+              _buildLogSection('Feeding Logs', feedingLogs, PdfColors.blue500),
+              pw.SizedBox(height: 20),
+            ],
+
+            if (includeGrowth && growthLogs.isNotEmpty) ...[
+              _buildLogSection('Growth Logs', growthLogs, PdfColors.purple500),
+              pw.SizedBox(height: 20),
+            ],
+
+            if (includeSleeping && sleepLogs.isNotEmpty) ...[
+              _buildLogSection('Sleeping Logs', sleepLogs, PdfColors.green500),
+              pw.SizedBox(height: 20),
+            ],
+
+            if (includeMedication && medicationLogs.isNotEmpty) ...[
+              _buildLogSection('Medication Logs', medicationLogs, PdfColors.red500),
+            ],
+          ],
+        ),
+      );
+
+      // Show/save PDF
+      if (!context.mounted) return;
+      
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdf.save(),
+        name: 'baby_logs_report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
+      );
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Text('PDF generated successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error generating PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  pw.Widget _buildStatisticsGrid(
+    int feedingCount,
+    int growthCount,
+    int sleepCount,
+    int medicationCount,
+    bool showFeeding,
+    bool showGrowth,
+    bool showSleep,
+    bool showMedication,
+  ) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(16),
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.grey300),
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+      ),
+      child: pw.Column(
+        children: [
+          if (showFeeding)
+            _buildStatRow('Feeding Logs', feedingCount, PdfColors.blue500),
+          if (showGrowth)
+            _buildStatRow('Growth Logs', growthCount, PdfColors.purple500),
+          if (showSleep)
+            _buildStatRow('Sleeping Logs', sleepCount, PdfColors.green500),
+          if (showMedication)
+            _buildStatRow('Medication Logs', medicationCount, PdfColors.red500),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildStatRow(String label, int count, PdfColor color) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 8),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(
+            label,
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: pw.BoxDecoration(
+              color: color,
+              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
+            ),
+            child: pw.Text(
+              '$count',
+              style: const pw.TextStyle(
+                fontSize: 14,
+                color: PdfColors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildLogSection(String title, List<BabyLog> logs, PdfColor color) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: pw.BoxDecoration(
+            color: color,
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+          ),
+          child: pw.Text(
+            title,
+            style: pw.TextStyle(
+              fontSize: 18,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.white,
+            ),
+          ),
+        ),
+        pw.SizedBox(height: 12),
+        pw.Table(
+          border: pw.TableBorder.all(color: PdfColors.grey300),
+          children: [
+            // Header
+            pw.TableRow(
+              decoration: pw.BoxDecoration(color: PdfColors.grey200),
+              children: [
+                _buildTableCell('Date/Time', isHeader: true),
+                _buildTableCell('Title', isHeader: true),
+                _buildTableCell('Details', isHeader: true),
+              ],
+            ),
+            // Data rows
+            ...logs.map((log) => pw.TableRow(
+              children: [
+                _buildTableCell(
+                  DateFormat('MMM dd, yyyy\nhh:mm a').format(log.timestamp),
+                ),
+                _buildTableCell(log.title),
+                _buildTableCell(log.details),
+              ],
+            )),
+          ],
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildTableCell(String text, {bool isHeader = false}) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(8),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          fontSize: isHeader ? 12 : 10,
+          fontWeight: isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
+        ),
+      ),
+    );
   }
 
   @override
@@ -308,7 +710,17 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
             elevation: 6,
           ),
           onPressed: () {
-            // keep original behavior - hook your report generation
+            final state = context.read<BabyLogsCubit>().state;
+            if (state is BabyLogsLoaded) {
+              _showExportDialog(context, state.logs);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please wait for logs to load'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
           },
         ),
       ),

@@ -116,9 +116,7 @@ class MemoriesSection extends StatelessWidget {
                       context.read<ChildSelectionCubit>().selectedChildId ?? '';
                   if (childId.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.pleaseSelectBaby),
-                      ),
+                      SnackBar(content: Text(l10n.pleaseSelectBaby)),
                     );
                     return;
                   }

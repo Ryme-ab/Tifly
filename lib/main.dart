@@ -48,6 +48,11 @@ import 'package:tifli/features/schedules/data/data_sources/schedules_remote_data
 import 'package:tifli/features/schedules/data/repositories/schedules_repository.dart';
 import 'package:tifli/features/schedules/presentation/cubit/schedules_cubit.dart';
 
+// --- Meal Planner ---
+import 'package:tifli/features/schedules/data/data_sources/meal_planner_data_source.dart';
+import 'package:tifli/features/schedules/data/repositories/meal_planner_repository.dart';
+import 'package:tifli/features/schedules/presentation/cubit/meal_planner_cubit.dart';
+
 // --- Children ---
 import 'package:tifli/features/profiles/data/data_sources/children_data_source.dart';
 import 'package:tifli/features/profiles/data/repositories/children_repository.dart';
@@ -82,6 +87,7 @@ Future<void> main() async {
   await SupabaseClientManager.initialize();
 
   final supabase = SupabaseClientManager().client;
+  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
     MultiBlocProvider(
@@ -167,6 +173,15 @@ Future<void> main() async {
             ),
             supabase: supabase,
             childSelectionCubit: context.read<ChildSelectionCubit>(),
+          ),
+        ),
+
+        // MEAL PLANNER SYSTEM
+        BlocProvider<MealPlannerCubit>(
+          create: (_) => MealPlannerCubit(
+            repository: MealPlannerRepository(
+              dataSource: MealPlannerDataSource(),
+            ),
           ),
         ),
 

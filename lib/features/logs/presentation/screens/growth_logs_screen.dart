@@ -158,7 +158,7 @@ class _GrowthLogsScreenState extends State<GrowthLogsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-       backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.backgroundLight,
       appBar: CustomAppBar(title: l10n.growthTracker),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
