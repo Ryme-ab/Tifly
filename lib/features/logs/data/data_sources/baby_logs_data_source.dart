@@ -6,108 +6,94 @@ class BabyLogsDataSource {
 
   BabyLogsDataSource({required this.client});
 
-  Future<List<BabyLog>> getAllLogs(String childId) async {
+  Future<List<BabyLog>> getFilteredLogs({
+    required String childId,
+    LogType? type,
+    DateTime? date,
+    String? time, // "HH:mm"
+  }) async {
     final allLogs = <BabyLog>[];
 
+    // 🟦 helper for date filter
+    bool matchDate(DateTime ts) {
+      if (date == null) return true;
+      return ts.year == date.year &&
+          ts.month == date.month &&
+          ts.day == date.day;
+    }
+
+    // 🟦 helper for time filter
+    bool matchTime(DateTime ts) {
+      if (time == null) return true;
+      final t = "${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}";
+      return t == time;
+    }
+
     try {
-      // Fetch feeding logs
-      final mealsData = await client
-          .from('meals')
-          .select()
-          .eq('child_id', childId)
-          .order('meal_time', ascending: false)
-          .limit(50);
+      // ---------- FEEDING ----------
+      if (type == null || type == LogType.feeding) {
+        final data = await client
+            .from('meals')
+            .select()
+            .eq('child_id', childId);
 
-      for (final meal in mealsData) {
-        allLogs.add(BabyLog.fromFeeding(meal));
+        for (final e in data) {
+          final log = BabyLog.fromFeeding(e);
+          if (matchDate(log.timestamp) && matchTime(log.timestamp)) {
+            allLogs.add(log);
+          }
+        }
       }
 
-      // Fetch sleep logs
-      final sleepData = await client
-          .from('sleep')
-          .select()
-          .eq('child_id', childId)
-          .order('start_time', ascending: false)
-          .limit(50);
+      // ---------- SLEEP ----------
+      if (type == null || type == LogType.sleep) {
+        final data = await client
+            .from('sleep')
+            .select()
+            .eq('child_id', childId);
 
-      for (final sleep in sleepData) {
-        allLogs.add(BabyLog.fromSleep(sleep));
+        for (final e in data) {
+          final log = BabyLog.fromSleep(e);
+          if (matchDate(log.timestamp) && matchTime(log.timestamp)) {
+            allLogs.add(log);
+          }
+        }
       }
 
-      // Fetch medication logs
-      final healthData = await client
-          .from('medicines')
-          .select()
-          .eq('baby_id', childId)
-          .order('created_at', ascending: false)
-          .limit(50);
+      // ---------- MEDICATION ----------
+      if (type == null || type == LogType.medication) {
+        final data = await client
+            .from('medicines')
+            .select()
+            .eq('baby_id', childId);
 
-      for (final health in healthData) {
-        allLogs.add(BabyLog.fromMedication(health));
+        for (final e in data) {
+          final log = BabyLog.fromMedication(e);
+          if (matchDate(log.timestamp) && matchTime(log.timestamp)) {
+            allLogs.add(log);
+          }
+        }
       }
 
-      // Try to fetch growth logs (optional)
-      try {
-        final growthData = await client
+      // ---------- GROWTH ----------
+      if (type == null || type == LogType.growth) {
+        final data = await client
             .from('growth')
             .select()
-            .eq('child_id', childId)
-            .order('date', ascending: false)
-            .limit(20);
+            .eq('child_id', childId);
 
-        for (final growth in growthData) {
-          allLogs.add(BabyLog.fromGrowth(growth));
+        for (final e in data) {
+          final log = BabyLog.fromGrowth(e);
+          if (matchDate(log.timestamp) && matchTime(log.timestamp)) {
+            allLogs.add(log);
+          }
         }
-      } catch (e) {
-        // Growth table might not exist
       }
 
-      // Sort all logs by timestamp (most recent first)
       allLogs.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
       return allLogs;
     } catch (e) {
-      throw Exception('Failed to fetch baby logs: $e');
-    }
-  }
-
-  Future<List<BabyLog>> getLogsByType(String childId, LogType type) async {
-    try {
-      switch (type) {
-        case LogType.feeding:
-          final data = await client
-              .from('meals')
-              .select()
-              .eq('child_id', childId)
-              .order('meal_time', ascending: false);
-          return data.map<BabyLog>((e) => BabyLog.fromFeeding(e)).toList();
-
-        case LogType.sleep:
-          final data = await client
-              .from('sleep')
-              .select()
-              .eq('child_id', childId)
-              .order('start_time', ascending: false);
-          return data.map<BabyLog>((e) => BabyLog.fromSleep(e)).toList();
-
-        case LogType.medication:
-          final data = await client
-              .from('medication')
-              .select()
-              .eq('baby_id', childId)
-              .order('created_at', ascending: false);
-          return data.map<BabyLog>((e) => BabyLog.fromMedication(e)).toList();
-
-        case LogType.growth:
-          final data = await client
-              .from('growth')
-              .select()
-              .eq('child_id', childId)
-              .order('date', ascending: false);
-          return data.map<BabyLog>((e) => BabyLog.fromGrowth(e)).toList();
-      }
-    } catch (e) {
-      throw Exception('Failed to fetch logs by type: $e');
+      throw Exception('Filter failed: $e');
     }
   }
 }
