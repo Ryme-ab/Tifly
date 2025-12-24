@@ -10,11 +10,9 @@ import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.da
 import 'package:tifli/features/logs/presentation/screens/medication_logs_screen.dart';
 
 import 'package:tifli/widgets/custom_app_bar.dart';
-
 import 'package:tifli/features/logs/presentation/cubit/baby_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/baby_logs_state.dart';
 import 'package:tifli/features/logs/data/models/baby_log_model.dart';
-
 import 'package:tifli/core/state/child_selection_cubit.dart';
 
 class BabyLogsReportsPage extends StatefulWidget {
@@ -25,6 +23,10 @@ class BabyLogsReportsPage extends StatefulWidget {
 }
 
 class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
+  LogType? selectedType;
+  DateTime? selectedDate;
+  String? selectedTime;
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +37,6 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
   void _initializeFromCubit() {
     final cubit = context.read<ChildSelectionCubit>();
-    // listen for child selection changes to reload logs
     cubit.stream.listen(_handleChildSelectionState);
     _handleChildSelectionState(cubit.state);
   }
@@ -47,6 +48,182 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
     }
   }
 
+  void _showFilterDialog() {
+  LogType? tempType = selectedType;
+  DateTime? tempDate = selectedDate;
+  String? tempTime = selectedTime;
+
+  final cubit = context.read<BabyLogsCubit>();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.35,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, controller) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          controller: controller,
+          child: StatefulBuilder(
+            builder: (context, setState) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const Text(
+                  "Filter Logs",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+
+                // Log Type ChoiceChips
+                Wrap(
+                  spacing: 8,
+                  children: LogType.values.map((e) {
+                    final isSelected = tempType == e;
+                    return ChoiceChip(
+                      label: Text(e.toString().split('.').last),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() => tempType = e);
+                        cubit.applyFilter(type: tempType, date: tempDate, time: tempTime);
+                      },
+                      selectedColor: Colors.blue.withOpacity(0.2),
+                      backgroundColor: Colors.grey[200],
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.blue : Colors.black87,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+
+                // Date Picker
+                Row(
+                  children: [
+                    const Text("Date:"),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: tempDate ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          setState(() => tempDate = picked);
+                          cubit.applyFilter(type: tempType, date: tempDate, time: tempTime);
+                        }
+                      },
+                      child: Text(
+                        tempDate == null
+                            ? "Select Date"
+                            : "${tempDate!.year}-${tempDate!.month.toString().padLeft(2, '0')}-${tempDate!.day.toString().padLeft(2, '0')}",
+                      ),
+                    ),
+                    if (tempDate != null)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() => tempDate = null);
+                          cubit.applyFilter(type: tempType, date: tempDate, time: tempTime);
+                        },
+                      ),
+                  ],
+                ),
+
+                // Time Picker
+                Row(
+                  children: [
+                    const Text("Time:"),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: tempTime != null
+                              ? TimeOfDay(
+                                  hour: int.parse(tempTime!.split(':')[0]),
+                                  minute: int.parse(tempTime!.split(':')[1]),
+                                )
+                              : TimeOfDay.now(),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            tempTime =
+                                "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+                          });
+                          cubit.applyFilter(type: tempType, date: tempDate, time: tempTime);
+                        }
+                      },
+                      child: Text(tempTime ?? "Select Time"),
+                    ),
+                    if (tempTime != null)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() => tempTime = null);
+                          cubit.applyFilter(type: tempType, date: tempDate, time: tempTime);
+                        },
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() {
+                            tempType = null;
+                            tempDate = null;
+                            tempTime = null;
+                          });
+                          cubit.applyFilter(type: null, date: null, time: null);
+                        },
+                        child: const Text("Reset"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Done"),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -57,7 +234,15 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: CustomAppBar(title: l10n.logsAndReports),
+      appBar: CustomAppBar(
+        title: l10n.logsAndReports,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _showFilterDialog,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           const SizedBox(height: 12),
@@ -67,8 +252,6 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 12),
-
-                  // Top action buttons - modernized and colorful
                   Row(
                     children: [
                       Expanded(
@@ -78,8 +261,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const FeedingLogsScreen(),
-                            ),
+                                builder: (_) => const FeedingLogsScreen()),
                           ),
                         ),
                       ),
@@ -91,16 +273,13 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const GrowthLogsScreen(),
-                            ),
+                                builder: (_) => const GrowthLogsScreen()),
                           ),
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
@@ -110,8 +289,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const SleepingLogsScreen(),
-                            ),
+                                builder: (_) => const SleepingLogsScreen()),
                           ),
                         ),
                       ),
@@ -123,17 +301,13 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const MedicationsScreen(),
-                            ),
+                                builder: (_) => const MedicationsScreen()),
                           ),
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 18),
-
-                  // Activity Logs panel
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
@@ -154,122 +328,25 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                         width: 0.5,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // header row with title and quick filters (visual only)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    l10n.activityLogs,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w800,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? Colors.white10
-                                          : const Color(0xFFF3F6F9),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      l10n.recent,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark
-                                            ? Colors.white70
-                                            : Colors.black54,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        BlocBuilder<BabyLogsCubit, BabyLogsState>(
-                          builder: (context, state) {
-                            if (state is BabyLogsLoading) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 28,
-                                ),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(
-                                      isDark
-                                          ? Colors.white
-                                          : const Color(0xFF6B6BFF),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            if (state is BabyLogsError) {
-                              return Padding(
-                                padding: const EdgeInsets.all(28.0),
-                                child: Center(
-                                  child: Text(
-                                    "Error: ${state.message}",
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white70
-                                          : Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            if (state is BabyLogsLoaded) {
-                              return LogTable(logs: state.logs);
-                            }
-
-                            final selectionState = context
-                                .watch<ChildSelectionCubit>()
-                                .state;
-
-                            if (selectionState is NoChildSelected) {
-                              return const Padding(
-                                padding: EdgeInsets.all(32.0),
-                                child: Center(
-                                  child: Text(
-                                    "Please select a baby from the drawer.",
-                                  ),
-                                ),
-                              );
-                            }
-
-                            return const Padding(
-                              padding: EdgeInsets.all(24.0),
-                              child: Center(
-                                child: Text("Select a baby to view logs."),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                    child: BlocBuilder<BabyLogsCubit, BabyLogsState>(
+                      builder: (context, state) {
+                        if (state is BabyLogsLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (state is BabyLogsError) {
+                          return Center(
+                              child: Text("Error: ${state.message}"));
+                        }
+                        if (state is BabyLogsLoaded) {
+                          return LogTable(logs: state.logs);
+                        }
+                        return const Center(
+                          child: Text("Select a baby to view logs."),
+                        );
+                      },
                     ),
                   ),
-
                   const SizedBox(height: 120),
                 ],
               ),
@@ -277,48 +354,10 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
           ),
         ],
       ),
-
-      // Bottom action
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: bgColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.description_outlined, size: 20),
-          label: const Text("Generate Report"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFF56587),
-            foregroundColor: Colors.white,
-            minimumSize: const Size.fromHeight(52),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-            textStyle: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-            ),
-            elevation: 6,
-          ),
-          onPressed: () {
-            // keep original behavior - hook your report generation
-          },
-        ),
-      ),
     );
   }
 }
 
-/* -----------------------------------------
-   _LogButton - modernized and color-coded
-   ----------------------------------------- */
 class _LogButton extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -349,7 +388,6 @@ class _LogButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = mapColor(title);
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -409,9 +447,6 @@ class _LogButton extends StatelessWidget {
   }
 }
 
-/* -----------------------------------------
-   LogTable - modern cards with colors/icons
-   ----------------------------------------- */
 class LogTable extends StatelessWidget {
   final List<BabyLog> logs;
 
@@ -440,19 +475,6 @@ class LogTable extends StatelessWidget {
         return Icons.medication_liquid;
       case LogType.growth:
         return Icons.child_care;
-    }
-  }
-
-  String typeName(LogType type) {
-    switch (type) {
-      case LogType.feeding:
-        return "Feeding";
-      case LogType.sleep:
-        return "Sleep";
-      case LogType.medication:
-        return "Medication";
-      case LogType.growth:
-        return "Growth";
     }
   }
 
@@ -507,7 +529,6 @@ class LogTable extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // colored vertical indicator
               Container(
                 width: 6,
                 height: 60,
@@ -520,14 +541,10 @@ class LogTable extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              // Icon + details
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // icon badge
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -538,16 +555,13 @@ class LogTable extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(width: 12),
-
-              // DETAILS
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      typeName(log.type),
+                      log.type.toString().split('.').last,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -568,10 +582,7 @@ class LogTable extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              // TIME
               SizedBox(
                 width: 78,
                 child: Text(

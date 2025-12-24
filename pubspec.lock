@@ -390,7 +390,7 @@ packages:
     source: sdk
     version: "0.0.0"
   font_awesome_flutter:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: font_awesome_flutter
       sha256: b9011df3a1fa02993630b8fb83526368cf2206a711259830325bab2f1d2a4eb0
@@ -614,7 +614,7 @@ packages:
     source: hosted
     version: "0.11.1"
   material_symbols_icons:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: material_symbols_icons
       sha256: "9a7de58ffc299c8e362b4e860e36e1d198fa0981a894376fe1b6bfe52773e15b"

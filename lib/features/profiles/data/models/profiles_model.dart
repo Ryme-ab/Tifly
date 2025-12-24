@@ -29,7 +29,8 @@ class UserProfileModel {
       'full_name': fullName,
       'email': email,
       'phone': phone,
-      // 'avatar_url': avatarUrl, // Uncomment after running SQL migration: ALTER TABLE profiles ADD COLUMN avatar_url text;
+
+      'avatar_url': avatarUrl,
     };
   }
 }
