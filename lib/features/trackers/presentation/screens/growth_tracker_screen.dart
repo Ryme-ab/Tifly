@@ -10,6 +10,7 @@ import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart
 import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/navigation/app_router.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class GrowthPage extends StatefulWidget {
   final bool showTracker;
@@ -57,16 +58,6 @@ class _GrowthPageState extends State<GrowthPage> {
     bmiController.dispose();
     notesController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) setState(() => _selectedDate = picked);
   }
 
   Future<void> _save() async {
@@ -246,31 +237,10 @@ class _GrowthPageState extends State<GrowthPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAF5),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: Text(
-          widget.existingLog != null ? 'Edit Growth Log' : 'Add Growth Data',
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundImage: AssetImage(
-                'assets/images/parent_placeholder.jpg',
-              ),
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: widget.existingLog != null
+            ? 'Edit Growth Log'
+            : 'Add Growth Data',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -283,7 +253,10 @@ class _GrowthPageState extends State<GrowthPage> {
                 TrackerButtonsRow(currentPage: 'growth'),
                 const SizedBox(height: 20),
               ],
-              const SmallWeekCalendar(),
+              SmallWeekCalendar(
+                selectedDate: _selectedDate,
+                onDateSelected: (date) => setState(() => _selectedDate = date),
+              ),
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,
@@ -298,40 +271,7 @@ class _GrowthPageState extends State<GrowthPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Date
-                    const Text(
-                      'Date',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 6),
-                    GestureDetector(
-                      onTap: _pickDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const Icon(
-                              Icons.calendar_month,
-                              color: Colors.black54,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // Date picker removed (redundant)
 
                     // Weight
                     _buildMeasurementField(

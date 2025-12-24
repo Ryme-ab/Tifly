@@ -2,14 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SmallWeekCalendar extends StatefulWidget {
-  const SmallWeekCalendar({super.key});
+  final DateTime? selectedDate;
+  final ValueChanged<DateTime>? onDateSelected;
+
+  const SmallWeekCalendar({
+    super.key,
+    this.selectedDate,
+    this.onDateSelected,
+  });
 
   @override
   State<SmallWeekCalendar> createState() => _SmallWeekCalendarState();
 }
 
 class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.selectedDate ?? DateTime.now();
+  }
+
+  @override
+  void didUpdateWidget(covariant SmallWeekCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedDate != null &&
+        widget.selectedDate != oldWidget.selectedDate) {
+      _selectedDate = widget.selectedDate!;
+    }
+  }
 
   List<DateTime> get _weekDays {
     final startOfWeek = _selectedDate.subtract(
@@ -22,10 +44,16 @@ class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
     setState(
       () => _selectedDate = _selectedDate.subtract(const Duration(days: 7)),
     );
+    if (widget.onDateSelected != null) {
+      widget.onDateSelected!(_selectedDate);
+    }
   }
 
   void _nextWeek() {
     setState(() => _selectedDate = _selectedDate.add(const Duration(days: 7)));
+    if (widget.onDateSelected != null) {
+      widget.onDateSelected!(_selectedDate);
+    }
   }
 
   @override
@@ -98,7 +126,12 @@ class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
                     date.year == _selectedDate.year;
 
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedDate = date),
+                  onTap: () {
+                    setState(() => _selectedDate = date);
+                    if (widget.onDateSelected != null) {
+                      widget.onDateSelected!(date);
+                    }
+                  },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(

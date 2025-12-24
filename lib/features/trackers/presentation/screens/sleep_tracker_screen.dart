@@ -10,6 +10,7 @@ import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
 import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
 import 'package:tifli/core/config/supabaseClient.dart';
 import 'package:tifli/features/navigation/app_router.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
 
 class SleepPage extends StatefulWidget {
   const SleepPage({super.key, this.showTracker = true, this.existingEntry});
@@ -33,11 +34,14 @@ class _SleepPageState extends State<SleepPage> {
       endTime = TimeOfDay.fromDateTime(widget.existingEntry!.endTime);
       notesController.text = widget.existingEntry!.description;
       selectedQuality = widget.existingEntry!.quality;
-      
+
       // Validate that the quality exists in our options
-      final bool qualityExists = qualityOptions.any((q) => q['value'] == selectedQuality);
+      final bool qualityExists = qualityOptions.any(
+        (q) => q['value'] == selectedQuality,
+      );
       if (!qualityExists) {
-        selectedQuality = null; // Reset if invalid/unknown value to prevent crash
+        selectedQuality =
+            null; // Reset if invalid/unknown value to prevent crash
       }
     } else {
       startTime = const TimeOfDay(hour: 8, minute: 30);
@@ -183,11 +187,11 @@ class _SleepPageState extends State<SleepPage> {
         );
 
         await context.read<SleepCubit>().addSleepLog(
-              sleepLog: sleepLog,
-              childId: selectedChildId,
-              startTime: startDateTime,
-              endTime: endDateTime,
-            );
+          sleepLog: sleepLog,
+          childId: selectedChildId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -221,28 +225,10 @@ class _SleepPageState extends State<SleepPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1FBFE),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: Text(
-          widget.existingEntry != null ? 'Edit Sleep Log' : 'Add Trackers',
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundImage: AssetImage(
-                'assets/images/parent_placeholder.jpg',
-              ),
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: widget.existingEntry != null
+            ? 'Edit Sleep Log'
+            : 'Add Sleep Data',
       ),
       body: SafeArea(
         child: SingleChildScrollView(

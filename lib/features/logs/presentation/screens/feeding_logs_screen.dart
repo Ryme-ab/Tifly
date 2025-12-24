@@ -244,9 +244,7 @@ class _FeedingLogsScreenState extends State<FeedingLogsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(
-        title: 'Feeding Tracker',
-      ), // replace or use normal AppBar
+      appBar: const CustomAppBar(title: 'Feeding Logs'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
