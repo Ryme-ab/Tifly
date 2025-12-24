@@ -40,8 +40,9 @@ class EmergencyCardRepositoryImpl implements EmergencyCardRepository {
   @override
   Future<void> saveEmergencyCard(EmergencyCard card) async {
     final model = EmergencyCardModel.fromEntity(card);
-    
+
     // 1. Save locally immediately with pending status
+
     final pendingModel = EmergencyCardModel(
       id: model.id,
       childId: model.childId,
@@ -62,7 +63,7 @@ class EmergencyCardRepositoryImpl implements EmergencyCardRepository {
     );
     // Actually, model.syncStatus is already 'pending' by default in Entity or I can specify it.
     // Let's use a explicit copyWith if I had implemented it, but I'll craft it.
-    
+
     final toSave = EmergencyCardModel(
       id: model.id,
       childId: model.childId,

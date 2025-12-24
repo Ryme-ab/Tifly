@@ -1,6 +1,8 @@
 // lib/features/trackers/presentation/screens/food_tracker_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import '../cubit/meal_cubit.dart';
@@ -55,11 +57,17 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       );
     } else {
       _selectedFeeding = _feedingOptions.first;
-      _quantity = 14;
+      _quantity = 120; // Default reasonable amount
       _selectedTime = const TimeOfDay(hour: 8, minute: 30);
       _notes = "";
       _selectedDate = DateTime.now();
     }
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickTime() async {
@@ -83,10 +91,11 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       _selectedTime.minute,
     );
 
+    // Get selected child ID
     final childState = context.read<ChildSelectionCubit>().state;
     if (childState is! ChildSelected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a baby first")),
+        const SnackBar(content: Text("Please select a baby first"), backgroundColor: Colors.orange),
       );
       return;
     }
@@ -139,7 +148,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6FAF5),
+      backgroundColor: const Color.fromARGB(116, 255, 243, 224), // Matched SleepPage background
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -158,7 +167,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.showTracker) ...[
-                TrackerButtonsRow(currentPage: 'food'),
+                const TrackerButtonsRow(currentPage: 'food'),
                 const SizedBox(height: 20),
               ],
 
@@ -175,7 +184,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7FBF8),
+                  color: const Color.fromARGB(91, 255, 243, 224),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -186,8 +195,8 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black26),
-                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade300), // Lighter border
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButton<String>(
                         value: _selectedFeeding,
@@ -236,7 +245,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                                 icon: const Icon(Icons.remove, color: Color(0xFFA41639)),
                                 onPressed: () {
                                   setState(() {
-                                    if (_quantity > 0) _quantity--;
+                                    if (_quantity > 0) _quantity -= 10;
                                   });
                                 },
                               ),
@@ -266,15 +275,14 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                     const Text('Notes', style: TextStyle(fontSize: 14, color: Colors.black54)),
                     const SizedBox(height: 6),
                     TextField(
+                      controller: _notesController,
                       maxLines: 3,
-                      controller: TextEditingController(text: _notes),
                       decoration: InputDecoration(
                         hintText: 'Add any notes...',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         isDense: true,
                         contentPadding: const EdgeInsets.all(10),
                       ),
-                      onChanged: (value) => _notes = value,
                     ),
                     const SizedBox(height: 30),
 

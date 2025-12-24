@@ -198,11 +198,11 @@ class _SleepPageState extends State<SleepPage> {
         );
 
         await context.read<SleepCubit>().addSleepLog(
-              sleepLog: sleepLog,
-              childId: selectedChildId,
-              startTime: startDateTime,
-              endTime: endDateTime,
-            );
+          sleepLog: sleepLog,
+          childId: selectedChildId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
