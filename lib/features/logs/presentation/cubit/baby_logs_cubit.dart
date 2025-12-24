@@ -8,9 +8,10 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
   String? currentChildId;
   LogType? currentFilter;
   DateTime? currentDate;
+  DateTime? currentStartDate;
+  DateTime? currentEndDate;
   String? currentTime; // format "HH:mm"
 
-  // ✅ Option 1: named parameter 'repository'
   BabyLogsCubit({required BabyLogsRepository repository})
       : repo = repository,
         super(BabyLogsInitial());
@@ -20,6 +21,8 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
     currentChildId = childId;
     currentFilter = null;
     currentDate = null;
+    currentStartDate = null;
+    currentEndDate = null;
     currentTime = null;
     emit(BabyLogsLoading());
     try {
@@ -47,11 +50,15 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
   Future<void> applyFilter({
     LogType? type,
     DateTime? date,
+    DateTime? startDate,
+    DateTime? endDate,
     String? time,
   }) async {
     if (currentChildId == null) return;
     currentFilter = type;
     currentDate = date;
+    currentStartDate = startDate;
+    currentEndDate = endDate;
     currentTime = time;
 
     emit(BabyLogsLoading());
@@ -60,6 +67,8 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
         childId: currentChildId!,
         type: type,
         date: date,
+        startDate: startDate,
+        endDate: endDate,
         time: time,
       );
       emit(BabyLogsLoaded(logs));
@@ -74,8 +83,17 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
       await applyFilter(
         type: currentFilter,
         date: currentDate,
+        startDate: currentStartDate,
+        endDate: currentEndDate,
         time: currentTime,
       );
+    }
+  }
+
+  // Clear all filters
+  void clearFilters() {
+    if (currentChildId != null) {
+      loadAllLogs(currentChildId!);
     }
   }
 }
