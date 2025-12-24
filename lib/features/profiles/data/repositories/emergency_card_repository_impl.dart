@@ -42,6 +42,7 @@ class EmergencyCardRepositoryImpl implements EmergencyCardRepository {
     final model = EmergencyCardModel.fromEntity(card);
     
     // 1. Save locally immediately with pending status
+    // ignore: unused_local_variable
     final pendingModel = EmergencyCardModel(
       id: model.id,
       childId: model.childId,

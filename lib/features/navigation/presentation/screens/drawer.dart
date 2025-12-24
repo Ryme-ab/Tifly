@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tifli/l10n/app_localizations.dart';
-import 'package:tifli/features/admin/presentation/screens/settings.dart';
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -153,6 +152,12 @@ class Tiflidrawer extends StatelessWidget {
                     ),
                   ),
 
+                  menuItem(
+                    icon: Icons.emergency_outlined,
+                    title: "Emergency Medical Card",
+                    onTap: () => Navigator.pushNamed(context, '/profiles/emergency-card'),
+                  ),
+
                   const SizedBox(height: 20),
                   Divider(color: Colors.grey.shade300),
                   const SizedBox(height: 20),
@@ -160,15 +165,7 @@ class Tiflidrawer extends StatelessWidget {
                   menuItem(
                     icon: Icons.settings_outlined,
                     title: l10n.settings,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => Provider<AppBarConfig>(
-                          create: (_) => AppBarConfig(),
-                          child: const SettingsPage(),
-                        ),
-                      ),
-                    ),
+                    onTap: () => Navigator.pushNamed(context, '/settings'),
                   ),
 
                   menuItem(
