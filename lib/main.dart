@@ -99,7 +99,7 @@ import 'package:tifli/features/schedules/presentation/cubit/appointments_cubit.d
 import 'package:tifli/features/schedules/presentation/cubit/doctors_cubit.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
-import 'package:timezone/timezone.dart' as tz;
+
 
 // --- Theme ---
 import 'package:tifli/core/theme/app_theme.dart';
