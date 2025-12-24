@@ -22,7 +22,7 @@ class Tiflidrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Drawer(
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -194,7 +194,6 @@ class Tiflidrawer extends StatelessWidget {
               ),
             ),
 
-         
             const DrawerFooter(),
           ],
         ),

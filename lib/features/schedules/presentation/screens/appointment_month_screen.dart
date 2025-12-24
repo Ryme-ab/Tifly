@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:tifli/widgets/appointmentcard.dart';
+import 'package:tifli/features/schedules/presentation/cubit/appointments_cubit.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
+import 'package:tifli/widgets/appointmentcard.dart';
+import 'package:tifli/features/navigation/app_router.dart';
 
 class MonthAppointmentsView extends StatefulWidget {
   final DateTime selectedDate;
@@ -202,11 +205,13 @@ class _MonthAppointmentsViewState extends State<MonthAppointmentsView> {
                 final newLog = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AppointmentScreen(),
+                    builder: (context) => const AppointmentScreen(
+                      appointment: null, // creating new
+                    ),
                   ),
                 );
 
-                if (newLog != null) {
+                if (newLog == true) {
                   widget.onAdd(widget.selectedDate);
                 }
               },
@@ -243,8 +248,19 @@ class _MonthAppointmentsViewState extends State<MonthAppointmentsView> {
     }
     return list
         .map(
-          (a) =>
-              AppointmentCard(time: a['time'] ?? '', title: a['title'] ?? ''),
+          (a) => AppointmentCard(
+            time: a['time'] ?? '',
+            title: a['title'] ?? '',
+            appointmentId: a['id'] ?? '',
+            childId: a['childId'] ?? '',
+            onDelete: () {
+              // 🔥 Call your backend / cubit / provider
+              context.read<AppointmentsCubit>().deleteAppointment(
+                a['id'] ?? '',
+                a['childId'] ?? '',
+              );
+            },
+          ),
         )
         .toList();
   }
