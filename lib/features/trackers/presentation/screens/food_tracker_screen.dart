@@ -247,7 +247,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1FBFE), // Matched SleepPage background
+      backgroundColor: const Color.fromARGB(116, 255, 243, 224), // Matched SleepPage background
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
         title: widget.existingEntry != null
@@ -275,7 +275,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7FBF8),
+                  color: const Color.fromARGB(91, 255, 243, 224),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(

@@ -25,11 +25,12 @@ class GrowthPage extends StatefulWidget {
 class _GrowthPageState extends State<GrowthPage> {
   String? selectedUnitWeight = 'kg';
   String? selectedUnitHeight = 'cm';
-  String? selectedUnitBmi = 'kg/m²';
+  String? selectedUnitHeadCircumference = 'cm';
 
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-  final TextEditingController bmiController = TextEditingController();
+  final TextEditingController headCircumferenceController =
+      TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
@@ -44,7 +45,7 @@ class _GrowthPageState extends State<GrowthPage> {
       final e = widget.existingLog!;
       weightController.text = e.weight.toString();
       heightController.text = e.height.toString();
-      bmiController.text = e.headCircumference.toString();
+      headCircumferenceController.text = e.headCircumference.toString();
       notesController.text = e.notes ?? '';
       _selectedDate = e.date;
       // units keep defaults (kg/cm), change if you store units in model
@@ -55,7 +56,7 @@ class _GrowthPageState extends State<GrowthPage> {
   void dispose() {
     weightController.dispose();
     heightController.dispose();
-    bmiController.dispose();
+    headCircumferenceController.dispose();
     notesController.dispose();
     super.dispose();
   }
@@ -63,14 +64,16 @@ class _GrowthPageState extends State<GrowthPage> {
   Future<void> _save() async {
     final weight = double.tryParse(weightController.text.trim());
     final height = double.tryParse(heightController.text.trim());
-    final bmi = double.tryParse(bmiController.text.trim());
+    final headCircumference = double.tryParse(
+      headCircumferenceController.text.trim(),
+    );
     final notes = notesController.text.trim();
 
-    if (weight == null || height == null || bmi == null) {
+    if (weight == null || height == null || headCircumference == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Please enter valid numeric values for weight, height and BMI.',
+            'Please enter valid numeric values for weight, height and head circumference.',
           ),
           backgroundColor: Colors.orange,
         ),
@@ -100,7 +103,7 @@ class _GrowthPageState extends State<GrowthPage> {
           date: _selectedDate,
           height: height,
           weight: weight,
-          headCircumference: bmi,
+          headCircumference: headCircumference,
           notes: notes.isEmpty ? existing.notes : notes,
           // keep createdAt as existing.createdAt
         );
@@ -124,7 +127,7 @@ class _GrowthPageState extends State<GrowthPage> {
           date: _selectedDate,
           height: height,
           weight: weight,
-          headCircumference: bmi,
+          headCircumference: headCircumference,
           notes: notes.isEmpty ? null : notes,
         );
 
@@ -188,8 +191,9 @@ class _GrowthPageState extends State<GrowthPage> {
               ),
             ),
             const SizedBox(width: 10),
-            Flexible(
-              flex: 1,
+            SizedBox(
+              width: 80, 
+              height: 50,
               child: InputDecorator(
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(
@@ -203,7 +207,6 @@ class _GrowthPageState extends State<GrowthPage> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    isExpanded: true,
                     value: selectedUnit,
                     items: _unitsForLabel(label)
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
@@ -225,8 +228,8 @@ class _GrowthPageState extends State<GrowthPage> {
         return ['kg', 'lb'];
       case 'Height':
         return ['cm', 'in'];
-      case 'BMI':
-        return ['kg/m²'];
+      case 'Head Circumference':
+        return ['cm', 'in'];
       default:
         return [''];
     }
@@ -271,8 +274,6 @@ class _GrowthPageState extends State<GrowthPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Date picker removed (redundant)
-
                     // Weight
                     _buildMeasurementField(
                       label: 'Weight',
@@ -293,12 +294,13 @@ class _GrowthPageState extends State<GrowthPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // BMI / Head circumference field (we keep BMI label to match your UI)
+                    // Head Circumference field
                     _buildMeasurementField(
-                      label: 'BMI',
-                      selectedUnit: selectedUnitBmi,
-                      controller: bmiController,
-                      onUnitChanged: (v) => setState(() => selectedUnitBmi = v),
+                      label: 'Head Circumference',
+                      selectedUnit: selectedUnitHeadCircumference,
+                      controller: headCircumferenceController,
+                      onUnitChanged: (v) =>
+                          setState(() => selectedUnitHeadCircumference = v),
                     ),
                     const SizedBox(height: 20),
 
@@ -354,9 +356,8 @@ class _GrowthPageState extends State<GrowthPage> {
       ),
     );
   }
-}
+} // Minimal TrackerButtonsRow - you already had this in your original file; included for completeness
 
-// Minimal TrackerButtonsRow - you already had this in your original file; included for completeness
 class TrackerButtonsRow extends StatelessWidget {
   final String currentPage;
   const TrackerButtonsRow({super.key, required this.currentPage});

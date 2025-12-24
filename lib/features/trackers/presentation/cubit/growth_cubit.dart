@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:uuid/uuid.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import '../../data/repositories/growth_repository.dart';
 import 'package:tifli/core/utils/user_context.dart';
@@ -41,9 +42,13 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
         throw Exception("This growth log already exists!");
       }
 
-      // Create new growth log
+      // Generate a valid UUID for the growth log
+      const uuid = Uuid();
+      final logId = uuid.v4();
+
+      // Create new growth log with valid UUID
       final growthLog = GrowthLog(
-        id: '',
+        id: logId,
         childId: childId,
         userId: userId,
         date: date,

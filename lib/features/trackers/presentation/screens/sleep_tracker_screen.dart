@@ -252,7 +252,7 @@ class _SleepPageState extends State<SleepPage> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7FBF8),
+                  color: const Color(0xFFF1FBFE),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
