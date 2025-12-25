@@ -324,18 +324,44 @@ class FeedingAnalyticsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(
-        title: 'Feeding Tracker',
-      ), // replace or use normal AppBar
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final mealTypeCounts = <String, int>{};
+    final amountPerDay = <String, int>{};
+    final feedingsByHour = <int, int>{};
+
+    for (var log in logs) {
+      mealTypeCounts[log.mealType] = (mealTypeCounts[log.mealType] ?? 0) + 1;
+      final dayKey = DateFormat('MM/dd').format(log.mealTime);
+      amountPerDay[dayKey] = (amountPerDay[dayKey] ?? 0) + log.amount;
+      final hour = log.mealTime.hour;
+      feedingsByHour[hour] = (feedingsByHour[hour] ?? 0) + 1;
+    }
+
+    final totalAmount = logs.fold<int>(0, (sum, log) => sum + log.amount);
+    final avgAmount = logs.isEmpty ? 0 : (totalAmount / logs.length).round();
+    final maxAmount = logs.isEmpty ? 0 : logs.map((l) => l.amount).reduce((a, b) => a > b ? a : b);
+
+    return Column(
+      children: [
+        // Stats Cards
+        Row(
+          children: [
+            Expanded(child: _StatCard(icon: Icons.restaurant, title: "Avg Amount", value: "${avgAmount}ml", color: const Color(0xFFFF9800), isDark: isDark)),
+            const SizedBox(width: 12),
+            Expanded(child: _StatCard(icon: Icons.water_drop, title: "Total", value: "${totalAmount}ml", color: const Color(0xFF2196F3), isDark: isDark)),
+            const SizedBox(width: 12),
+            Expanded(child: _StatCard(icon: Icons.history, title: "Feedings", value: "${logs.length}", color: const Color(0xFF4CAF50), isDark: isDark)),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Meal Type Distribution
+        if (mealTypeCounts.isNotEmpty) ...[
+          _ChartCard(
+            title: "Feeding Type Distribution",
+            isDark: isDark,
+            child: SizedBox(
+              height: 220,
+              child: Row(
                 children: [
                   Expanded(
                     flex: 3,
