@@ -1,0 +1,4 @@
+node_modules/
+*.local
+# Secrets
+backend/serviceAccountKey.json

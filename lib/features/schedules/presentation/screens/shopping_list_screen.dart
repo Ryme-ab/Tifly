@@ -403,6 +403,8 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         ? Colors.grey
                         : AppColors.textPrimaryLight,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -411,6 +413,8 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                     color: AppColors.textPrimaryLight,
                     fontSize: 12,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

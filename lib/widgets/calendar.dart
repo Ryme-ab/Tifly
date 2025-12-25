@@ -2,30 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SmallWeekCalendar extends StatefulWidget {
-  const SmallWeekCalendar({super.key});
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateSelected;
+
+  const SmallWeekCalendar({
+    super.key,
+    required this.selectedDate,
+    required this.onDateSelected,
+  });
 
   @override
   State<SmallWeekCalendar> createState() => _SmallWeekCalendarState();
 }
 
 class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.selectedDate;
+  }
 
   List<DateTime> get _weekDays {
-    final startOfWeek = _selectedDate.subtract(
-      Duration(days: _selectedDate.weekday % 7),
-    );
+    final startOfWeek =
+        _selectedDate.subtract(Duration(days: _selectedDate.weekday % 7));
     return List.generate(7, (i) => startOfWeek.add(Duration(days: i)));
   }
 
   void _previousWeek() {
-    setState(
-      () => _selectedDate = _selectedDate.subtract(const Duration(days: 7)),
-    );
+    setState(() {
+      _selectedDate = _selectedDate.subtract(const Duration(days: 7));
+    });
+    widget.onDateSelected(_selectedDate);
   }
 
   void _nextWeek() {
-    setState(() => _selectedDate = _selectedDate.add(const Duration(days: 7)));
+    setState(() {
+      _selectedDate = _selectedDate.add(const Duration(days: 7));
+    });
+    widget.onDateSelected(_selectedDate);
   }
 
   @override
@@ -89,16 +105,20 @@ class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 6),
               itemCount: _weekDays.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final date = _weekDays[index];
                 final isSelected =
-                    date.day == _selectedDate.day &&
+                    date.year == _selectedDate.year &&
                     date.month == _selectedDate.month &&
-                    date.year == _selectedDate.year;
+                    date.day == _selectedDate.day;
 
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedDate = date),
+                  onTap: () {
+                    setState(() => _selectedDate = date);
+                    widget.onDateSelected(date);
+                  },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
@@ -126,7 +146,8 @@ class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: isSelected ? Colors.white : Colors.black54,
+                            color:
+                                isSelected ? Colors.white : Colors.black54,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -135,7 +156,8 @@ class _SmallWeekCalendarState extends State<SmallWeekCalendar> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
-                            color: isSelected ? Colors.white : Colors.black87,
+                            color:
+                                isSelected ? Colors.white : Colors.black87,
                           ),
                         ),
                       ],

@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
 import 'package:tifli/features/logs/data/models/medication_log_model.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
 // For test child ID
 
 class MedicationsScreen extends StatefulWidget {
@@ -28,11 +32,100 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     });
   }
 
+  Future<void> _exportMedicationLogsPDF(BuildContext context) async {
+    final state = context.read<MedicationLogCubit>().state;
+    if (state is! MedicationLoaded) return;
+
+    final logs = state.medicines;
+    if (logs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No medication logs to export')),
+      );
+      return;
+    }
+
+    try {
+      final pdf = pw.Document();
+      final childState = context.read<ChildSelectionCubit>().state;
+      String childName = 'Baby';
+      if (childState is ChildSelected) {
+        childName = childState.childName;
+      }
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+          build: (context) => [
+            pw.Header(
+              level: 0,
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Medication Logs Report', style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold, color: PdfColors.red700)),
+                  pw.SizedBox(height: 8),
+                  pw.Text('Child: $childName', style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800)),
+                  pw.Text('Generated: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                  pw.Divider(thickness: 2),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('Total Logs: ${logs.length}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 16),
+            pw.Table.fromTextArray(
+              headers: ['Date', 'Medicine', 'Doctor', 'Dose', 'Notes'],
+              data: logs.map((log) {
+                return [
+                  DateFormat('MMM dd, yyyy').format(log.createdAt),
+                  log.medicineName,
+                  '-',
+                  log.dosage.toString(),
+                  log.notes?.isEmpty ?? true ? '-' : log.notes!,
+                ];
+              }).toList(),
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+              headerDecoration: const pw.BoxDecoration(color: PdfColors.red500),
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.all(8),
+            ),
+          ],
+        ),
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdf.save(),
+        name: 'medication_logs_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PDF exported successfully!'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error exporting PDF: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
      backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: "Medication Tracker"),
+      appBar: CustomAppBar(
+        title: "Medication Tracker",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFE74C3C)),
+            onPressed: () => _exportMedicationLogsPDF(context),
+            tooltip: 'Export PDF',
+          ),
+        ],
+      ),
       body: SafeArea(
         child: BlocBuilder<MedicationLogCubit, MedicationState>(
           builder: (context, state) {

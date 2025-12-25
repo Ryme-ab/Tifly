@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tifli/features/schedules/presentation/cubit/appointments_cubit.dart';
+import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
 import 'package:tifli/widgets/appointmentcard.dart';
-import 'package:tifli/widgets/addlog.dart';
 
 class WeekAppointmentsView extends StatelessWidget {
   final List<DateTime> weekDays;
@@ -114,15 +116,15 @@ class WeekAppointmentsView extends StatelessWidget {
             ),
             OutlinedButton.icon(
               onPressed: () async {
-                // Navigate to the AddLogForm
-                final newLog = await Navigator.push(
+                final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AddLogForm()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const AppointmentScreen(appointment: null),
+                  ),
                 );
 
-                // If the user filled the form and pressed "Add Log"
-                if (newLog != null) {
-                  // ✅ Tell parent widget to handle adding logic
+                if (result == true) {
                   onAdd(selected);
                 }
               },
@@ -139,8 +141,18 @@ class WeekAppointmentsView extends StatelessWidget {
 
         // appointment cards
         ...appointmentsForDate(selected).map(
-          (a) =>
-              AppointmentCard(time: a['time'] ?? '', title: a['title'] ?? ''),
+          (a) => AppointmentCard(
+            time: a['time'] ?? '',
+            title: a['title'] ?? '',
+            appointmentId: a['id'] ?? '',
+            childId: a['childId'] ?? '',
+            onDelete: () {
+              context.read<AppointmentsCubit>().deleteAppointment(
+                a['id'] ?? '',
+                a['childId'] ?? '',
+              );
+            },
+          ),
         ),
       ],
     );
