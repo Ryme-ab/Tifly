@@ -71,6 +71,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.2
 
 dependency_overrides:
   sign_in_with_apple: ^6.1.0
@@ -93,3 +94,11 @@ flutter:
         - asset: assets/fonts/Afacad-Regular.ttf
         - asset: assets/fonts/Afacad-SemiBold.ttf
           weight: 600
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo_notext.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo_notext.png"
+  remove_alpha_ios: true
