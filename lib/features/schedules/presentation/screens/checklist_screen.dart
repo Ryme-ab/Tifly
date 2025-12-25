@@ -90,7 +90,7 @@ class _ChecklistPageState extends State<ChecklistPage> {
                       ],
                     ),
                     CircleAvatar(
-                      backgroundImage: const AssetImage("assets/profile.jpg"),
+                      backgroundImage: const AssetImage("assets/images/parent_placeholder.jpg"),
                       backgroundColor: Colors.grey[200],
                     ),
                   ],

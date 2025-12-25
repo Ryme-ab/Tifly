@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/profiles/presentation/screens/emergency_card_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/splash_screen.dart';
 import 'package:tifli/features/home/presentation/screens/home_screen.dart';
@@ -7,6 +8,7 @@ import 'package:tifli/features/schedules/presentation/screens/schedules_menu_scr
 import 'package:tifli/features/schedules/presentation/screens/appointments_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_details_screen.dart';
+import 'package:tifli/features/schedules/presentation/screens/doctors_list_screen.dart';
 
 import 'package:tifli/features/schedules/presentation/screens/meal_planner_screen.dart';
 import 'package:tifli/features/schedules/presentation/screens/medicine_schedule_screen.dart';
@@ -27,6 +29,7 @@ import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
 import 'package:tifli/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:tifli/features/settings/presentation/screens/settings_screen.dart';
 
 class AppRoutes {
   // Auth
@@ -46,6 +49,7 @@ class AppRoutes {
   static const String appointmentDetails = '/schedules/appointment-details';
   static const String appointmentMonth = '/schedules/appointment-month';
   static const String appointmentWeek = '/schedules/appointment-week';
+  static const String addDoctor = '/add-doctor';
   static const String mealPlanner = '/schedules/meal-planner';
   static const String medicineSchedule = '/schedules/medicine';
   static const String addMedicine = '/schedules/add-medicine';
@@ -73,9 +77,13 @@ class AppRoutes {
   static const String createProfile = '/profiles/create-profile';
   static const String myBabies = '/profiles/my-babies';
   static const String parentProfile = '/profiles/parent';
+  static const String emergencyCard = '/profiles/emergency-card';
 
   // Admin
   static const String adminDashboard = '/admin/dashboard';
+  
+  // Settings
+  static const String settings = '/settings';
 }
 
 class AppRouter {
@@ -105,10 +113,25 @@ class AppRouter {
       case AppRoutes.appointments:
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case AppRoutes.appointmentForm:
-        return MaterialPageRoute(builder: (_) => const AppointmentScreen());
-      case AppRoutes.appointmentDetails:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final appointment = args?['appointment']; // Appointment object for editing
+        
         return MaterialPageRoute(
-          builder: (_) => const AppointmentDetailsScreen(),
+          builder: (_) => AppointmentScreen(
+            appointment: appointment,
+          ),
+        );
+      case AppRoutes.appointmentDetails:
+        // Extract parameters from route arguments
+        final args = settings.arguments as Map<String, dynamic>?;
+        final appointmentId = args?['appointmentId'] as String? ?? '';
+        final childId = args?['childId'] as String? ?? '';
+        
+        return MaterialPageRoute(
+          builder: (_) => AppointmentDetailsScreen(
+            appointmentId: appointmentId,
+            childId: childId,
+          ),
         );
       case AppRoutes.appointmentMonth:
         // Month View Placeholder
@@ -121,6 +144,8 @@ class AppRouter {
           builder: (_) =>
               const Scaffold(body: Center(child: Text('Week View'))),
         );
+      case AppRoutes.addDoctor:
+        return MaterialPageRoute(builder: (_) => const DoctorsListScreen());
       case AppRoutes.mealPlanner:
         return MaterialPageRoute(builder: (_) => const MealPlannerScreenV2());
       case AppRoutes.medicineSchedule:
@@ -161,10 +186,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const MyBabiesPage());
       case AppRoutes.parentProfile:
         return MaterialPageRoute(builder: (_) => const ParentProfileScreen());
+      case AppRoutes.emergencyCard:
+        return MaterialPageRoute(builder: (_) => const EmergencyCardScreen());
 
       // Admin
       case AppRoutes.adminDashboard:
         return MaterialPageRoute(builder: (_) => const AdminDashboard());
+      
+      // Settings
+      case AppRoutes.settings:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
       default:
         return _errorRoute(settings);

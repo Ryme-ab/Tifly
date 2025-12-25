@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_sizes.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'package:tifli/core/utils/user_context.dart';
+import 'package:tifli/features/trackers/data/models/meal.dart';
+import 'package:tifli/features/trackers/presentation/cubit/meal_cubit.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 
 class MealPlannerScreenV2 extends StatefulWidget {
@@ -13,440 +18,585 @@ class MealPlannerScreenV2 extends StatefulWidget {
 }
 
 class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
-  // Meals are stored by date
-  final Map<DateTime, List<Map<String, dynamic>>> _mealsByDate = {};
-
   DateTime _selectedDate = DateTime.now();
+  String? _selectedChildId;
+  String? _selectedUserId;
 
-  // Helper: get meals for current date
-  List<Map<String, dynamic>> get _mealsForSelectedDate {
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    _selectedUserId = UserContext.getCurrentUserId();
+    _selectedChildId = context.read<ChildSelectionCubit>().selectedChildId;
+    
+    if (_selectedChildId != null) {
+      await _loadMealsForDate();
+    }
+  }
+
+  Future<void> _loadMealsForDate() async {
+    if (_selectedChildId == null) return;
+    await context.read<MealCubit>().loadMealLogs(_selectedChildId!);
+  }
+
+  // Helper: get meals for current date from BLoC state
+  List<Meal> _getMealsForSelectedDate(List<Meal> allMeals) {
     final normalized = _normalizeDate(_selectedDate);
-    return _mealsByDate[normalized] ?? [];
+    return allMeals.where((meal) {
+      final mealDate = _normalizeDate(meal.mealTime);
+      return mealDate.year == normalized.year &&
+          mealDate.month == normalized.month &&
+          mealDate.day == normalized.day;
+    }).toList();
   }
 
   // Normalize date (strip time)
   DateTime _normalizeDate(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
-  // Toggle checked meal
-  void _toggleChecked(String id) {
-    final dateKey = _normalizeDate(_selectedDate);
-    setState(() {
-      final meals = _mealsByDate[dateKey];
-      if (meals == null) return;
-      final idx = meals.indexWhere((m) => m['id'] == id);
-      if (idx != -1) meals[idx]['checked'] = !meals[idx]['checked'];
-    });
+  // Toggle meal status (pending/completed)
+  Future<void> _toggleMealStatus(Meal meal) async {
+    if (_selectedChildId == null || _selectedUserId == null) return;
+    
+    try {
+      final newStatus = meal.status == 'completed' ? 'pending' : 'completed';
+      
+      await context.read<MealCubit>().updateMeal(
+        id: meal.id,
+        childId: _selectedChildId!,
+        mealTime: meal.mealTime,
+        mealType: meal.mealType,
+        items: meal.items,
+        amount: meal.amount,
+        status: newStatus,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newStatus == 'completed' ? 'Meal marked as completed' : 'Meal marked as pending'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating meal: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  // Delete meal
+  Future<void> _deleteMeal(Meal meal) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Meal'),
+        content: const Text('Are you sure you want to delete this meal?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && _selectedChildId != null) {
+      try {
+        await context.read<MealCubit>().deleteMeal(meal.id, _selectedChildId!);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Meal deleted'), backgroundColor: Colors.green),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting meal: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
+  // Show options menu
+  void _showOptions(Meal meal) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Edit'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _showAddOrEdit(meal: meal);
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              meal.status == 'completed' ? Icons.close : Icons.check,
+            ),
+            title: Text(meal.status == 'completed' ? 'Mark as Pending' : 'Mark as Done'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _toggleMealStatus(meal);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text('Delete', style: TextStyle(color: Colors.red)),
+            onTap: () {
+              Navigator.pop(ctx);
+              _deleteMeal(meal);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   // Add or edit meal
-  Future<void> _showAddOrEdit({String? id}) async {
-    String title = '';
-    String subtitle = '';
-    final dateKey = _normalizeDate(_selectedDate);
-    final meals = _mealsByDate[dateKey] ?? [];
-
-    if (id != null) {
-      final idx = meals.indexWhere((m) => m['id'] == id);
-      if (idx != -1) {
-        title = meals[idx]['title'];
-        subtitle = meals[idx]['subtitle'];
-      }
+  Future<void> _showAddOrEdit({Meal? meal}) async {
+    if (_selectedChildId == null || _selectedUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a child first'), backgroundColor: Colors.red),
+      );
+      return;
     }
 
+    String title = meal?.items ?? '';
+    String mealType = meal?.mealType ?? 'breakfast';
+    int amount = meal?.amount ?? 120;
+    TimeOfDay selectedTime = meal != null 
+        ? TimeOfDay.fromDateTime(meal.mealTime)
+        : TimeOfDay.now();
+
     final titleController = TextEditingController(text: title);
-    final subtitleController = TextEditingController(text: subtitle);
+    final amountController = TextEditingController(text: amount.toString());
 
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => FocusScope.of(ctx).unfocus(),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(AppSizes.lg),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(AppSizes.radius),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => FocusScope.of(ctx).unfocus(),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(ctx).viewInsets.bottom,
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    id == null ? 'Add Meal' : 'Edit Meal',
-                    style: AppFonts.heading1,
+                child: Container(
+                  padding: const EdgeInsets.all(AppSizes.lg),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(AppSizes.radius),
+                    ),
                   ),
-                  const SizedBox(height: AppSizes.md),
-                  TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(hintText: 'Meal title'),
-                    textCapitalization: TextCapitalization.words,
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  TextField(
-                    controller: subtitleController,
-                    decoration: const InputDecoration(hintText: 'Subtitle'),
-                  ),
-                  const SizedBox(height: AppSizes.md),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Cancel'),
+                      Center(
+                        child: Text(
+                          meal == null ? 'Add Meal' : 'Edit Meal',
+                          style: AppFonts.heading1,
+                        ),
                       ),
-                      const SizedBox(width: AppSizes.sm),
-                      ElevatedButton(
-                        onPressed: () {
-                          final t = titleController.text.trim();
-                          final s = subtitleController.text.trim();
-                          if (t.isEmpty) return;
-
-                          setState(() {
-                            final normalized = _normalizeDate(_selectedDate);
-                            _mealsByDate.putIfAbsent(normalized, () => []);
-                            if (id == null) {
-                              final newId = DateTime.now()
-                                  .millisecondsSinceEpoch
-                                  .toString();
-                              _mealsByDate[normalized]!.insert(0, {
-                                "id": newId,
-                                "title": t,
-                                "subtitle": s,
-                                "checked": false,
-                              });
-                            } else {
-                              final idx = _mealsByDate[normalized]!.indexWhere(
-                                (m) => m['id'] == id,
-                              );
-                              if (idx != -1) {
-                                _mealsByDate[normalized]![idx]['title'] = t;
-                                _mealsByDate[normalized]![idx]['subtitle'] = s;
-                              }
-                            }
+                      const SizedBox(height: AppSizes.md),
+                      
+                      // Meal Type Dropdown
+                      Text('Meal Type', style: AppFonts.body.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSizes.sm),
+                      DropdownButtonFormField<String>(
+                        value: mealType,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        items: ['breakfast', 'lunch', 'dinner', 'snack', 'milk'].map((type) {
+                          return DropdownMenuItem(
+                            value: type,
+                            child: Text(type[0].toUpperCase() + type.substring(1)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setModalState(() {
+                            mealType = value!;
                           });
-
-                          Navigator.pop(ctx);
                         },
-                        child: const Text('Save'),
+                      ),
+                      const SizedBox(height: AppSizes.md),
+                      
+                      // Food Items
+                      Text('Food Items', style: AppFonts.body.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSizes.sm),
+                      TextField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          hintText: 'e.g., Breast milk, Rice cereal, Apple sauce',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        textCapitalization: TextCapitalization.sentences,
+                      ),
+                      const SizedBox(height: AppSizes.md),
+                      
+                      // Amount
+                      Text('Amount (ml)', style: AppFonts.body.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSizes.sm),
+                      TextField(
+                        controller: amountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: '120',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.md),
+                      
+                      // Time Picker
+                      Text('Time', style: AppFonts.body.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSizes.sm),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: selectedTime,
+                          );
+                          if (picked != null) {
+                            setModalState(() {
+                              selectedTime = picked;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(selectedTime.format(ctx)),
+                              const Icon(Icons.access_time, color: Colors.grey),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.lg),
+                      
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: AppSizes.sm),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final items = titleController.text.trim();
+                              final amountValue = int.tryParse(amountController.text.trim()) ?? 120;
+                              
+                              if (items.isEmpty) {
+                                ScaffoldMessenger.of(ctx).showSnackBar(
+                                  const SnackBar(content: Text('Please enter food items')),
+                                );
+                                return;
+                              }
+
+                              Navigator.pop(ctx);
+
+                              try {
+                                final mealTime = DateTime(
+                                  _selectedDate.year,
+                                  _selectedDate.month,
+                                  _selectedDate.day,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                );
+
+                                if (meal == null) {
+                                  // Add new meal
+                                  await context.read<MealCubit>().addMeal(
+                                    childId: _selectedChildId!,
+                                    mealTime: mealTime,
+                                    mealType: mealType,
+                                    items: items,
+                                    amount: amountValue,
+                                    status: 'pending',
+                                  );
+
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Meal added successfully'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  // Update existing meal
+                                  await context.read<MealCubit>().updateMeal(
+                                    id: meal.id,
+                                    childId: _selectedChildId!,
+                                    mealTime: mealTime,
+                                    mealType: mealType,
+                                    items: items,
+                                    amount: amountValue,
+                                    status: meal.status ?? 'pending',
+                                  );
+
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Meal updated successfully'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: ${e.toString()}'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text('Save'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  void _deleteMeal(String id) {
-    final dateKey = _normalizeDate(_selectedDate);
+  // Date navigation
+  void _changeDate(int days) {
     setState(() {
-      _mealsByDate[dateKey]?.removeWhere((m) => m['id'] == id);
+      _selectedDate = _selectedDate.add(Duration(days: days));
     });
-  }
-
-  void _showOptions(String id) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Edit'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showAddOrEdit(id: id);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: const Text('Delete'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _deleteMeal(id);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.open_in_new),
-                title: const Text('Open Details'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  Navigator.pushNamed(
-                    context,
-                    '/meal-details',
-                    arguments: {'id': id},
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // --- Calendar logic ---
-
-  DateTime get _startOfWeek =>
-      _selectedDate.subtract(Duration(days: _selectedDate.weekday % 7));
-
-  void _goToPreviousWeek() {
-    setState(() {
-      _selectedDate = _selectedDate.subtract(const Duration(days: 7));
-    });
-  }
-
-  void _goToNextWeek() {
-    setState(() {
-      _selectedDate = _selectedDate.add(const Duration(days: 7));
-    });
-  }
-
-  void _selectDay(DateTime day) {
-    setState(() {
-      _selectedDate = day;
-    });
+    _loadMealsForDate();
   }
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = DateFormat('EEEE, MMM d').format(_selectedDate);
+    final dateLabel = DateFormat('MMM d, yyyy').format(_selectedDate);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: AppColors.backgroundLight,
-        appBar: const CustomAppBar(title: 'Meal Planner'),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSizes.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDateStrip(dateLabel),
-                const SizedBox(height: AppSizes.md),
-                Text(
-                  'Planned Meals',
-                  style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: AppSizes.sm),
-                Expanded(
-                  child: _mealsForSelectedDate.isEmpty
-                      ? Center(
-                          child: Text(
-                            'No meals planned for this day',
-                            style: AppFonts.body.copyWith(
-                              color: AppColors.textPrimaryLight,
-                            ),
-                          ),
-                        )
-                      : ListView.separated(
-                          padding: EdgeInsets.zero,
-                          itemCount: _mealsForSelectedDate.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: AppSizes.md),
-                          itemBuilder: (context, index) {
-                            final meal = _mealsForSelectedDate[index];
-                            return MealCardV2(
-                              meal: meal,
-                              onCheck: () => _toggleChecked(meal['id']),
-                              onMore: () => _showOptions(meal['id']),
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/meal-details',
-                                arguments: {'id': meal['id']},
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddOrEdit(),
-          backgroundColor: AppColors.primary,
-          child: const Icon(Icons.add),
-        ),
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: const CustomAppBar(
+        title: 'Meal Planner',
       ),
-    );
-  }
+      body: BlocBuilder<MealCubit, MealState>(
+        builder: (context, state) {
+          if (_selectedChildId == null) {
+            return const Center(
+              child: Text('Please select a child first'),
+            );
+          }
 
-  Widget _buildDateStrip(String dateLabel) {
-    final startOfWeek = _startOfWeek;
+          final allMeals = state.mealLogs;
+          final mealsForDate = _getMealsForSelectedDate(allMeals);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSizes.radius),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return Column(
             children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: _goToPreviousWeek,
+              // Date Navigator
+              Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: () => _changeDate(-1),
+                    ),
+                    Text(dateLabel, style: AppFonts.heading2),
+                    IconButton(
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: () => _changeDate(1),
+                    ),
+                  ],
+                ),
               ),
-              Text(dateLabel, style: AppFonts.body),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: _goToNextWeek,
+
+              // Meals List
+              Expanded(
+                child: state.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : mealsForDate.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No meals planned for this day',
+                              style: AppFonts.body.copyWith(
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(AppSizes.md),
+                            itemCount: mealsForDate.length,
+                            itemBuilder: (context, index) {
+                              final meal = mealsForDate[index];
+                              return _MealCard(
+                                meal: meal,
+                                onCheck: () => _toggleMealStatus(meal),
+                                onMore: () => _showOptions(meal),
+                              );
+                            },
+                          ),
               ),
             ],
-          ),
-          const SizedBox(height: AppSizes.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(7, (index) {
-              final day = startOfWeek.add(Duration(days: index));
-              final label = DateFormat('E').format(day); // Sun, Mon, etc.
-              final isSelected =
-                  _normalizeDate(day) == _normalizeDate(_selectedDate);
-
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                    onTap: () => _selectDay(day),
-                    child: Container(
-                      height: 36,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.backgroundLight,
-                        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                      ),
-                      child: Text(
-                        label,
-                        style: AppFonts.body.copyWith(
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.textPrimaryLight,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddOrEdit(),
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 }
 
-class MealCardV2 extends StatelessWidget {
-  final Map<String, dynamic> meal;
-  final VoidCallback? onCheck;
-  final VoidCallback? onMore;
-  final VoidCallback? onTap;
+class _MealCard extends StatelessWidget {
+  final Meal meal;
+  final VoidCallback onCheck;
+  final VoidCallback onMore;
 
-  const MealCardV2({
-    super.key,
+  const _MealCard({
     required this.meal,
-    this.onCheck,
-    this.onMore,
-    this.onTap,
+    required this.onCheck,
+    required this.onMore,
   });
+
+  Color _getMealTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'breakfast':
+        return const Color(0xFFFFF8E1);
+      case 'lunch':
+        return const Color(0xFFE8F5E9);
+      case 'dinner':
+        return const Color(0xFFE3F2FD);
+      case 'snack':
+        return const Color(0xFFFCE4EC);
+      case 'milk':
+        return const Color(0xFFE0F7FA);
+      default:
+        return Colors.grey.shade200;
+    }
+  }
+
+  IconData _getMealTypeIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'breakfast':
+        return Icons.free_breakfast;
+      case 'lunch':
+        return Icons.lunch_dining;
+      case 'dinner':
+        return Icons.dinner_dining;
+      case 'snack':
+        return Icons.cookie;
+      case 'milk':
+        return Icons.local_drink;
+      default:
+        return Icons.restaurant;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      child: Container(
-        padding: const EdgeInsets.all(AppSizes.md),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppSizes.radius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+    final isCompleted = meal.status == 'completed';
+    final timeStr = DateFormat('h:mm a').format(meal.mealTime);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: _getMealTypeColor(meal.mealType),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isCompleted ? Colors.green : Colors.grey.shade300,
+          width: isCompleted ? 2 : 1,
+        ),
+      ),
+      child: ListTile(
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Checkbox(
+              value: isCompleted,
+              onChanged: (_) => onCheck(),
+              activeColor: Colors.green,
+            ),
+            Icon(
+              _getMealTypeIcon(meal.mealType),
+              color: Colors.grey.shade700,
             ),
           ],
         ),
-        child: Row(
+        title: Text(
+          meal.items,
+          style: TextStyle(
+            decoration: isCompleted ? TextDecoration.lineThrough : null,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: onCheck,
-              child: Container(
-                width: 44,
-                height: 44,
+            Text('${meal.mealType[0].toUpperCase()}${meal.mealType.substring(1)} • ${meal.amount}ml'),
+            Text(timeStr, style: const TextStyle(fontSize: 12)),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isCompleted)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: meal['checked']
-                      ? AppColors.primary
-                      : AppColors.backgroundLight,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                  border: Border.all(
-                    color: meal['checked']
-                        ? AppColors.primary
-                        : AppColors.primary.withValues(alpha: 0.12),
-                  ),
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: meal['checked']
-                    ? const Icon(Icons.check, color: Colors.white)
-                    : null,
-              ),
-            ),
-            const SizedBox(width: AppSizes.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    meal['title'],
-                    style: AppFonts.body.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: AppSizes.xs),
-                  Text(
-                    meal['subtitle'],
-                    style: AppFonts.body.copyWith(
-                      color: AppColors.textPrimaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSizes.sm),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.12),
+                child: const Text(
+                  'DONE',
+                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ),
-              child: IconButton(
-                icon: Icon(Icons.more_horiz, color: AppColors.primary),
-                onPressed: onMore,
-              ),
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: onMore,
             ),
           ],
         ),

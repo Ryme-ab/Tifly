@@ -59,7 +59,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                       ),
                       CircleAvatar(
                         radius: 18,
-                        backgroundImage: const AssetImage("assets/profile.jpg"),
+                        backgroundImage: const AssetImage("assets/images/parent_placeholder.jpg"),
                         backgroundColor: Colors.grey[200],
                       ),
                     ],

@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
-import 'package:tifli/core/state/child_selection_cubit.dart';
+
 import 'package:tifli/features/profiles/domain/entities/emergency_card_entity.dart';
 import 'package:tifli/features/profiles/presentation/cubit/emergency_card_cubit.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';

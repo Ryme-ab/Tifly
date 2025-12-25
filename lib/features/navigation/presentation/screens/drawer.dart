@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tifli/features/profiles/presentation/screens/emergency_card_screen.dart';
 import 'package:tifli/l10n/app_localizations.dart';
-import 'package:tifli/features/admin/presentation/screens/settings.dart';
+import 'package:tifli/features/settings/presentation/screens/settings_screen.dart';
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
 import 'package:tifli/features/auth/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class Tiflidrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Drawer(
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -153,6 +154,20 @@ class Tiflidrawer extends StatelessWidget {
                     ),
                   ),
 
+                  menuItem(
+                    icon: Icons.emergency_outlined,
+                    title: "Emrgency Card",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => Provider<AppBarConfig>(
+                          create: (_) => AppBarConfig(),
+                          child: const EmergencyCardScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+
                   const SizedBox(height: 20),
                   Divider(color: Colors.grey.shade300),
                   const SizedBox(height: 20),
@@ -165,7 +180,7 @@ class Tiflidrawer extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => Provider<AppBarConfig>(
                           create: (_) => AppBarConfig(),
-                          child: const SettingsPage(),
+                          child: const SettingsScreen(),
                         ),
                       ),
                     ),
@@ -194,7 +209,6 @@ class Tiflidrawer extends StatelessWidget {
               ),
             ),
 
-         
             const DrawerFooter(),
           ],
         ),
