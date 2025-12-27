@@ -12,9 +12,8 @@ import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/firebase_options.dart';
 
 // --- Supabase Core ---
-import 'package:tifli/core/config/supabaseClient.dart';
-import 'package:tifli/core/config/test_config.dart';
-import 'package:tifli/core/widgets/test_data_loader.dart';
+import 'package:tifli/core/config/supabase_client.dart';
+
 
 // --- Auth ---
 import 'package:tifli/features/auth/presentation/cubit/signin_cubit.dart';
@@ -234,9 +233,6 @@ Future<void> main() async {
                 datasource: ChildrenDataSource(client: supabase),
               ),
             );
-            if (TestConfig.enableTestMode) {
-              cubit.loadChildren(TestConfig.testParentId);
-            }
             return cubit;
           },
         ),
@@ -302,23 +298,21 @@ Future<void> main() async {
         builder: (context, locale) {
           return BlocBuilder<ThemeCubit, ThemeState>(
             builder: (context, themeState) {
-              return TestDataLoader(
-                child: MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  theme: AppTheme.lightTheme,
-                  darkTheme: AppTheme.darkTheme,
-                  themeMode: themeState.themeMode,
-                  locale: locale,
-                  localizationsDelegates: const [
-                    AppLocalizations.delegate,
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                  ],
-                  supportedLocales: const [Locale('en'), Locale('fr')],
-                  initialRoute: AppRoutes.splash,
-                  onGenerateRoute: AppRouter.generateRoute,
-                ),
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeState.themeMode,
+                locale: locale,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [Locale('en'), Locale('fr')],
+                initialRoute: AppRoutes.splash,
+                onGenerateRoute: AppRouter.generateRoute,
               );
             },
           );

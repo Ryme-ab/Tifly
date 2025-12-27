@@ -51,14 +51,10 @@ class _DrawerFooterState extends State<DrawerFooter> {
   }
 
   Future<void> _loadChildren() async {
-    print('DrawerFooter: _loadChildren called');
     final userId = UserContext.getCurrentUserId();
-    print('DrawerFooter: userId = $userId');
     if (userId != null) {
       context.read<ChildrenCubit>().loadChildren(userId);
-    } else {
-      print('DrawerFooter: userId is null, cannot load children');
-    }
+    } 
   }
 
   @override
@@ -147,7 +143,6 @@ class _DrawerFooterState extends State<DrawerFooter> {
   Widget _buildBabySelector() {
     return BlocBuilder<ChildrenCubit, ChildrenState>(
       builder: (context, childrenState) {
-        print('DrawerFooter: ChildrenState = ${childrenState.runtimeType}');
 
         return BlocBuilder<ChildSelectionCubit, ChildSelectionState>(
           builder: (context, selectionState) {
@@ -198,7 +193,6 @@ class _DrawerFooterState extends State<DrawerFooter> {
             }
 
             final children = childrenState.children;
-            print('DrawerFooter: Loaded ${children.length} children');
 
             if (children.isEmpty) {
               return GestureDetector(
@@ -229,8 +223,6 @@ class _DrawerFooterState extends State<DrawerFooter> {
               (child) => child.id == selectedChildId,
               orElse: () => children.first,
             );
-
-            print('DrawerFooter: Selected child = ${selectedChild.firstName}');
 
             return GestureDetector(
               onTap: () =>

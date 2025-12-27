@@ -62,7 +62,6 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
       await repository.addGrowth(growthLog);
       await loadGrowthLogs(childId);
     } catch (e) {
-      print("Error adding growth log: $e");
       rethrow;
     }
   }
@@ -95,7 +94,6 @@ class GrowthCubit extends Cubit<List<GrowthLog>> {
       // Refresh logs
       await loadGrowthLogs(updatedLog.childId);
     } catch (e) {
-      print("Error updating growth log: $e");
       rethrow;
     }
   }

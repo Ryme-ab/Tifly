@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:tifli/core/config/api_config.dart';
+
 class ApiService {
-  // Use your development machine's IP for physical device
-  static const String baseUrl = 'http://10.52.1.199:3000';
+  static const String baseUrl = ApiConfig.backendUrl;
 
   static final ApiService _instance = ApiService._internal();
   static ApiService get instance => _instance;
@@ -51,14 +52,10 @@ class ApiService {
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 201) {
-        print('✅ Appointment created via Backend: ${response.body}');
-      } else {
-        print('❌ Backend Error: ${response.statusCode} - ${response.body}');
+      if (response.statusCode != 201) {
         throw Exception('Failed to create appointment: ${response.body}');
       }
     } catch (e) {
-      print('❌ Network Error: $e');
       throw Exception('Failed to connect to backend: $e');
     }
   }

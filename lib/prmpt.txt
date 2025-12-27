@@ -1,0 +1,124 @@
+Role
+You are a senior Flutter engineer preparing a Flutter application for production release to real users (Google Play Store).
+
+🎯 Objective
+
+Carefully review every Dart file in this Flutter project and clean the codebase for production readiness.
+
+This is a strict production audit, not a refactor for style or preference.
+
+🚨 Strict Requirements (DO NOT SKIP)
+1️⃣ Remove all debug & test artifacts
+
+You must completely remove all development-only code, including:
+
+❌ All print() statements
+
+❌ All debug logging (debugPrint, custom loggers, temporary debug comments)
+
+❌ Test users, mock data, fake IDs, seed data, or test accounts
+
+❌ Test-only flags, feature toggles, or dev-only logic
+
+❌ Any widgets, services, or utilities used only for testing
+
+2️⃣ Remove all localhost & development URLs
+
+❌ Remove any usage of localhost, 127.0.0.1, emulator URLs, or dev endpoints
+
+✅ Replace with production-ready configuration
+
+✅ If URLs are required, centralize them in a single production config file
+
+❌ No hardcoded environment-specific URLs inside widgets or business logic
+
+3️⃣ Enforce production-safe main.dart
+
+main.dart must follow this structure exactly:
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
+
+
+Additionally:
+
+✅ debugShowCheckedModeBanner: false
+
+❌ No debug wrappers
+
+❌ No test initializers
+
+❌ No conditional dev logic
+
+4️⃣ Security & stability rules
+
+❌ No hardcoded secrets, API keys, tokens, or credentials
+
+❌ No logging of sensitive or user data
+
+✅ Ensure null-safety is respected
+
+✅ Error handling must be production-safe (no silent failures, no debug-only behavior)
+
+5️⃣ Code quality & cleanup
+
+Remove unused imports
+
+Remove commented-out code
+
+Simplify logic where possible without changing behavior
+
+Ensure naming is professional and production-appropriate
+
+📄 Output Format (MANDATORY)
+For every file you modify, provide:
+
+📁 File path
+
+🛠 What was changed
+
+✅ Cleaned, production-ready code
+
+For files that require no changes, explicitly state:
+
+“Reviewed – no production issues found.”
+
+⚠️ Every Dart file under /lib must be explicitly reviewed and accounted for.
+
+🖥️ Terminal / Command Execution Policy (VERY IMPORTANT)
+
+🚫 DO NOT execute any terminal, shell, Git, Flutter, or system commands automatically.
+
+If a command is required (e.g. flutter analyze, grep, git status, flutter build):
+
+Ask for my explicit permission
+
+Clearly explain why the command is needed
+
+Show the exact command to run
+
+Wait for me to execute it and paste back the output
+
+❌ Do not continue until I provide the command result
+
+✅ Treat all command outputs I provide as authoritative input
+
+✅ Final Goal
+
+The codebase must be:
+
+Play Store ready
+
+Secure
+
+Clean
+
+Stable
+
+Free of all dev-only artifacts
+
+Safe for real users
+
+This project should be suitable for public release without further cleanup.

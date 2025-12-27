@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/config/supabase_client.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:intl/intl.dart';
 import 'edit_baby_screen.dart';

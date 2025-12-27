@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/config/supabase_client.dart';
 import 'create_baby_screen_2.dart';
 
 import 'package:tifli/widgets/custom_app_bar.dart';

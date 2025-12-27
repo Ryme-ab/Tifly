@@ -16,7 +16,6 @@ class GalleryRemoteDataSource {
           .map((json) => GalleryItem.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error fetching gallery: $e');
       return [];
     }
   }
@@ -24,16 +23,8 @@ class GalleryRemoteDataSource {
   Future<String> uploadImage(File file) async {
     try {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      print('=== IMAGE UPLOAD START ===');
-      print('File name: $fileName');
-      print('File size: ${await file.length()} bytes');
-      print('File path: ${file.path}');
-
       final fileBytes = await file.readAsBytes();
       final storage = supabase.storage.from('gallery_media');
-
-      print('Uploading binary data to gallery_media bucket...');
 
       // Use uploadBinary with explicit content type
       final response = await storage.uploadBinary(
@@ -42,18 +33,9 @@ class GalleryRemoteDataSource {
         fileOptions: const FileOptions(contentType: 'image/jpeg'),
       );
 
-      print('Upload response: $response');
-      print('Image uploaded successfully');
-
       final url = storage.getPublicUrl(fileName);
-      print('Public URL: $url');
-      print('=== IMAGE UPLOAD END ===');
       return url;
     } catch (e) {
-      print('=== IMAGE UPLOAD ERROR ===');
-      print('Error type: ${e.runtimeType}');
-      print('Error message: $e');
-      print('Stack: ${StackTrace.current}');
       rethrow;
     }
   }
@@ -78,12 +60,8 @@ class GalleryRemoteDataSource {
           'Cannot add memory: no authenticated user (uploadedBy empty)',
         );
       }
-      print('Starting memory insertion for child: $childId');
-      print('File exists: ${imageFile.existsSync()}');
-      print('File path: ${imageFile.path}');
 
       final remoteUrl = await uploadImage(imageFile);
-      print('Image uploaded to: $remoteUrl');
 
       final data = {
         'child_id': childId,
@@ -94,11 +72,8 @@ class GalleryRemoteDataSource {
         'picture_date': pictureDate.toIso8601String(),
       };
 
-      print('Inserting record to database with data: $data');
-
       // Test the insert without select first
       final insertResult = await supabase.from('gallery').insert(data);
-      print('Insert result: $insertResult');
 
       // Now fetch the inserted record
       final response = await supabase
@@ -107,11 +82,8 @@ class GalleryRemoteDataSource {
           .eq('file_path', remoteUrl)
           .single();
 
-      print('Database insertion successful: ${response['id']}');
       return GalleryItem.fromJson(response);
     } catch (e) {
-      print('Error inserting memory: $e');
-      print('Stack trace: ${StackTrace.current}');
       rethrow;
     }
   }
@@ -146,7 +118,6 @@ class GalleryRemoteDataSource {
           .single();
       return GalleryItem.fromJson(response);
     } catch (e) {
-      print('Error updating memory: $e');
       rethrow;
     }
   }
@@ -168,10 +139,8 @@ class GalleryRemoteDataSource {
         }
       } catch (e) {
         // Ignore storage delete issues; row already removed
-        print('Warning: failed to remove storage object: $e');
       }
     } catch (e) {
-      print('Error deleting memory: $e');
       rethrow;
     }
   }

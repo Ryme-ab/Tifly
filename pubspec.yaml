@@ -10,15 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^3.0.7
+  uuid: ^4.3.3
   flutter_bloc: ^9.1.1
-  fl_chart: ^1.1.1
-  # Firebase - all compatible versions
-  firebase_core: ^3.8.1
-  firebase_auth: ^5.3.4
-  cloud_firestore: ^5.6.0
-  firebase_messaging: ^15.2.10
-  firebase_analytics: ^11.6.0
 
   # Flutter & UI
   flutter_localizations:
@@ -26,38 +19,26 @@ dependencies:
 
   # Localization & Formatting
   intl: ^0.20.2
-<<<<<<< HEAD
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.2.1
   equatable: ^2.0.5
-
-  # Supabase
-  supabase_flutter: ^2.12.0
-
-  # Utilities
-=======
 
   # Charts
   fl_chart: ^0.68.0
 
   # UI & Icons
-  cupertino_icons: ^1.0.8
-  flutter_svg: ^2.2.1
   material_symbols_icons: ^4.0.0
   font_awesome_flutter: ^10.7.0
 
-  # State Management
-  flutter_bloc: ^9.1.1
-  equatable: ^2.0.5
-
-  # Authentication & Backend
-  supabase_flutter: ^1.6.0
-  firebase_core: ^2.20.0
-  firebase_messaging: ^14.7.0
-  cloud_firestore: ^4.17.5
+  # Supabase & Firebase
+  supabase_flutter: ^2.12.0
+  firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
+  cloud_firestore: ^5.6.0
+  firebase_messaging: ^15.2.10
+  firebase_analytics: ^11.6.0
 
   # Image & Media
->>>>>>> be41c2120e1cd2e8c41a42ccd7a31969dc7a4d1b
   image_picker: ^1.0.5
   cached_network_image: ^3.2.3
 
@@ -70,7 +51,6 @@ dependencies:
   # Utilities
   path: ^1.9.0
   path_provider: ^2.1.2
-  uuid: ^4.3.3
   http: ^1.2.0
 
   # URL & Sharing
@@ -105,5 +85,3 @@ flutter:
     - family: Afacad
       fonts:
         - asset: assets/fonts/Afacad-Regular.ttf
-        - asset: assets/fonts/Afacad-SemiBold.ttf
-          weight: 600

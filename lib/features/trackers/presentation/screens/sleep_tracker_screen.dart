@@ -8,7 +8,7 @@ import 'package:tifli/features/trackers/presentation/screens/growth_tracker_scre
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/trackers/presentation/cubit/sleep_cubit.dart';
 import 'package:tifli/features/logs/data/models/sleep_log_model.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
+import 'package:tifli/core/config/supabase_client.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:intl/intl.dart';
 
@@ -221,7 +221,6 @@ class _SleepPageState extends State<SleepPage> {
         selectedDate = DateTime.now(); // ✅ Reset to today
       });
     } catch (e) {
-      print("ERROR logging sleep: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Failed to log sleep."),

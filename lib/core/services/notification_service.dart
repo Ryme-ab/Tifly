@@ -18,13 +18,9 @@ class NotificationService {
       sound: true,
     );
 
-    print('User granted permission: ${settings.authorizationStatus}');
-
     // Get device FCM token
     String? token = await _messaging.getToken();
     if (token != null) {
-      print('FCM Token: $token');
-
       // Save token to Firestore
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'fcmToken': token,
@@ -33,13 +29,11 @@ class NotificationService {
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Foreground notification received: ${message.notification?.title}');
       // You can show a local notification here if needed
     });
 
     // Handle background and terminated messages
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notification clicked: ${message.notification?.title}');
       // Navigate to specific screen if needed
     });
   }

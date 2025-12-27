@@ -46,7 +46,6 @@ class GrowthRepository {
 
       return duplicate != null;
     } catch (e) {
-      print("Error checking duplicate: $e");
       return false;
     }
   }

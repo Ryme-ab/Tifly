@@ -61,7 +61,6 @@ class SleepCubit extends Cubit<List<SleepLog>> {
 
       await loadSleepLogs(childId);
     } catch (e) {
-      print("Error adding sleep log: $e");
       rethrow;
     }
   }
@@ -71,7 +70,6 @@ class SleepCubit extends Cubit<List<SleepLog>> {
       await repository.updateSleep(log);
       await loadSleepLogs(log.childId);
     } catch (e) {
-      print("Error updating sleep log: $e");
       rethrow;
     }
   }

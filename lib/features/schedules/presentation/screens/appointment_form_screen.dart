@@ -106,14 +106,12 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         >();
 
     if (android != null) {
-      final granted = await android.requestNotificationsPermission();
-      debugPrint('🔔 Notification permission granted: $granted');
+      await android.requestNotificationsPermission();
     }
   }
 
   // Test notification to verify setup
   Future<void> _showTestNotification() async {
-    debugPrint('🔔 Showing test notification...');
     try {
       await flutterLocalNotificationsPlugin.show(
         999999,
@@ -129,9 +127,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           ),
         ),
       );
-      debugPrint('✅ Test notification sent');
     } catch (e) {
-      debugPrint('❌ Failed to show test notification: $e');
     }
   }
 
@@ -618,7 +614,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             date: dateTime,
           );
         } catch (e) {
-          debugPrint('⚠️ Backend sync failed, appointment saved locally: $e');
           // Continue anyway - appointment is already saved locally
         }
       } else {
@@ -630,7 +625,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       try {
         await _scheduleReminder(appointment);
       } catch (e) {
-        debugPrint('Failed to schedule reminder: $e');
         // Do not block saving if reminder fails
       }
 

@@ -39,11 +39,6 @@ class GalleryCubit extends Cubit<GalleryState> {
     emit(GalleryState(loading: true, items: state.items));
 
     try {
-      print('=== CUBIT: ADDING MEMORY ===');
-      print('Child ID: $childId');
-      print('Uploaded by: $uploadedBy');
-      print('Title: $title');
-
       final newItem = await repo.addMemory(
         childId: childId,
         uploadedBy: uploadedBy,
@@ -52,15 +47,9 @@ class GalleryCubit extends Cubit<GalleryState> {
         picture: picture,
       );
 
-      print('=== CUBIT: MEMORY ADDED SUCCESSFULLY ===');
-      print('New item ID: ${newItem.id}');
-
       final updated = [...state.items, newItem];
       emit(GalleryState(loading: false, items: updated));
     } catch (e) {
-      print('=== CUBIT: ERROR ADDING MEMORY ===');
-      print('Error: $e');
-      print('Stack: ${StackTrace.current}');
       emit(
         GalleryState(
           loading: false,

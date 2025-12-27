@@ -40,7 +40,6 @@ class SupabaseHomeRepository implements HomeRepository {
 
     // FIX: Return empty data instead of throwing if no child exists
     if (childResp == null) {
-      print('no child');
       return HomeData(
         profile: Profile(
           name: safeProfileResp['full_name'] ?? 'User',
@@ -75,8 +74,6 @@ class SupabaseHomeRepository implements HomeRepository {
         .order('created_at', ascending: false);
 
     // Debug: log counts and fallback without user filter if empty
-    // ignore: avoid_print
-    print('[home] checklist rows (child+user) => ${checklist.length}');
     List<Map> filtered = checklist.whereType<Map>().toList();
     if (filtered.isEmpty) {
       final checklistChildOnly = await client
@@ -87,10 +84,6 @@ class SupabaseHomeRepository implements HomeRepository {
           .eq('child_id', childId)
           .order('checklist_date', ascending: false)
           .order('created_at', ascending: false);
-      // ignore: avoid_print
-      print(
-        '[home] checklist rows (child only) => ${checklistChildOnly.length}',
-      );
       filtered = checklistChildOnly.whereType<Map>().toList();
     }
 
@@ -207,9 +200,6 @@ class SupabaseHomeRepository implements HomeRepository {
 
     // 6) Growth summary (latest)
     // Growth: filter by child and user; fallback to child-only
-    // Debug: who's querying
-    // ignore: avoid_print
-    print('[home] growth query using userId=$userId, childId=$childId');
     var growthRows = await client
         .from('growth')
         .select(
@@ -219,8 +209,7 @@ class SupabaseHomeRepository implements HomeRepository {
         .eq('user_id', userId)
         .order('date', ascending: false)
         .limit(1);
-    // ignore: avoid_print
-    print('[home] growth rows (child+user) => ${growthRows.length}');
+
     if (growthRows.isEmpty) {
       growthRows = await client
           .from('growth')
@@ -230,8 +219,6 @@ class SupabaseHomeRepository implements HomeRepository {
           .eq('child_id', childId)
           .order('date', ascending: false)
           .limit(1);
-      // ignore: avoid_print
-      print('[home] growth rows (child only) => ${growthRows.length}');
     }
     GrowthSummary? growthSummary;
     if (growthRows.isNotEmpty) {
@@ -352,9 +339,6 @@ class SupabaseHomeRepository implements HomeRepository {
         .order('checklist_date', ascending: false)
         .order('created_at', ascending: false);
 
-    // Debug: log counts and fallback without user filter if empty
-    // ignore: avoid_print
-    print('[home] checklist rows (child+user) => ${checklist.length}');
     List<Map> filtered = checklist.whereType<Map>().toList();
     if (filtered.isEmpty) {
       final checklistChildOnly = await client
@@ -365,10 +349,6 @@ class SupabaseHomeRepository implements HomeRepository {
           .eq('child_id', childId)
           .order('checklist_date', ascending: false)
           .order('created_at', ascending: false);
-      // ignore: avoid_print
-      print(
-        '[home] checklist rows (child only) => ${checklistChildOnly.length}',
-      );
       filtered = checklistChildOnly.whereType<Map>().toList();
     }
 
@@ -482,9 +462,6 @@ class SupabaseHomeRepository implements HomeRepository {
 
     // 6) Growth summary (latest)
     // Growth: filter by child and user; fallback to child-only
-    // Debug: who's querying
-    // ignore: avoid_print
-    print('[home] growth query using userId=$userId, childId=$childId');
     var growthRows = await client
         .from('growth')
         .select(
@@ -494,8 +471,7 @@ class SupabaseHomeRepository implements HomeRepository {
         .eq('user_id', userId)
         .order('date', ascending: false)
         .limit(1);
-    // ignore: avoid_print
-    print('[home] growth rows (child+user) => ${growthRows.length}');
+
     if (growthRows.isEmpty) {
       growthRows = await client
           .from('growth')
@@ -505,8 +481,6 @@ class SupabaseHomeRepository implements HomeRepository {
           .eq('child_id', childId)
           .order('date', ascending: false)
           .limit(1);
-      // ignore: avoid_print
-      print('[home] growth rows (child only) => ${growthRows.length}');
     }
     GrowthSummary? growthSummary;
     if (growthRows.isNotEmpty) {

@@ -18,7 +18,6 @@ class ThemeRepository {
       await prefs.setString(_themeKey, mode);
     } catch (e) {
       // Fail silently - theme will default to system on next load
-      print('Error saving theme mode: $e');
     }
   }
 
@@ -30,7 +29,6 @@ class ThemeRepository {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(_themeKey);
     } catch (e) {
-      print('Error loading theme mode: $e');
       return null;
     }
   }
@@ -42,7 +40,6 @@ class ThemeRepository {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_themeKey);
     } catch (e) {
-      print('Error clearing theme mode: $e');
     }
   }
 }

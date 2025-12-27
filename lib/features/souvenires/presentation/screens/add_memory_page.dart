@@ -89,7 +89,6 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
 
     setState(() => _submitting = true);
     try {
-      print('=== ADD MEMORY PAGE: SUBMIT START ===');
       final cubit = context.read<GalleryCubit>();
       if (isEdit) {
         await cubit.updateMemory(
@@ -112,20 +111,15 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
       // Check if there was an error in the cubit state
       final currentState = cubit.state;
       if (currentState.error != null && currentState.error!.isNotEmpty) {
-        print('=== ADD MEMORY PAGE: ERROR IN STATE ===');
-        print('Error: ${currentState.error}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Upload failed: ${currentState.error}')),
           );
         }
       } else {
-        print('=== ADD MEMORY PAGE: SUCCESS ===');
         if (mounted) Navigator.of(context).pop(true);
       }
     } catch (e) {
-      print('=== ADD MEMORY PAGE: EXCEPTION ===');
-      print('Error: $e');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
