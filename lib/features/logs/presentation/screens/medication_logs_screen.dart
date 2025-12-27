@@ -37,9 +37,10 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     if (state is! MedicationLoaded) return;
 
     final logs = state.medicines;
+    final l10n = AppLocalizations.of(context)!;
     if (logs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No medication logs to export')),
+        SnackBar(content: Text(l10n.noLogsToExport)),
       );
       return;
     }
@@ -62,16 +63,16 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text('Medication Logs Report', style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold, color: PdfColors.red700)),
+                  pw.Text(l10n.medicationLogsReport, style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold, color: PdfColors.red700)),
                   pw.SizedBox(height: 8),
-                  pw.Text('Child: $childName', style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800)),
-                  pw.Text('Generated: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                  pw.Text('${l10n.child}: $childName', style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800)),
+                  pw.Text('${l10n.generated}: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
                   pw.Divider(thickness: 2),
                 ],
               ),
             ),
             pw.SizedBox(height: 20),
-            pw.Text('Total Logs: ${logs.length}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.Text('${l10n.totalLogs}: ${logs.length}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 16),
             pw.Table.fromTextArray(
               headers: ['Date', 'Medicine', 'Doctor', 'Dose', 'Notes'],
@@ -99,14 +100,16 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       );
 
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PDF exported successfully!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.pdfExportedSuccessfully), backgroundColor: Colors.green),
         );
       }
     } catch (e) {
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error exporting PDF: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('${l10n.errorExportingPdf}: $e'), backgroundColor: Colors.red),
         );
       }
     }

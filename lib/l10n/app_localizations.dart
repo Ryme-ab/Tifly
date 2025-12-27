@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_ar.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_fr.dart';
 
@@ -94,6 +95,7 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
     Locale('en'),
     Locale('fr'),
   ];
@@ -229,6 +231,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'French'**
   String get french;
+
+  /// No description provided for @arabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get arabic;
 
   /// No description provided for @settings.
   ///
@@ -793,6 +801,924 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
+
+  /// No description provided for @exportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get exportPdf;
+
+  /// No description provided for @filterFeatureComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter feature coming soon'**
+  String get filterFeatureComingSoon;
+
+  /// No description provided for @generatingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF...'**
+  String get generatingPdf;
+
+  /// No description provided for @pdfGeneratedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF generated successfully!'**
+  String get pdfGeneratedSuccessfully;
+
+  /// No description provided for @errorGeneratingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating PDF'**
+  String get errorGeneratingPdf;
+
+  /// No description provided for @noLogsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs found'**
+  String get noLogsFound;
+
+  /// No description provided for @summaryStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary Statistics'**
+  String get summaryStatistics;
+
+  /// No description provided for @visualAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual Analytics'**
+  String get visualAnalytics;
+
+  /// No description provided for @activityComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Comparison'**
+  String get activityComparison;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Less'**
+  String get showLess;
+
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show More'**
+  String get showMore;
+
+  /// No description provided for @now.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get now;
+
+  /// No description provided for @breastMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Breast Milk'**
+  String get breastMilk;
+
+  /// No description provided for @formula.
+  ///
+  /// In en, this message translates to:
+  /// **'Formula'**
+  String get formula;
+
+  /// No description provided for @solidFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid Food'**
+  String get solidFood;
+
+  /// No description provided for @juice.
+  ///
+  /// In en, this message translates to:
+  /// **'Juice'**
+  String get juice;
+
+  /// No description provided for @sleepQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep Quality'**
+  String get sleepQuality;
+
+  /// No description provided for @notGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Good'**
+  String get notGood;
+
+  /// No description provided for @good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// No description provided for @excellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get excellent;
+
+  /// No description provided for @startTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get startTime;
+
+  /// No description provided for @endTime.
+  ///
+  /// In en, this message translates to:
+  /// **'End time'**
+  String get endTime;
+
+  /// No description provided for @headCircumference.
+  ///
+  /// In en, this message translates to:
+  /// **'Head Circumference'**
+  String get headCircumference;
+
+  /// No description provided for @editFoodTracker.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Food Tracker'**
+  String get editFoodTracker;
+
+  /// No description provided for @feedingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding Name'**
+  String get feedingName;
+
+  /// No description provided for @quantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity (ml)'**
+  String get quantity;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @updateMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Meal'**
+  String get updateMeal;
+
+  /// No description provided for @saveMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Meal'**
+  String get saveMeal;
+
+  /// No description provided for @editMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Memory'**
+  String get editMemory;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @deleteMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete memory?'**
+  String get deleteMemory;
+
+  /// No description provided for @actionCannotBeUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get actionCannotBeUndone;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get chooseFromGallery;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get takePhoto;
+
+  /// No description provided for @tapToAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add photo'**
+  String get tapToAddPhoto;
+
+  /// No description provided for @change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// No description provided for @dailyChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Checklist'**
+  String get dailyChecklist;
+
+  /// No description provided for @addMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Meal'**
+  String get addMeal;
+
+  /// No description provided for @editMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Meal'**
+  String get editMeal;
+
+  /// No description provided for @mealType.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Type'**
+  String get mealType;
+
+  /// No description provided for @deleteMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Meal'**
+  String get deleteMeal;
+
+  /// No description provided for @viewRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'View Recipe'**
+  String get viewRecipe;
+
+  /// No description provided for @plannedMeals.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned Meals'**
+  String get plannedMeals;
+
+  /// No description provided for @addFirstMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Meal'**
+  String get addFirstMeal;
+
+  /// No description provided for @areYouSureDeleteMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete'**
+  String get areYouSureDeleteMeal;
+
+  /// No description provided for @mealAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal added successfully'**
+  String get mealAddedSuccessfully;
+
+  /// No description provided for @mealDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal deleted successfully'**
+  String get mealDeletedSuccessfully;
+
+  /// No description provided for @pleaseEnterMealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a meal title'**
+  String get pleaseEnterMealTitle;
+
+  /// No description provided for @appLock.
+  ///
+  /// In en, this message translates to:
+  /// **'App lock'**
+  String get appLock;
+
+  /// No description provided for @shareAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Share analytics'**
+  String get shareAnalytics;
+
+  /// No description provided for @shoppingList.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping List'**
+  String get shoppingList;
+
+  /// No description provided for @editItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get editItem;
+
+  /// No description provided for @itemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Item name'**
+  String get itemName;
+
+  /// No description provided for @addNewCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Category'**
+  String get addNewCategory;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryName;
+
+  /// No description provided for @addNewItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Item'**
+  String get addNewItem;
+
+  /// No description provided for @manageDoctors.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Doctors'**
+  String get manageDoctors;
+
+  /// No description provided for @addDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Doctor'**
+  String get addDoctor;
+
+  /// No description provided for @deleteDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Doctor'**
+  String get deleteDoctor;
+
+  /// No description provided for @doctorInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Information'**
+  String get doctorInformation;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// No description provided for @saveDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Doctor'**
+  String get saveDoctor;
+
+  /// No description provided for @failedToSaveDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save doctor'**
+  String get failedToSaveDoctor;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemDefault;
+
+  /// No description provided for @appointmentReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment reminders'**
+  String get appointmentReminders;
+
+  /// No description provided for @pushNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get pushNotifications;
+
+  /// No description provided for @emailNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Email notifications'**
+  String get emailNotifications;
+
+  /// No description provided for @importantAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Important alerts'**
+  String get importantAlerts;
+
+  /// No description provided for @noAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'No appointments'**
+  String get noAppointments;
+
+  /// No description provided for @editAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Appointment'**
+  String get editAppointment;
+
+  /// No description provided for @newAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'New Appointment'**
+  String get newAppointment;
+
+  /// No description provided for @enableReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Reminder'**
+  String get enableReminder;
+
+  /// No description provided for @testNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Notification'**
+  String get testNotification;
+
+  /// No description provided for @saveAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Appointment'**
+  String get saveAppointment;
+
+  /// No description provided for @updateAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Appointment'**
+  String get updateAppointment;
+
+  /// No description provided for @selectDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Doctor'**
+  String get selectDoctor;
+
+  /// No description provided for @pleasSelectDateAndTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select date and time'**
+  String get pleasSelectDateAndTime;
+
+  /// No description provided for @errorSavingAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving appointment'**
+  String get errorSavingAppointment;
+
+  /// No description provided for @appointmentDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment Details'**
+  String get appointmentDetails;
+
+  /// No description provided for @unknownDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Doctor'**
+  String get unknownDoctor;
+
+  /// No description provided for @appointmentTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment Time'**
+  String get appointmentTime;
+
+  /// No description provided for @noAppointmentData.
+  ///
+  /// In en, this message translates to:
+  /// **'No appointment data'**
+  String get noAppointmentData;
+
+  /// No description provided for @noDoctorAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No doctor assigned'**
+  String get noDoctorAssigned;
+
+  /// No description provided for @medicineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Name'**
+  String get medicineName;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
+  /// No description provided for @weeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get weeks;
+
+  /// No description provided for @months.
+  ///
+  /// In en, this message translates to:
+  /// **'Months'**
+  String get months;
+
+  /// No description provided for @every.
+  ///
+  /// In en, this message translates to:
+  /// **'Every:'**
+  String get every;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours  Start:'**
+  String get hours;
+
+  /// No description provided for @notesFieldCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes field cannot be empty! Please add notes.'**
+  String get notesFieldCannotBeEmpty;
+
+  /// No description provided for @pleaseSelectSleepQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select sleep quality.'**
+  String get pleaseSelectSleepQuality;
+
+  /// No description provided for @userNotAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'User not authenticated'**
+  String get userNotAuthenticated;
+
+  /// No description provided for @sleepLogUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep log updated successfully!'**
+  String get sleepLogUpdatedSuccessfully;
+
+  /// No description provided for @sleepLoggedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep logged successfully!'**
+  String get sleepLoggedSuccessfully;
+
+  /// No description provided for @failedToLogSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to log sleep.'**
+  String get failedToLogSleep;
+
+  /// No description provided for @thisSleepLogAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This sleep log already exists!'**
+  String get thisSleepLogAlreadyExists;
+
+  /// No description provided for @growthLogUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth log updated'**
+  String get growthLogUpdated;
+
+  /// No description provided for @growthDataLoggedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth data logged successfully!'**
+  String get growthDataLoggedSuccessfully;
+
+  /// No description provided for @failedToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save'**
+  String get failedToSave;
+
+  /// No description provided for @mealUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal updated successfully'**
+  String get mealUpdatedSuccessfully;
+
+  /// No description provided for @selectBaby.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Baby'**
+  String get selectBaby;
+
+  /// No description provided for @selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get selected;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @unknownTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Tab'**
+  String get unknownTab;
+
+  /// No description provided for @emergencyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Card'**
+  String get emergencyCard;
+
+  /// No description provided for @errorLoadingBabyData.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading baby data'**
+  String get errorLoadingBabyData;
+
+  /// No description provided for @openDrawer.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Drawer'**
+  String get openDrawer;
+
+  /// No description provided for @age.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// No description provided for @babyInformationUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Baby information updated successfully!'**
+  String get babyInformationUpdatedSuccessfully;
+
+  /// No description provided for @errorUpdating.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating'**
+  String get errorUpdating;
+
+  /// No description provided for @imageUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Image upload failed'**
+  String get imageUploadFailed;
+
+  /// No description provided for @editBabyProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Baby Profile'**
+  String get editBabyProfile;
+
+  /// No description provided for @imageUploadedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Image uploaded successfully'**
+  String get imageUploadedSuccessfully;
+
+  /// No description provided for @uploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get uploadFailed;
+
+  /// No description provided for @uploadProfilePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Profile Picture'**
+  String get uploadProfilePicture;
+
+  /// No description provided for @chooseAndUploadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose & Upload Image'**
+  String get chooseAndUploadImage;
+
+  /// No description provided for @saveEmergencyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Emergency Card'**
+  String get saveEmergencyCard;
+
+  /// No description provided for @allergies.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergies'**
+  String get allergies;
+
+  /// No description provided for @addAllergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Allergy'**
+  String get addAllergy;
+
+  /// No description provided for @addMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Medication'**
+  String get addMedication;
+
+  /// No description provided for @medications.
+  ///
+  /// In en, this message translates to:
+  /// **'Medications'**
+  String get medications;
+
+  /// No description provided for @createEmergencyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Emergency Card'**
+  String get createEmergencyCard;
+
+  /// No description provided for @selectChildToViewEmergencyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a child to view emergency card.'**
+  String get selectChildToViewEmergencyCard;
+
+  /// No description provided for @generatingEmergencyCardPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Emergency Card PDF...'**
+  String get generatingEmergencyCardPdf;
+
+  /// No description provided for @emergencyCardPdfGeneratedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Card PDF generated successfully!'**
+  String get emergencyCardPdfGeneratedSuccessfully;
+
+  /// No description provided for @myBabies.
+  ///
+  /// In en, this message translates to:
+  /// **'My Babies'**
+  String get myBabies;
+
+  /// No description provided for @deleteBaby.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Baby'**
+  String get deleteBaby;
+
+  /// No description provided for @areYouSureDeleteBaby.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this baby?'**
+  String get areYouSureDeleteBaby;
+
+  /// No description provided for @noChildSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No child selected for gallery'**
+  String get noChildSelected;
+
+  /// No description provided for @pleasePickImageAndEnterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick an image and enter a title'**
+  String get pleasePickImageAndEnterTitle;
+
+  /// No description provided for @uploadFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get uploadFailedError;
+
+  /// No description provided for @babyDetailsSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Baby details saved successfully'**
+  String get babyDetailsSavedSuccessfully;
+
+  /// No description provided for @pdfExportedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF exported successfully!'**
+  String get pdfExportedSuccessfully;
+
+  /// No description provided for @errorExportingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Error exporting PDF'**
+  String get errorExportingPdf;
+
+  /// No description provided for @noLogsToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs to export'**
+  String get noLogsToExport;
+
+  /// No description provided for @totalLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Logs'**
+  String get totalLogs;
+
+  /// No description provided for @child.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get child;
+
+  /// No description provided for @generated.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated'**
+  String get generated;
+
+  /// No description provided for @sleepLogsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep Logs Report'**
+  String get sleepLogsReport;
+
+  /// No description provided for @medicationLogsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Logs Report'**
+  String get medicationLogsReport;
+
+  /// No description provided for @growthLogsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Logs Report'**
+  String get growthLogsReport;
+
+  /// No description provided for @feedingLogsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding Logs Report'**
+  String get feedingLogsReport;
+
+  /// No description provided for @noDataToDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'No data to display'**
+  String get noDataToDisplay;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @loginSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Successful'**
+  String get loginSuccessful;
+
+  /// No description provided for @signUpSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up Successful!'**
+  String get signUpSuccessful;
+
+  /// No description provided for @failedToMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark done'**
+  String get failedToMarkDone;
+
+  /// No description provided for @noRouteDefinedFor.
+  ///
+  /// In en, this message translates to:
+  /// **'No route defined for'**
+  String get noRouteDefinedFor;
+
+  /// No description provided for @monthView.
+  ///
+  /// In en, this message translates to:
+  /// **'Month View'**
+  String get monthView;
+
+  /// No description provided for @weekView.
+  ///
+  /// In en, this message translates to:
+  /// **'Week View'**
+  String get weekView;
 }
 
 class _AppLocalizationsDelegate
@@ -806,7 +1732,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'fr'].contains(locale.languageCode);
+      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -815,6 +1741,8 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
     case 'en':
       return AppLocalizationsEn();
     case 'fr':

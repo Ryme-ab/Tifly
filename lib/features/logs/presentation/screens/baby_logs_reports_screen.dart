@@ -59,8 +59,9 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
   void _showEnhancedFilterDialog() {
     // TODO: Implement enhanced filter dialog
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Filter feature coming soon')),
+      SnackBar(content: Text(l10n.filterFeatureComingSoon)),
     );
   }
 
@@ -70,18 +71,19 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
     bool includeSleeping = true;
     bool includeMedication = true;
 
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.picture_as_pdf, color: Color(0xFFF56587)),
-                SizedBox(width: 12),
+                const Icon(Icons.picture_as_pdf, color: Color(0xFFF56587)),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Export PDF Report',
+                    l10n.exportPdf,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -91,9 +93,9 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Select which logs to include:',
-                  style: TextStyle(
+                Text(
+                  '${l10n.selectBaby}:',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -104,7 +106,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                     children: [
                       const Icon(Icons.local_drink, size: 20, color: Color(0xFF6B6BFF)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('Feeding Logs')),
+                      Expanded(child: Text(l10n.feedingLogs)),
                     ],
                   ),
                   value: includeFeeding,
@@ -116,7 +118,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                     children: [
                       const Icon(Icons.child_care, size: 20, color: Color(0xFF8E44AD)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('Growth Logs')),
+                      Expanded(child: Text(l10n.growthLogs)),
                     ],
                   ),
                   value: includeGrowth,
@@ -128,7 +130,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                     children: [
                       const Icon(Icons.bedtime, size: 20, color: Color(0xFF4FB783)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('Sleeping Logs')),
+                      Expanded(child: Text(l10n.sleepingLogs)),
                     ],
                   ),
                   value: includeSleeping,
@@ -140,7 +142,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                     children: [
                       const Icon(Icons.medication_liquid, size: 20, color: Color(0xFFE74C3C)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('Medication Logs')),
+                      Expanded(child: Text(l10n.medicationLogs)),
                     ],
                   ),
                   value: includeMedication,
@@ -152,11 +154,11 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.download, size: 18),
-                label: const Text('Export PDF'),
+                label: Text(l10n.exportPdf),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF56587),
                   foregroundColor: Colors.white,
@@ -191,11 +193,12 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
     try {
       // Show loading
       if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -203,11 +206,11 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                   valueColor: AlwaysStoppedAnimation(Colors.white),
                 ),
               ),
-              SizedBox(width: 12),
-              Text('Generating PDF...'),
+              const SizedBox(width: 12),
+              Text(l10n.generatingPdf),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
 
@@ -248,7 +251,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
-                    'Baby Logs Report',
+                    l10n.logsAndReports,
                     style: pw.TextStyle(
                       fontSize: 28,
                       fontWeight: pw.FontWeight.bold,
@@ -257,11 +260,11 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
                   ),
                   pw.SizedBox(height: 8),
                   pw.Text(
-                    'Child: $childName',
+                    '${l10n.child}: $childName',
                     style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800),
                   ),
                   pw.Text(
-                    'Generated: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}',
+                    '${l10n.generated}: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}',
                     style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
                   ),
                   pw.Divider(thickness: 2),
@@ -273,7 +276,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
             // Summary Statistics
             pw.Text(
-              'Summary Statistics',
+              l10n.summaryStatistics,
               style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 12),
@@ -293,7 +296,7 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
             // Visual Charts Section
             pw.Text(
-              'Visual Analytics',
+              l10n.visualAnalytics,
               style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 12),
@@ -311,22 +314,22 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
             // Detailed Logs
             if (includeFeeding && feedingLogs.isNotEmpty) ...[
-              _buildLogSection('Feeding Logs', feedingLogs, PdfColors.blue500),
+              _buildLogSection(l10n.feedingLogs, feedingLogs, PdfColors.blue500),
               pw.SizedBox(height: 20),
             ],
 
             if (includeGrowth && growthLogs.isNotEmpty) ...[
-              _buildLogSection('Growth Logs', growthLogs, PdfColors.purple500),
+              _buildLogSection(l10n.growthLogs, growthLogs, PdfColors.purple500),
               pw.SizedBox(height: 20),
             ],
 
             if (includeSleeping && sleepLogs.isNotEmpty) ...[
-              _buildLogSection('Sleeping Logs', sleepLogs, PdfColors.green500),
+              _buildLogSection(l10n.sleepingLogs, sleepLogs, PdfColors.green500),
               pw.SizedBox(height: 20),
             ],
 
             if (includeMedication && medicationLogs.isNotEmpty) ...[
-              _buildLogSection('Medication Logs', medicationLogs, PdfColors.red500),
+              _buildLogSection(l10n.medicationLogs, medicationLogs, PdfColors.red500),
             ],
           ],
         ),
@@ -342,12 +345,12 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Text('PDF generated successfully!'),
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 12),
+              Text(l10n.pdfGeneratedSuccessfully),
             ],
           ),
           backgroundColor: Colors.green,
@@ -355,9 +358,10 @@ class _BabyLogsReportsPageState extends State<BabyLogsReportsPage> {
       );
     } catch (e) {
       if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error generating PDF: $e'),
+          content: Text('${l10n.errorGeneratingPdf}: $e'),
           backgroundColor: Colors.red,
         ),
       );
