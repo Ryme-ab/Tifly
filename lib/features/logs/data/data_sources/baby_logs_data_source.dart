@@ -158,7 +158,7 @@ class BabyLogsDataSource {
     DateTime? endDate,
     String? time,
   }) async {
-    var query = client.from('medicines').select().eq('baby_id', childId);
+    var query = client.from('medicine_schedules').select().eq('baby_id', childId);
 
     // Apply date filters
     if (date != null) {

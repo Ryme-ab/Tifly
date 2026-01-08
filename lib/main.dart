@@ -10,6 +10,7 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:tifli/core/services/notification_service.dart';
 import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/firebase_options.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 // --- Supabase Core ---
 import 'package:tifli/core/config/supabaseClient.dart';
@@ -141,6 +142,7 @@ Future<void> main() async {
   if (userId != null) {
     NotificationService.instance.initFCM(userId: userId);
   }
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   runApp(
     MultiBlocProvider(
@@ -330,7 +332,11 @@ Future<void> main() async {
                     GlobalWidgetsLocalizations.delegate,
                     GlobalCupertinoLocalizations.delegate,
                   ],
-                  supportedLocales: const [Locale('en'), Locale('fr'), Locale('ar')],
+                  supportedLocales: const [
+                    Locale('en'),
+                    Locale('fr'),
+                    Locale('ar'),
+                  ],
                   initialRoute: AppRoutes.splash,
                   onGenerateRoute: AppRouter.generateRoute,
                 ),
