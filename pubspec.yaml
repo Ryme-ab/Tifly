@@ -72,6 +72,10 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.2
+  # Testing dependencies
+  mockito: ^5.4.4
+  build_runner: ^2.4.13
+  bloc_test: ^10.0.0
 
 dependency_overrides:
   sign_in_with_apple: ^6.1.0
