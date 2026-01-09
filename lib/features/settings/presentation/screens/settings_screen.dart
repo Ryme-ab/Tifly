@@ -65,13 +65,7 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Appearance Section
-          _buildSectionCard(
-            context,
-            title: 'Appearance',
-            icon: Icons.palette_outlined,
-            children: [_buildThemeSelector(context)],
-          ),
+
 
           const SizedBox(height: 16),
 
@@ -165,76 +159,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeState>(
-      builder: (context, state) {
-        return Column(
-          children: [
-            _buildThemeOption(
-              context,
-              mode: AppThemeMode.light,
-              currentMode: state.mode,
-              title: 'Light',
-              icon: Icons.light_mode,
-            ),
-            _buildThemeOption(
-              context,
-              mode: AppThemeMode.dark,
-              currentMode: state.mode,
-              title: 'Dark',
-              icon: Icons.dark_mode,
-            ),
-            _buildThemeOption(
-              context,
-              mode: AppThemeMode.system,
-              currentMode: state.mode,
-              title: 'System Default',
-              icon: Icons.brightness_auto,
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  Widget _buildThemeOption(
-    BuildContext context, {
-    required AppThemeMode mode,
-    required AppThemeMode currentMode,
-    required String title,
-    required IconData icon,
-  }) {
-    final isSelected = mode == currentMode;
-
-    return RadioListTile<AppThemeMode>(
-      value: mode,
-      groupValue: currentMode,
-      onChanged: (value) {
-        if (value != null) {
-          context.read<ThemeCubit>().setTheme(value);
-        }
-      },
-      title: Row(
-        children: [
-          Icon(
-            icon,
-            size: 20,
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).iconTheme.color,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-      activeColor: Theme.of(context).colorScheme.primary,
-    );
-  }
 
   Widget _buildLanguageSelector(BuildContext context, AppLocalizations l10n) {
     return BlocBuilder<LocaleCubit, Locale>(

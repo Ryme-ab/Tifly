@@ -1099,7 +1099,7 @@ class ProfessionalChartsSection extends StatelessWidget {
                   child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
-                      centerSpaceRadius: 45,
+                      centerSpaceRadius: 30,
                       sections: logCounts.entries.map((e) {
                         final percentage = (e.value / logs.length * 100)
                             .toStringAsFixed(1);
@@ -1107,7 +1107,7 @@ class ProfessionalChartsSection extends StatelessWidget {
                           value: e.value.toDouble(),
                           title: '$percentage%',
                           color: _getColor(e.key),
-                          radius: 60,
+                          radius: 50,
                           titleStyle: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

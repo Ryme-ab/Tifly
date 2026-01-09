@@ -11,6 +11,7 @@ import 'package:tifli/features/logs/presentation/cubit/feeding_logs_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/feeding_logs_state.dart';
 import 'package:tifli/features/logs/data/models/logs_model.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 

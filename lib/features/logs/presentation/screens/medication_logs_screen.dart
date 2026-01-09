@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
@@ -81,7 +82,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                   DateFormat('MMM dd, yyyy').format(log.createdAt),
                   log.medicineName,
                   '-',
-                  log.dosage.toString(),
+                  '${log.dosageAmount} ${log.dosageUnit}',
                   log.notes?.isEmpty ?? true ? '-' : log.notes!,
                 ];
               }).toList(),
@@ -209,7 +210,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const MedicineApp()),
+            MaterialPageRoute(builder: (_) => const MedicineSchedulePage()),
           );
         },
         child: const Icon(Icons.add),
@@ -282,13 +283,15 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                       med.medicineName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    if (med.timeOfMedication != null)
+                    if (med.times.isNotEmpty)
                       Text(
-                        DateFormat(
-                          'hh:mm a',
-                        ).format(DateTime.parse(med.timeOfMedication!)),
+                        'Scheduled: ${med.times.join(", ")}',
                         style: const TextStyle(color: Colors.black54),
                       ),
+                    Text(
+                      '${med.dosageAmount} ${med.dosageUnit} • ${med.frequency}',
+                      style: const TextStyle(color: Colors.black54, fontSize: 12),
+                    ),
                     if (med.notes != null && med.notes!.isNotEmpty)
                       Text(
                         med.notes!,

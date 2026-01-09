@@ -111,29 +111,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     }
   }
 
-  // Test notification to verify setup
-  Future<void> _showTestNotification() async {
-    debugPrint('🔔 Showing test notification...');
-    try {
-      await flutterLocalNotificationsPlugin.show(
-        999999,
-        'Test Notification',
-        'If you see this, notifications are working!',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'appointment_channel',
-            'Appointment Reminders',
-            channelDescription: 'Reminders for scheduled appointments',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-        ),
-      );
-      debugPrint('✅ Test notification sent');
-    } catch (e) {
-      debugPrint('❌ Failed to show test notification: $e');
-    }
-  }
+
 
   @override
   void dispose() {
@@ -251,16 +229,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               ],
               const SizedBox(height: 15),
 
-              // Test Notification Button (for debugging)
-              OutlinedButton.icon(
-                onPressed: _showTestNotification,
-                icon: const Icon(Icons.notification_add),
-                label: const Text('Test Notification'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFD9436B),
-                ),
-              ),
-              const SizedBox(height: 15),
+
 
               // Notes
               _buildTextField("Notes (Optional)", notesController, maxLines: 3),
