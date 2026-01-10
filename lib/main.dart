@@ -92,8 +92,8 @@ import 'package:tifli/core/state/locale_cubit.dart';
 
 // --- Theme ---
 import 'package:tifli/core/theme/app_theme.dart';
-import 'package:tifli/features/theme/presentation/cubit/theme_cubit.dart';
-import 'package:tifli/features/theme/presentation/cubit/theme_state.dart';
+import 'package:tifli/core/state/theme_cubit.dart';
+
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -135,7 +135,6 @@ Future<void> main() async {
   // Initialize Supabase
   await SupabaseClientManager.initialize();
   final supabase = SupabaseClientManager().client;
-  WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize FCM for current user
   final userId = UserContext.getCurrentUserId();
@@ -147,8 +146,8 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        // THEME SYSTEM
-        BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()..loadSavedTheme()),
+        // THEME
+        BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
 
         // LOCALIZATION
         BlocProvider<LocaleCubit>(create: (_) => LocaleCubit()),

@@ -1,15 +1,13 @@
 // lib/features/trackers/presentation/screens/food_tracker_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tifli/core/config/supabaseClient.dart';
-import 'package:tifli/core/utils/user_context.dart';
+import 'package:tifli/features/trackers/data/models/meal.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import '../cubit/meal_cubit.dart';
 import 'sleep_tracker_screen.dart';
 import 'growth_tracker_screen.dart';
-
-import 'package:tifli/features/trackers/data/models/meal.dart';
 import '../widgets/tracker_button.dart';
 
 class FoodTrackerScreen extends StatefulWidget {
@@ -47,9 +45,13 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
 
     if (widget.existingEntry != null) {
       _selectedFeeding = widget.existingEntry!.mealType;
-      if (!_feedingOptions.contains(_selectedFeeding)) _feedingOptions.add(_selectedFeeding);
+      if (!_feedingOptions.contains(_selectedFeeding))
+        _feedingOptions.add(_selectedFeeding);
       _quantity = widget.existingEntry!.amount;
-      _selectedTime = TimeOfDay(hour: widget.existingEntry!.mealTime.hour, minute: widget.existingEntry!.mealTime.minute);
+      _selectedTime = TimeOfDay(
+        hour: widget.existingEntry!.mealTime.hour,
+        minute: widget.existingEntry!.mealTime.minute,
+      );
       _notes = widget.existingEntry!.items;
       _selectedDate = DateTime(
         widget.existingEntry!.mealTime.year,
@@ -63,7 +65,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       _notes = "";
       _selectedDate = DateTime.now();
     }
-    
+
     _notesController = TextEditingController(text: _notes);
   }
 
@@ -74,7 +76,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
   }
 
   Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _selectedTime);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
     if (picked != null) setState(() => _selectedTime = picked);
   }
 
@@ -97,14 +102,19 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     // Get selected child ID
     final childState = context.read<ChildSelectionCubit>().state;
     if (childState is! ChildSelected) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a baby first"), backgroundColor: Colors.orange),
+        SnackBar(
+          content: Text(l10n.pleaseSelectBabyFirst),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
     final childId = childState.childId;
 
     try {
+      final l10n = AppLocalizations.of(context)!;
       if (widget.existingEntry != null) {
         // Update existing meal
         await context.read<MealCubit>().updateMeal(
@@ -112,13 +122,18 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
           childId: childId,
           mealTime: mealTime,
           mealType: _selectedFeeding,
-          items: _notesController.text.isNotEmpty ? _notesController.text : _selectedFeeding,
+          items: _notesController.text.isNotEmpty
+              ? _notesController.text
+              : _selectedFeeding,
           amount: _quantity,
           status: 'completed',
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Meal updated successfully"), backgroundColor: Colors.green),
+          SnackBar(
+            content: Text(l10n.mealUpdatedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
         );
       } else {
         // Add new meal
@@ -126,13 +141,18 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
           childId: childId,
           mealTime: mealTime,
           mealType: _selectedFeeding,
-          items: _notesController.text.isNotEmpty ? _notesController.text : _selectedFeeding,
+          items: _notesController.text.isNotEmpty
+              ? _notesController.text
+              : _selectedFeeding,
           amount: _quantity,
           status: 'completed',
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Meal added successfully"), backgroundColor: Colors.green),
+          SnackBar(
+            content: Text(l10n.mealAddedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
         );
       }
 
@@ -143,23 +163,37 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       Navigator.pop(context, true); // return true to parent
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}"), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(116, 255, 243, 224), // Matched SleepPage background
+      backgroundColor: const Color.fromARGB(
+        116,
+        255,
+        243,
+        224,
+      ), // Matched SleepPage background
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
         title: Text(
-          widget.existingEntry != null ? "Edit Food Tracker" : "Food Tracker",
-          style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+          widget.existingEntry != null
+              ? l10n.editFoodTracker
+              : l10n.foodTracker,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: SafeArea(
@@ -185,7 +219,10 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(91, 255, 243, 224),
                   borderRadius: BorderRadius.circular(12),
@@ -193,12 +230,20 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Feeding Name", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                    Text(
+                      l10n.feedingName,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300), // Lighter border
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                        ), // Lighter border
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButton<String>(
@@ -211,24 +256,43 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                                 value: option,
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.local_drink, color: Colors.black54, size: 20),
+                                    const Icon(
+                                      Icons.local_drink,
+                                      color: Colors.black54,
+                                      size: 20,
+                                    ),
                                     const SizedBox(width: 8),
-                                    Text(option),
+                                    Text(
+                                      _getLocalizedFeedingOption(option, l10n),
+                                    ),
                                   ],
                                 ),
                               ),
                             )
                             .toList(),
-                        onChanged: (val) => setState(() => _selectedFeeding = val!),
+                        onChanged: (val) =>
+                            setState(() => _selectedFeeding = val!),
                       ),
                     ),
                     const SizedBox(height: 20),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text("Quantity (ml)", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                        Text("Time", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                      children: [
+                        Text(
+                          l10n.quantityMl,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        Text(
+                          l10n.time,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -245,16 +309,28 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                           child: Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.remove, color: Color(0xFFA41639)),
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: Color(0xFFA41639),
+                                ),
                                 onPressed: () {
                                   setState(() {
                                     if (_quantity > 0) _quantity -= 10;
                                   });
                                 },
                               ),
-                              Text('$_quantity', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text(
+                                '$_quantity',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               IconButton(
-                                icon: const Icon(Icons.add, color: Color(0xFFA41639)),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Color(0xFFA41639),
+                                ),
                                 onPressed: () => setState(() => _quantity++),
                               ),
                             ],
@@ -263,26 +339,44 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                         GestureDetector(
                           onTap: _pickTime,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF9ECEE),
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: Text(_formatTime(_selectedTime), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black87)),
+                            child: Text(
+                              _formatTime(_selectedTime),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
 
                     const SizedBox(height: 20),
-                    const Text('Notes', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                    Text(
+                      l10n.notesOptional,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Add any notes...',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        hintText: l10n.addAnyNotes,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         isDense: true,
                         contentPadding: const EdgeInsets.all(10),
                       ),
@@ -295,10 +389,20 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _saveFoodTracker,
                         icon: const Icon(Icons.fastfood, color: Colors.white),
-                        label: Text(widget.existingEntry != null ? 'Update Meal' : 'Save Meal', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        label: Text(
+                          widget.existingEntry != null
+                              ? l10n.updateMeal
+                              : l10n.saveMeal,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFA41639),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
@@ -311,6 +415,21 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
         ),
       ),
     );
+  }
+
+  String _getLocalizedFeedingOption(String option, AppLocalizations l10n) {
+    switch (option) {
+      case "Breast Milk":
+        return l10n.breastMilk;
+      case "Formula":
+        return l10n.formula;
+      case "Solid Food":
+        return l10n.solidFood;
+      case "Juice":
+        return l10n.juice;
+      default:
+        return option;
+    }
   }
 }
 
@@ -338,7 +457,10 @@ class TrackerButtonsRow extends StatelessWidget {
           activeColor: Colors.blue,
           isActive: currentPage == 'sleep',
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SleepPage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const SleepPage()),
+            );
           },
         ),
         const SizedBox(width: 20),
@@ -348,7 +470,10 @@ class TrackerButtonsRow extends StatelessWidget {
           activeColor: Colors.green,
           isActive: currentPage == 'growth',
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GrowthPage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const GrowthPage()),
+            );
           },
         ),
       ],

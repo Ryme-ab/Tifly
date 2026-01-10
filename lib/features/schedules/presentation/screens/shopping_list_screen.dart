@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_sizes.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+
 
 class ShoppingListScreen extends StatefulWidget {
   const ShoppingListScreen({super.key});
@@ -108,35 +110,36 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
     final titleController = TextEditingController(text: item['title']);
     final subtitleController = TextEditingController(text: item['subtitle']);
 
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Item'),
+        title: Text(l10n.editItem),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(hintText: 'Item name'),
+              decoration: InputDecoration(hintText: l10n.itemName),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: subtitleController,
-              decoration: const InputDecoration(hintText: 'Details'),
+              decoration: InputDecoration(hintText: l10n.details),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, {
               'title': titleController.text,
               'subtitle': subtitleController.text,
             }),
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -153,22 +156,23 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   void _addCategory() async {
     final titleController = TextEditingController();
 
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add New Category'),
+        title: Text(l10n.addNewCategory),
         content: TextField(
           controller: titleController,
-          decoration: const InputDecoration(hintText: 'Category name'),
+          decoration: InputDecoration(hintText: l10n.categoryName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, titleController.text),
-            child: const Text('Add'),
+            child: Text(l10n.add),
           ),
         ],
       ),
@@ -190,35 +194,36 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
     final titleController = TextEditingController();
     final subtitleController = TextEditingController();
 
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add New Item'),
+        title: Text(l10n.addNewItem),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(hintText: 'Item name'),
+              decoration: InputDecoration(hintText: l10n.itemName),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: subtitleController,
-              decoration: const InputDecoration(hintText: 'Details'),
+              decoration: InputDecoration(hintText: l10n.details),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, {
               'title': titleController.text,
               'subtitle': subtitleController.text,
             }),
-            child: const Text('Add'),
+            child: Text(l10n.add),
           ),
         ],
       ),
@@ -239,9 +244,10 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: 'Shopping List'),
+      appBar: CustomAppBar(title: l10n.shoppingListTitle),
       body: SafeArea(
         child: Stack(
           children: [
@@ -278,7 +284,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                     backgroundColor: Colors.white,
                   ),
                   child: Text(
-                    "+ Add New Category",
+                    "+ ${l10n.addNewCategory}",
                     style: AppFonts.body.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -309,7 +315,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: "Search shopping items...",
+          hintText: AppLocalizations.of(context)!.searchShoppingItems,
           hintStyle: AppFonts.body.copyWith(color: AppColors.textPrimaryLight),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,

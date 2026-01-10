@@ -195,7 +195,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appointmentSchedule => 'جدول المواعيد';
 
   @override
-  String get addTrackers => 'إضافة متتبعات';
+  String get addTrackers => 'إضافة تتبعات';
 
   @override
   String get editSleepLog => 'تعديل سجل النوم';
@@ -204,7 +204,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trackYourBabyEasily => 'تتبع طفلك بسهولة';
 
   @override
-  String get foodTracker => 'متتبع الطعام';
+  String get foodTracker => 'تتبع الطعام';
 
   @override
   String get sleepTracker => 'متتبع النوم';
@@ -432,10 +432,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get headCircumference => 'محيط الرأس';
 
   @override
-  String get editFoodTracker => 'تعديل متتبع الطعام';
+  String get editFoodTracker => 'تعديل سجل الطعام';
 
   @override
-  String get feedingName => 'اسم الرضعة';
+  String get feedingName => 'نوع الرضاعة/الطعام';
 
   @override
   String get quantity => 'الكمية (مل)';
@@ -498,10 +498,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannedMeals => 'الوجبات المخططة';
 
   @override
-  String get addFirstMeal => 'إضافة أول وجبة';
+  String get addFirstMeal => 'أضف أول وجبة';
 
   @override
-  String get areYouSureDeleteMeal => 'هل أنت متأكد من حذف';
+  String areYouSureDeleteMeal(String title) {
+    return 'هل أنت متأكد من حذف \"$title\"؟';
+  }
 
   @override
   String get mealAddedSuccessfully => 'تمت إضافة الوجبة بنجاح';
@@ -510,7 +512,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mealDeletedSuccessfully => 'تم حذف الوجبة بنجاح';
 
   @override
-  String get pleaseEnterMealTitle => 'يرجى إدخال عنوان الوجبة';
+  String get pleaseEnterMealTitle => 'يرجى إدخال اسم الوجبة';
 
   @override
   String get appLock => 'قفل التطبيق';
@@ -597,7 +599,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get updateAppointment => 'تحديث الموعد';
 
   @override
-  String get selectDoctor => 'اختر طبيب';
+  String get selectDoctor => 'اختر الطبيب';
 
   @override
   String get pleasSelectDateAndTime => 'يرجى تحديد التاريخ والوقت';
@@ -823,4 +825,270 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get weekView => 'عرض الأسبوع';
+
+  @override
+  String get dosage => 'الجرعة';
+
+  @override
+  String get pill => 'قرص';
+
+  @override
+  String get ml => 'مل';
+
+  @override
+  String get drugDrop => 'قطرة';
+
+  @override
+  String get frequency => 'التكرار';
+
+  @override
+  String get onceADay => 'مرة يومياً';
+
+  @override
+  String get twiceADay => 'مرتين يومياً';
+
+  @override
+  String get threeTimesADay => 'ثلاث مرات يومياً';
+
+  @override
+  String get times => 'الأوقات';
+
+  @override
+  String get scheduleDuration => 'المدة';
+
+  @override
+  String get saveSchedule => 'حفظ الجدول';
+
+  @override
+  String get required => 'مطلوب';
+
+  @override
+  String get pleaseSelectTime => 'يرجى اختيار وقت واحد على الأقل';
+
+  @override
+  String get medicationSummary => 'ملخص الأدوية';
+
+  @override
+  String get scheduledPrefix => 'مجدول: ';
+
+  @override
+  String get title => 'العنوان';
+
+  @override
+  String get titleRequired => 'العنوان مطلوب';
+
+  @override
+  String get descriptionOptional => 'الوصف (اختياري)';
+
+  @override
+  String get doctorOptional => 'الطبيب (اختياري)';
+
+  @override
+  String get addNewDoctor => 'إضافة طبيب جديد';
+
+  @override
+  String get date => 'التاريخ';
+
+  @override
+  String get durationMinutesOptional => 'المدة (دقائق، اختياري)';
+
+  @override
+  String get locationOptional => 'الموقع (اختياري)';
+
+  @override
+  String get hospitalNameOptional => 'اسم المستشفى (اختياري)';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get statusScheduled => 'مجدول';
+
+  @override
+  String get statusCompleted => 'مكتمل';
+
+  @override
+  String get statusCancelled => 'ملغى';
+
+  @override
+  String get statusMissed => 'فائت';
+
+  @override
+  String get remindMeMinutesBefore => 'ذكرني قبل (بالدقائق)';
+
+  @override
+  String get notesOptional => 'ملاحظات (اختياري)';
+
+  @override
+  String get pleaseSelectDateAndTime => 'يرجى اختيار التاريخ والوقت';
+
+  @override
+  String get appointmentReminder => 'تذكير بالموعد';
+
+  @override
+  String get quantityMl => 'الكمية (مل)';
+
+  @override
+  String get addAnyNotes => 'أضف أي ملاحظات...';
+
+  @override
+  String get editGrowthLog => 'تعديل سجل النمو';
+
+  @override
+  String get addGrowthData => 'إضافة بيانات النمو';
+
+  @override
+  String get enter => 'أدخل';
+
+  @override
+  String get updateGrowthData => 'تحديث بيانات النمو';
+
+  @override
+  String get logGrowthData => 'تسجيل بيانات النمو';
+
+  @override
+  String get pleaseEnterValidNumericValues =>
+      'يرجى إدخال قيم رقمية صحيحة للوزن والطول ومحيط الرأس.';
+
+  @override
+  String get chooseTracker => 'اختر متتبع';
+
+  @override
+  String get whenDoesBabySleep => 'متى ينام طفلك؟';
+
+  @override
+  String get addSleepNotes => 'أضف ملاحظات النوم...';
+
+  @override
+  String get selectSleepQuality => 'اختر جودة النوم';
+
+  @override
+  String get qualityNotGood => 'غير جيد';
+
+  @override
+  String get qualityGood => 'جيد';
+
+  @override
+  String get qualityExcellent => 'ممتاز';
+
+  @override
+  String get updateSleepLog => 'تحديث سجل النوم';
+
+  @override
+  String get logSleepTime => 'تسجيل وقت النوم';
+
+  @override
+  String get notesCannotBeEmpty =>
+      'حقل الملاحظات لا يمكن أن يكون فارغاً! يرجى إضافة ملاحظات.';
+
+  @override
+  String get sleepLogExists => 'سجل النوم هذا موجود بالفعل!';
+
+  @override
+  String get pleaseSelectBabyFirst => 'يرجى اختيار طفل أولاً';
+
+  @override
+  String get medicineScheduleTitle => 'جدول الأدوية';
+
+  @override
+  String get noMedicinesScheduled => 'لا توجد أدوية مجدولة';
+
+  @override
+  String get noMedicinesForDate => 'لا توجد أدوية لهذا التاريخ';
+
+  @override
+  String get morning => 'صباحاً';
+
+  @override
+  String get night => 'ليلاً';
+
+  @override
+  String get weekOf => 'أسبوع';
+
+  @override
+  String get shoppingListTitle => 'قائمة التسوق';
+
+  @override
+  String get searchShoppingItems => 'بحث في العناصر...';
+
+  @override
+  String get details => 'التفاصيل';
+
+  @override
+  String areYouSureDelete(String title) {
+    return 'هل أنت متأكد أنك تريد حذف \"$title\"؟';
+  }
+
+  @override
+  String get mealPlannerTitle => 'مخطط الوجبات';
+
+  @override
+  String mealsDoneCount(int done, int total) {
+    return '$done/$total تم';
+  }
+
+  @override
+  String get noMealsPlanned => 'لا توجد وجبات مخططة لهذا اليوم';
+
+  @override
+  String get mealTitle => 'العنوان';
+
+  @override
+  String get mealSubtitle => 'العنوان الفرعي';
+
+  @override
+  String get ingredients => 'المكونات';
+
+  @override
+  String get recipe => 'الوصفة';
+
+  @override
+  String get mealTitleHint => 'اسم الوجبة (مثال: شوفان)';
+
+  @override
+  String get ingredientsHint => 'قائمة المكونات (اختياري)';
+
+  @override
+  String get recipeHint => 'تعليمات الوصفة (اختياري)';
+
+  @override
+  String get breakfast => 'إفطار';
+
+  @override
+  String get lunch => 'غداء';
+
+  @override
+  String get dinner => 'عشاء';
+
+  @override
+  String get snack => 'وجبة خفيفة';
+
+  @override
+  String get mealAddedSuccess => 'تم إضافة الوجبة بنجاح';
+
+  @override
+  String get mealDeletedSuccess => 'تم حذف الوجبة بنجاح';
+
+  @override
+  String get markAsDone => 'تحديد كمكتمل';
+
+  @override
+  String get markAsNotDone => 'تحديد كغير مكتمل';
+
+  @override
+  String get doneStatus => 'تم';
+
+  @override
+  String get noMemoriesYetPrompt =>
+      'لا توجد ذكريات بعد.\nاضغط على زر + أو بلاطة إضافة ذكرى لإضافة واحدة.';
+
+  @override
+  String uploadFailedWithError(String error) {
+    return 'فشل التحميل: $error';
+  }
+
+  @override
+  String dateLabel(String date) {
+    return 'التاريخ: $date';
+  }
 }

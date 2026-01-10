@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 
 import '../../data/models/gallery_item.dart';
 import '../cubit/gallery_cubit.dart';
@@ -82,7 +83,11 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
     if (!isEdit &&
         (_pickedImage == null || _titleController.text.trim().isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please pick an image and enter a title')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.pleasePickImageAndEnterTitle,
+          ),
+        ),
       );
       return;
     }
@@ -116,7 +121,13 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
         print('Error: ${currentState.error}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Upload failed: ${currentState.error}')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(
+                  context,
+                )!.uploadFailedWithError(currentState.error!),
+              ),
+            ),
           );
         }
       } else {
@@ -127,9 +138,13 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
       print('=== ADD MEMORY PAGE: EXCEPTION ===');
       print('Error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.uploadFailedWithError(e.toString()),
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -144,7 +159,9 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
-          isEdit ? 'Edit Memory' : 'Add Memory',
+          isEdit
+              ? AppLocalizations.of(context)!.editMemory
+              : AppLocalizations.of(context)!.addMemory,
           style: AppFonts.heading2.copyWith(color: AppColors.textPrimaryLight),
         ),
         backgroundColor: Colors.white,
@@ -165,7 +182,9 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.photo_library),
-                          title: const Text('Choose from gallery'),
+                          title: Text(
+                            AppLocalizations.of(context)!.chooseFromGallery,
+                          ),
                           onTap: () {
                             Navigator.pop(context);
                             _pickFromGallery();
@@ -173,7 +192,7 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                         ),
                         ListTile(
                           leading: const Icon(Icons.camera_alt),
-                          title: const Text('Take a photo'),
+                          title: Text(AppLocalizations.of(context)!.takePhoto),
                           onTap: () {
                             Navigator.pop(context);
                             _takePhoto();
@@ -205,10 +224,12 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Icon(Icons.add_a_photo, size: 32),
                                   SizedBox(height: 8),
-                                  Text('Tap to add photo'),
+                                  Text(
+                                    AppLocalizations.of(context)!.tapToAddPhoto,
+                                  ),
                                 ],
                               ),
                             ),
@@ -226,22 +247,25 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
             const SizedBox(height: 12),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.title,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Text(
-                  'Date: $dateText',
+                  AppLocalizations.of(context)!.dateLabel(dateText),
                   style: AppFonts.body.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
                 const Spacer(),
-                TextButton(onPressed: _pickDate, child: const Text('Change')),
+                TextButton(
+                  onPressed: _pickDate,
+                  child: Text(AppLocalizations.of(context)!.change),
+                ),
               ],
             ),
             const Spacer(),
@@ -252,9 +276,9 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    label: const Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
+                    label: Text(
+                      AppLocalizations.of(context)!.delete,
+                      style: const TextStyle(color: Colors.red),
                     ),
                     onPressed: _submitting
                         ? null
@@ -262,20 +286,28 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (_) => AlertDialog(
-                                title: const Text('Delete memory?'),
-                                content: const Text(
-                                  'This action cannot be undone.',
+                                title: Text(
+                                  AppLocalizations.of(context)!.deleteMemory,
+                                ),
+                                content: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.actionCannotBeUndone,
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () =>
                                         Navigator.pop(context, false),
-                                    child: const Text('Cancel'),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.cancel,
+                                    ),
                                   ),
                                   TextButton(
                                     onPressed: () =>
                                         Navigator.pop(context, true),
-                                    child: const Text('Delete'),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.delete,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -315,7 +347,11 @@ class _AddMemoryPageState extends State<AddMemoryPage> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(isEdit ? 'Save Changes' : 'Save'),
+                    : Text(
+                        isEdit
+                            ? AppLocalizations.of(context)!.saveChanges
+                            : AppLocalizations.of(context)!.save,
+                      ),
               ),
             ),
           ],

@@ -158,7 +158,7 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.emergency_outlined,
-                    title: "Emrgency Card",
+                    title: l10n.emergencyCard,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(

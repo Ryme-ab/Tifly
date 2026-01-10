@@ -504,7 +504,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addFirstMeal => 'Ajouter le premier repas';
 
   @override
-  String get areYouSureDeleteMeal => 'Êtes-vous sûr de vouloir supprimer';
+  String areYouSureDeleteMeal(String title) {
+    return 'Êtes-vous sûr de vouloir supprimer';
+  }
 
   @override
   String get mealAddedSuccessfully => 'Repas ajouté avec succès';
@@ -837,4 +839,270 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get weekView => 'Vue hebdomadaire';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get pill => 'Pill';
+
+  @override
+  String get ml => 'ml';
+
+  @override
+  String get drugDrop => 'Drop';
+
+  @override
+  String get frequency => 'Frequency';
+
+  @override
+  String get onceADay => 'Once a day';
+
+  @override
+  String get twiceADay => 'Twice a day';
+
+  @override
+  String get threeTimesADay => 'Three times a day';
+
+  @override
+  String get times => 'Times';
+
+  @override
+  String get scheduleDuration => 'Duration';
+
+  @override
+  String get saveSchedule => 'Save Schedule';
+
+  @override
+  String get required => 'Required';
+
+  @override
+  String get pleaseSelectTime => 'Please select at least one time';
+
+  @override
+  String get medicationSummary => 'Medication Summary';
+
+  @override
+  String get scheduledPrefix => 'Scheduled: ';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get titleRequired => 'Title is required';
+
+  @override
+  String get descriptionOptional => 'Description (Optional)';
+
+  @override
+  String get doctorOptional => 'Doctor (Optional)';
+
+  @override
+  String get addNewDoctor => 'Add New Doctor';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get durationMinutesOptional => 'Duration (minutes, optional)';
+
+  @override
+  String get locationOptional => 'Location (Optional)';
+
+  @override
+  String get hospitalNameOptional => 'Hospital Name (Optional)';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get statusScheduled => 'Scheduled';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusMissed => 'Missed';
+
+  @override
+  String get remindMeMinutesBefore => 'Remind me (minutes before)';
+
+  @override
+  String get notesOptional => 'Notes (Optional)';
+
+  @override
+  String get pleaseSelectDateAndTime => 'Please select date and time';
+
+  @override
+  String get appointmentReminder => 'Appointment Reminder';
+
+  @override
+  String get quantityMl => 'Quantity (ml)';
+
+  @override
+  String get addAnyNotes => 'Add any notes...';
+
+  @override
+  String get editGrowthLog => 'Edit Growth Log';
+
+  @override
+  String get addGrowthData => 'Add Growth Data';
+
+  @override
+  String get enter => 'Enter';
+
+  @override
+  String get updateGrowthData => 'Update Growth Data';
+
+  @override
+  String get logGrowthData => 'Log Growth Data';
+
+  @override
+  String get pleaseEnterValidNumericValues =>
+      'Please enter valid numeric values for weight, height and head circumference.';
+
+  @override
+  String get chooseTracker => 'Choose a tracker';
+
+  @override
+  String get whenDoesBabySleep => 'When does your baby sleep?';
+
+  @override
+  String get addSleepNotes => 'Add sleep notes...';
+
+  @override
+  String get selectSleepQuality => 'Select sleep quality';
+
+  @override
+  String get qualityNotGood => 'Not Good';
+
+  @override
+  String get qualityGood => 'Good';
+
+  @override
+  String get qualityExcellent => 'Excellent';
+
+  @override
+  String get updateSleepLog => 'Update Sleep Log';
+
+  @override
+  String get logSleepTime => 'Log Sleep Time';
+
+  @override
+  String get notesCannotBeEmpty =>
+      'Notes field cannot be empty! Please add notes.';
+
+  @override
+  String get sleepLogExists => 'This sleep log already exists!';
+
+  @override
+  String get pleaseSelectBabyFirst => 'Please select a baby first';
+
+  @override
+  String get medicineScheduleTitle => 'Medicine Schedule';
+
+  @override
+  String get noMedicinesScheduled => 'No medicines scheduled';
+
+  @override
+  String get noMedicinesForDate => 'No medicines for this date';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get night => 'Night';
+
+  @override
+  String get weekOf => 'Week of';
+
+  @override
+  String get shoppingListTitle => 'Shopping List';
+
+  @override
+  String get searchShoppingItems => 'Search shopping items...';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String areYouSureDelete(String title) {
+    return 'Are you sure you want to delete \"$title\"?';
+  }
+
+  @override
+  String get mealPlannerTitle => 'Meal Planner';
+
+  @override
+  String mealsDoneCount(int done, int total) {
+    return '$done/$total done';
+  }
+
+  @override
+  String get noMealsPlanned => 'No meals planned for this day';
+
+  @override
+  String get mealTitle => 'Title';
+
+  @override
+  String get mealSubtitle => 'Subtitle';
+
+  @override
+  String get ingredients => 'Ingredients';
+
+  @override
+  String get recipe => 'Recipe';
+
+  @override
+  String get mealTitleHint => 'Meal title (e.g., Oatmeal Cereal)';
+
+  @override
+  String get ingredientsHint => 'List ingredients (optional)';
+
+  @override
+  String get recipeHint => 'Recipe instructions (optional)';
+
+  @override
+  String get breakfast => 'Breakfast';
+
+  @override
+  String get lunch => 'Lunch';
+
+  @override
+  String get dinner => 'Dinner';
+
+  @override
+  String get snack => 'Snack';
+
+  @override
+  String get mealAddedSuccess => 'Meal added successfully';
+
+  @override
+  String get mealDeletedSuccess => 'Meal deleted successfully';
+
+  @override
+  String get markAsDone => 'Mark as Done';
+
+  @override
+  String get markAsNotDone => 'Mark as Not Done';
+
+  @override
+  String get doneStatus => 'DONE';
+
+  @override
+  String get noMemoriesYetPrompt =>
+      'No memories yet.\nTap the + button or Add Memory tile to add one.';
+
+  @override
+  String uploadFailedWithError(String error) {
+    return 'Upload failed: $error';
+  }
+
+  @override
+  String dateLabel(String date) {
+    return 'Date: $date';
+  }
 }

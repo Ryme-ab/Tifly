@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tifli/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Needed for read
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
 import 'package:tifli/core/state/child_selection_cubit.dart'; // Import ChildSelectionCubit
 
 class MedicineSchedulePage extends StatefulWidget {
@@ -213,6 +215,8 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     Widget dropdown<T>({
       required T value,
       required List<DropdownMenuItem<T>> items,
@@ -239,7 +243,7 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Medicine Schedule')),
+      appBar: AppBar(title: Text(l10n.medicineSchedule)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -247,22 +251,25 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
           children: [
             TextFormField(
               controller: _medicineController,
-              decoration: const InputDecoration(labelText: 'Medicine Name'),
+              decoration: InputDecoration(labelText: l10n.medicineName),
               validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+                  v == null || v.trim().isEmpty ? l10n.required : null,
             ),
 
             const SizedBox(height: 20),
-            const Text('Dosage'),
+            Text(l10n.dosage),
             Row(
               children: [
                 Expanded(
                   child: dropdown<String>(
                     value: dosageUnit,
-                    items: const [
-                      DropdownMenuItem(value: 'Pill', child: Text('Pill')),
-                      DropdownMenuItem(value: 'ml', child: Text('ml')),
-                      DropdownMenuItem(value: 'Drop', child: Text('Drop')),
+                    items: [
+                      DropdownMenuItem(value: 'Pill', child: Text(l10n.pill)),
+                      DropdownMenuItem(value: 'ml', child: Text(l10n.ml)),
+                      DropdownMenuItem(
+                        value: 'Drop',
+                        child: Text(l10n.drugDrop),
+                      ),
                     ],
                     onChanged: (v) => setState(() => dosageUnit = v!),
                   ),
@@ -283,21 +290,21 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
             ),
 
             const SizedBox(height: 20),
-            const Text('Frequency'),
+            Text(l10n.frequency),
             dropdown<String>(
               value: intakeType,
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'Once a day',
-                  child: Text('Once a day'),
+                  child: Text(l10n.onceADay),
                 ),
                 DropdownMenuItem(
                   value: 'Twice a day',
-                  child: Text('Twice a day'),
+                  child: Text(l10n.twiceADay),
                 ),
                 DropdownMenuItem(
                   value: 'Three times a day',
-                  child: Text('Three times a day'),
+                  child: Text(l10n.threeTimesADay),
                 ),
               ],
               onChanged: (v) {
@@ -316,7 +323,7 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
             ),
 
             const SizedBox(height: 20),
-            const Text('Times'),
+            Text(l10n.times),
             ...times.asMap().entries.map((entry) {
               final index = entry.key;
               return ListTile(
@@ -335,16 +342,19 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
             }),
 
             const SizedBox(height: 20),
-            const Text('Duration'),
+            Text(l10n.scheduleDuration),
             Row(
               children: [
                 Expanded(
                   child: dropdown<String>(
                     value: durationUnit,
-                    items: const [
-                      DropdownMenuItem(value: 'Days', child: Text('Days')),
-                      DropdownMenuItem(value: 'Weeks', child: Text('Weeks')),
-                      DropdownMenuItem(value: 'Months', child: Text('Months')),
+                    items: [
+                      DropdownMenuItem(value: 'Days', child: Text(l10n.days)),
+                      DropdownMenuItem(value: 'Weeks', child: Text(l10n.weeks)),
+                      DropdownMenuItem(
+                        value: 'Months',
+                        child: Text(l10n.months),
+                      ),
                     ],
                     onChanged: (v) => setState(() => durationUnit = v!),
                   ),
@@ -369,13 +379,13 @@ class _MedicineSchedulePageState extends State<MedicineSchedulePage> {
             TextFormField(
               controller: _notesController,
               maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: l10n.notes),
             ),
 
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _saveSchedule,
-              child: const Text('Save Schedule'),
+              child: Text(l10n.saveSchedule),
             ),
           ],
         ),

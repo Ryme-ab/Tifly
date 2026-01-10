@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:tifli/features/schedules/presentation/cubit/appointments_cubit.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
 import 'package:tifli/widgets/appointmentcard.dart';
-import 'package:tifli/features/navigation/app_router.dart';
 
 class MonthAppointmentsView extends StatefulWidget {
   final DateTime selectedDate;

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/core/state/locale_cubit.dart';
 import 'package:tifli/features/profiles/presentation/screens/parent_profile_screen.dart';
-import 'package:tifli/features/theme/presentation/cubit/theme_cubit.dart';
-import 'package:tifli/features/theme/presentation/cubit/theme_state.dart';
 import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/settings/presentation/screens/notification_settings_screen.dart';

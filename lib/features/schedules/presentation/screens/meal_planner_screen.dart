@@ -7,6 +7,7 @@ import 'package:tifli/core/constants/app_sizes.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/core/utils/user_context.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import '../cubit/meal_planner_cubit.dart';
 import '../../data/models/planned_meal_model.dart';
 
@@ -72,7 +73,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
 
     if (userId == null || childId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a child first')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectBabyFirst)),
       );
       return;
     }
@@ -95,6 +96,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
+            final l10n = AppLocalizations.of(context)!;
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => FocusScope.of(ctx).unfocus(),
@@ -115,14 +117,14 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        meal == null ? 'Add Meal' : 'Edit Meal',
+                        meal == null ? l10n.addMeal : l10n.editMeal,
                         style: AppFonts.heading1,
                       ),
                       const SizedBox(height: AppSizes.md),
 
                       // Meal Type Selector
                       Text(
-                        'Meal Type',
+                        l10n.mealType,
                         style: AppFonts.body.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -134,7 +136,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                           (type) {
                             final isSelected = mealType == type;
                             return ChoiceChip(
-                              label: Text(type.toUpperCase()),
+                              label: Text(_getLocalizedMealType(type, AppLocalizations.of(context)!)),
                               selected: isSelected,
                               onSelected: (selected) {
                                 setModalState(() {
@@ -145,7 +147,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                               labelStyle: TextStyle(
                                 color: isSelected
                                     ? Colors.white
-                                    : AppColors.textPrimaryLight,
+                                    : Colors.grey.shade700,
                               ),
                             );
                           },
@@ -155,9 +157,9 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
 
                       TextField(
                         controller: titleController,
-                        decoration: const InputDecoration(
-                          hintText: 'Meal title (e.g., Oatmeal Cereal)',
-                          labelText: 'Title',
+                        decoration: InputDecoration(
+                          hintText: l10n.mealTitleHint,
+                          labelText: l10n.mealTitle,
                         ),
                         textCapitalization: TextCapitalization.words,
                       ),
@@ -165,18 +167,18 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
 
                       TextField(
                         controller: subtitleController,
-                        decoration: const InputDecoration(
-                          hintText: 'Description',
-                          labelText: 'Subtitle',
+                        decoration: InputDecoration(
+                          hintText: l10n.mealSubtitle,
+                          labelText: l10n.mealSubtitle,
                         ),
                       ),
                       const SizedBox(height: AppSizes.sm),
 
                       TextField(
                         controller: ingredientsController,
-                        decoration: const InputDecoration(
-                          hintText: 'List ingredients (optional)',
-                          labelText: 'Ingredients',
+                        decoration: InputDecoration(
+                          hintText: l10n.ingredientsHint,
+                          labelText: l10n.ingredients,
                         ),
                         maxLines: 2,
                       ),
@@ -184,9 +186,9 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
 
                       TextField(
                         controller: recipeController,
-                        decoration: const InputDecoration(
-                          hintText: 'Recipe instructions (optional)',
-                          labelText: 'Recipe',
+                        decoration: InputDecoration(
+                          hintText: l10n.recipeHint,
+                          labelText: l10n.recipe,
                         ),
                         maxLines: 3,
                       ),
@@ -197,7 +199,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                         children: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancel'),
+                            child: Text(l10n.cancel),
                           ),
                           const SizedBox(width: AppSizes.sm),
                           ElevatedButton(
@@ -206,8 +208,8 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                               final s = subtitleController.text.trim();
                               if (t.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please enter a meal title'),
+                                  SnackBar(
+                                    content: Text(l10n.pleaseEnterMealTitle),
                                   ),
                                 );
                                 return;
@@ -231,8 +233,8 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                                       );
 
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Meal added successfully'),
+                                    SnackBar(
+                                      content: Text(l10n.mealAddedSuccess),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
@@ -278,7 +280,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                             ),
-                            child: const Text('Save'),
+                            child: Text(l10n.save),
                           ),
                         ],
                       ),
@@ -301,17 +303,17 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Delete Meal'),
-          content: Text('Are you sure you want to delete "${meal.title}"?'),
+          title: Text(AppLocalizations.of(context)!.deleteMeal),
+          content: Text(AppLocalizations.of(context)!.areYouSureDeleteMeal(meal.title)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         ),
@@ -325,8 +327,8 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Meal deleted successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.mealDeletedSuccess),
             backgroundColor: Colors.red,
           ),
         );
@@ -344,7 +346,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit, color: AppColors.primary),
-                title: const Text('Edit'),
+                title: Text(AppLocalizations.of(context)!.edit),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showAddOrEdit(meal: meal);
@@ -355,7 +357,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                   meal.isDone ? Icons.close : Icons.check,
                   color: AppColors.primary,
                 ),
-                title: Text(meal.isDone ? 'Mark as Not Done' : 'Mark as Done'),
+                title: Text(meal.isDone ? AppLocalizations.of(context)!.markAsNotDone : AppLocalizations.of(context)!.markAsDone),
                 onTap: () {
                   Navigator.pop(ctx);
                   _toggleChecked(meal);
@@ -367,7 +369,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                     Icons.restaurant_menu,
                     color: AppColors.primary,
                   ),
-                  title: const Text('View Recipe'),
+                  title: Text(AppLocalizations.of(context)!.viewRecipe),
                   onTap: () {
                     Navigator.pop(ctx);
                     _showRecipeDetails(meal);
@@ -375,9 +377,9 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                 ),
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
+                title: Text(
+                  AppLocalizations.of(context)!.delete,
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -412,7 +414,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
               ],
               if (meal.ingredients != null && meal.ingredients!.isNotEmpty) ...[
                 Text(
-                  'Ingredients:',
+                  '${AppLocalizations.of(context)!.ingredients}:',
                   style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -421,7 +423,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
               ],
               if (meal.recipe != null && meal.recipe!.isNotEmpty) ...[
                 Text(
-                  'Recipe:',
+                  '${AppLocalizations.of(context)!.recipe}:',
                   style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -433,7 +435,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.close),
           ),
         ],
       ),
@@ -475,13 +477,14 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
   @override
   Widget build(BuildContext context) {
     final dateLabel = DateFormat('EEEE, MMM d').format(_selectedDate);
+    final l10n = AppLocalizations.of(context)!;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppColors.backgroundLight,
-        appBar: const CustomAppBar(title: 'Meal Planner'),
+        appBar: CustomAppBar(title: l10n.mealPlannerTitle),
         body: BlocConsumer<MealPlannerCubit, MealPlannerState>(
           listener: (context, state) {
             if (state.error != null) {
@@ -510,14 +513,14 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Planned Meals',
+                          AppLocalizations.of(context)!.plannedMeals,
                           style: AppFonts.body.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         if (mealsForDate.isNotEmpty)
                           Text(
-                            '${mealsForDate.where((m) => m.isDone).length}/${mealsForDate.length} done',
+                            AppLocalizations.of(context)!.mealsDoneCount(mealsForDate.where((m) => m.isDone).length, mealsForDate.length),
                             style: AppFonts.body.copyWith(
                               color: AppColors.textPrimaryLight,
                               fontSize: 12,
@@ -543,7 +546,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                                   ),
                                   const SizedBox(height: AppSizes.md),
                                   Text(
-                                    'No meals planned for this day',
+                                    l10n.noMealsPlanned,
                                     style: AppFonts.body.copyWith(
                                       color: AppColors.textPrimaryLight,
                                     ),
@@ -552,7 +555,7 @@ class _MealPlannerScreenV2State extends State<MealPlannerScreenV2> {
                                   ElevatedButton.icon(
                                     onPressed: () => _showAddOrEdit(),
                                     icon: const Icon(Icons.add),
-                                    label: const Text('Add First Meal'),
+                                    label: Text(l10n.addFirstMeal),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
                                     ),
@@ -743,7 +746,7 @@ class MealCardV2 extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      meal.mealType.toUpperCase(),
+                      _getLocalizedMealType(meal.mealType, AppLocalizations.of(context)!),
                       style: AppFonts.body.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -761,9 +764,9 @@ class MealCardV2 extends StatelessWidget {
                           color: Colors.green.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'DONE',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.doneStatus,
+                          style: const TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w700,
                             color: Colors.green,
@@ -781,7 +784,7 @@ class MealCardV2 extends StatelessWidget {
                     decoration: meal.isDone ? TextDecoration.lineThrough : null,
                   ),
                 ),
-                if (meal.subtitle.isNotEmpty) ...[
+        if (meal.subtitle.isNotEmpty) ...[
                   const SizedBox(height: AppSizes.xs),
                   Text(
                     meal.subtitle,
@@ -842,5 +845,15 @@ class MealCardV2 extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+String _getLocalizedMealType(String type, AppLocalizations l10n) {
+  switch (type.toLowerCase()) {
+    case 'breakfast': return l10n.breakfast;
+    case 'lunch': return l10n.lunch;
+    case 'dinner': return l10n.dinner;
+    case 'snack': return l10n.snack;
+    default: return type.toUpperCase();
   }
 }

@@ -8,7 +8,9 @@ import 'package:tifli/features/schedules/data/models/medicine_model.dart';
 import 'package:tifli/features/schedules/domain/repositories/medicine_schedule_repository.dart';
 import 'package:tifli/features/schedules/presentation/cubit/medicine_schedule_cubit.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+
 
 class MedicineScreen extends StatelessWidget {
   const MedicineScreen({super.key});
@@ -53,9 +55,10 @@ class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: const CustomAppBar(title: 'Medicine Schedule'),
+      appBar: CustomAppBar(title: l10n.medicineScheduleTitle),
       body: SafeArea(
         child: Column(
           children: [
@@ -69,19 +72,14 @@ class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
                   } else if (state is MedicineScheduleError) {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is MedicineScheduleLoaded) {
-                    final schedules = state.schedules;
-                    if (schedules.isEmpty) {
-                      return const Center(child: Text("No medicines scheduled"));
+                    if (state.schedules.isEmpty) {
+                      return Center(child: Text(AppLocalizations.of(context)!.noMedicinesScheduled));
                     }
 
-                    // Filter for selected date (simple check if date falls within range)
-                    // Currently model has start_date and end_date.
-                    // Also simple morning/night split based on first time.
-                    
                     final morningMedicines = <MedicineSchedule>[];
                     final nightMedicines = <MedicineSchedule>[];
 
-                    for (var s in schedules) {
+                    for (var s in state.schedules) {
                        // Check if selectedDate is within range
                        if (selectedDate.isBefore(s.startDate) || selectedDate.isAfter(s.endDate)) {
                          continue; 
@@ -104,9 +102,9 @@ class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
                         if (morningMedicines.isNotEmpty) ...[
-                          const Text(
-                            "Morning",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                           Text(
+                            AppLocalizations.of(context)!.morning,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           ...morningMedicines.map((m) => _medicineCard(m, isMorning: true, context: context)),
@@ -114,16 +112,16 @@ class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
                         ],
                         
                         if (nightMedicines.isNotEmpty) ...[
-                          const Text(
-                            "Night",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                           Text(
+                            AppLocalizations.of(context)!.night,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           ...nightMedicines.map((m) => _medicineCard(m, isMorning: false, context: context)),
                         ],
 
                         if (morningMedicines.isEmpty && nightMedicines.isEmpty)
-                           const Center(child: Text("No medicines for this date")),
+                            Center(child: Text(AppLocalizations.of(context)!.noMedicinesForDate)),
 
                         const SizedBox(height: 40),
                       ],
@@ -170,7 +168,7 @@ class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
         child: Column(
           children: [
             Text(
-              "Week of ${DateFormat('d MMM').format(weekDays.first)}",
+              "${AppLocalizations.of(context)!.weekOf} ${DateFormat('d MMM').format(weekDays.first)}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),

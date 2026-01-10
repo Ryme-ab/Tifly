@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
@@ -11,6 +12,7 @@ import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
+
 
 class GrowthPage extends StatefulWidget {
   final bool showTracker;
@@ -62,6 +64,7 @@ class _GrowthPageState extends State<GrowthPage> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     final weight = double.tryParse(weightController.text.trim());
     final height = double.tryParse(heightController.text.trim());
     final headCircumference = double.tryParse(
@@ -71,9 +74,9 @@ class _GrowthPageState extends State<GrowthPage> {
 
     if (weight == null || height == null || headCircumference == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Please enter valid numeric values for weight, height and head circumference.',
+            l10n.pleaseEnterValidNumericValues,
           ),
           backgroundColor: Colors.orange,
         ),
@@ -85,8 +88,8 @@ class _GrowthPageState extends State<GrowthPage> {
     final childState = context.read<ChildSelectionCubit>().state;
     if (childState is! ChildSelected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a baby first.'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectBabyFirst),
           backgroundColor: Colors.orange,
         ),
       );
@@ -112,8 +115,8 @@ class _GrowthPageState extends State<GrowthPage> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Growth log updated'),
+          SnackBar(
+            content: Text(l10n.growthLogUpdated),
             backgroundColor: Colors.green,
           ),
         );
@@ -133,8 +136,8 @@ class _GrowthPageState extends State<GrowthPage> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Growth data logged successfully!'),
+          SnackBar(
+            content: Text(l10n.growthDataLoggedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -159,6 +162,7 @@ class _GrowthPageState extends State<GrowthPage> {
     required String? selectedUnit,
     required TextEditingController controller,
     required ValueChanged<String?> onUnitChanged,
+    required List<String> units, // Add units parameter
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +179,7 @@ class _GrowthPageState extends State<GrowthPage> {
               child: TextField(
                 controller: controller,
                 decoration: InputDecoration(
-                  hintText: 'Enter $label',
+                  hintText: '${AppLocalizations.of(context)!.enter} $label',
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 12,
@@ -208,7 +212,7 @@ class _GrowthPageState extends State<GrowthPage> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedUnit,
-                    items: _unitsForLabel(label)
+                    items: units
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                         .toList(),
                     onChanged: onUnitChanged,
@@ -222,28 +226,16 @@ class _GrowthPageState extends State<GrowthPage> {
     );
   }
 
-  List<String> _unitsForLabel(String label) {
-    switch (label) {
-      case 'Weight':
-        return ['kg', 'lb'];
-      case 'Height':
-        return ['cm', 'in'];
-      case 'Head Circumference':
-        return ['cm', 'in'];
-      default:
-        return [''];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAF5),
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
         title: widget.existingLog != null
-            ? 'Edit Growth Log'
-            : 'Add Growth Data',
+            ? l10n.editGrowthLog
+            : l10n.addGrowthData,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -276,44 +268,47 @@ class _GrowthPageState extends State<GrowthPage> {
                   children: [
                     // Weight
                     _buildMeasurementField(
-                      label: 'Weight',
+                      label: l10n.weight,
                       selectedUnit: selectedUnitWeight,
                       controller: weightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitWeight = v),
+                      units: ['kg', 'lb'],
                     ),
                     const SizedBox(height: 16),
 
                     // Height
                     _buildMeasurementField(
-                      label: 'Height',
+                      label: l10n.height,
                       selectedUnit: selectedUnitHeight,
                       controller: heightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitHeight = v),
+                      units: ['cm', 'in'],
                     ),
                     const SizedBox(height: 16),
 
                     // Head Circumference field
                     _buildMeasurementField(
-                      label: 'Head Circumference',
+                      label: l10n.headCircumference,
                       selectedUnit: selectedUnitHeadCircumference,
                       controller: headCircumferenceController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitHeadCircumference = v),
+                      units: ['cm', 'in'],
                     ),
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Notes',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    Text(
+                      l10n.notesOptional,
+                      style: const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Add any notes...',
+                        hintText: l10n.addAnyNotes,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -331,8 +326,8 @@ class _GrowthPageState extends State<GrowthPage> {
                         icon: const Icon(Icons.child_care, color: Colors.white),
                         label: Text(
                           widget.existingLog != null
-                              ? 'Update Growth Data'
-                              : 'Log Growth Data',
+                              ? l10n.updateGrowthData
+                              : l10n.logGrowthData,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

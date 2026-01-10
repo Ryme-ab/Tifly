@@ -1081,8 +1081,8 @@ abstract class AppLocalizations {
   /// No description provided for @areYouSureDeleteMeal.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete'**
-  String get areYouSureDeleteMeal;
+  /// **'Are you sure you want to delete \"{title}\"?'**
+  String areYouSureDeleteMeal(String title);
 
   /// No description provided for @mealAddedSuccessfully.
   ///
@@ -1719,6 +1719,516 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Week View'**
   String get weekView;
+
+  /// No description provided for @dosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get dosage;
+
+  /// No description provided for @pill.
+  ///
+  /// In en, this message translates to:
+  /// **'Pill'**
+  String get pill;
+
+  /// No description provided for @ml.
+  ///
+  /// In en, this message translates to:
+  /// **'ml'**
+  String get ml;
+
+  /// No description provided for @drugDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop'**
+  String get drugDrop;
+
+  /// No description provided for @frequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get frequency;
+
+  /// No description provided for @onceADay.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a day'**
+  String get onceADay;
+
+  /// No description provided for @twiceADay.
+  ///
+  /// In en, this message translates to:
+  /// **'Twice a day'**
+  String get twiceADay;
+
+  /// No description provided for @threeTimesADay.
+  ///
+  /// In en, this message translates to:
+  /// **'Three times a day'**
+  String get threeTimesADay;
+
+  /// No description provided for @times.
+  ///
+  /// In en, this message translates to:
+  /// **'Times'**
+  String get times;
+
+  /// No description provided for @scheduleDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get scheduleDuration;
+
+  /// No description provided for @saveSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Schedule'**
+  String get saveSchedule;
+
+  /// No description provided for @required.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get required;
+
+  /// No description provided for @pleaseSelectTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one time'**
+  String get pleaseSelectTime;
+
+  /// No description provided for @medicationSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Summary'**
+  String get medicationSummary;
+
+  /// No description provided for @scheduledPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled: '**
+  String get scheduledPrefix;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @titleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get titleRequired;
+
+  /// No description provided for @descriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (Optional)'**
+  String get descriptionOptional;
+
+  /// No description provided for @doctorOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor (Optional)'**
+  String get doctorOptional;
+
+  /// No description provided for @addNewDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Doctor'**
+  String get addNewDoctor;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @durationMinutesOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (minutes, optional)'**
+  String get durationMinutesOptional;
+
+  /// No description provided for @locationOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Location (Optional)'**
+  String get locationOptional;
+
+  /// No description provided for @hospitalNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital Name (Optional)'**
+  String get hospitalNameOptional;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @statusScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get statusScheduled;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get statusMissed;
+
+  /// No description provided for @remindMeMinutesBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me (minutes before)'**
+  String get remindMeMinutesBefore;
+
+  /// No description provided for @notesOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (Optional)'**
+  String get notesOptional;
+
+  /// No description provided for @pleaseSelectDateAndTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select date and time'**
+  String get pleaseSelectDateAndTime;
+
+  /// No description provided for @appointmentReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment Reminder'**
+  String get appointmentReminder;
+
+  /// No description provided for @quantityMl.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity (ml)'**
+  String get quantityMl;
+
+  /// No description provided for @addAnyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add any notes...'**
+  String get addAnyNotes;
+
+  /// No description provided for @editGrowthLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Growth Log'**
+  String get editGrowthLog;
+
+  /// No description provided for @addGrowthData.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Growth Data'**
+  String get addGrowthData;
+
+  /// No description provided for @enter.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter'**
+  String get enter;
+
+  /// No description provided for @updateGrowthData.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Growth Data'**
+  String get updateGrowthData;
+
+  /// No description provided for @logGrowthData.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Growth Data'**
+  String get logGrowthData;
+
+  /// No description provided for @pleaseEnterValidNumericValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter valid numeric values for weight, height and head circumference.'**
+  String get pleaseEnterValidNumericValues;
+
+  /// No description provided for @chooseTracker.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a tracker'**
+  String get chooseTracker;
+
+  /// No description provided for @whenDoesBabySleep.
+  ///
+  /// In en, this message translates to:
+  /// **'When does your baby sleep?'**
+  String get whenDoesBabySleep;
+
+  /// No description provided for @addSleepNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add sleep notes...'**
+  String get addSleepNotes;
+
+  /// No description provided for @selectSleepQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Select sleep quality'**
+  String get selectSleepQuality;
+
+  /// No description provided for @qualityNotGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Good'**
+  String get qualityNotGood;
+
+  /// No description provided for @qualityGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get qualityGood;
+
+  /// No description provided for @qualityExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get qualityExcellent;
+
+  /// No description provided for @updateSleepLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Sleep Log'**
+  String get updateSleepLog;
+
+  /// No description provided for @logSleepTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Sleep Time'**
+  String get logSleepTime;
+
+  /// No description provided for @notesCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes field cannot be empty! Please add notes.'**
+  String get notesCannotBeEmpty;
+
+  /// No description provided for @sleepLogExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This sleep log already exists!'**
+  String get sleepLogExists;
+
+  /// No description provided for @pleaseSelectBabyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a baby first'**
+  String get pleaseSelectBabyFirst;
+
+  /// No description provided for @medicineScheduleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Schedule'**
+  String get medicineScheduleTitle;
+
+  /// No description provided for @noMedicinesScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicines scheduled'**
+  String get noMedicinesScheduled;
+
+  /// No description provided for @noMedicinesForDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicines for this date'**
+  String get noMedicinesForDate;
+
+  /// No description provided for @morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// No description provided for @night.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get night;
+
+  /// No description provided for @weekOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of'**
+  String get weekOf;
+
+  /// No description provided for @shoppingListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping List'**
+  String get shoppingListTitle;
+
+  /// No description provided for @searchShoppingItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Search shopping items...'**
+  String get searchShoppingItems;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// No description provided for @areYouSureDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{title}\"?'**
+  String areYouSureDelete(String title);
+
+  /// No description provided for @mealPlannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Planner'**
+  String get mealPlannerTitle;
+
+  /// No description provided for @mealsDoneCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{done}/{total} done'**
+  String mealsDoneCount(int done, int total);
+
+  /// No description provided for @noMealsPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'No meals planned for this day'**
+  String get noMealsPlanned;
+
+  /// No description provided for @mealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get mealTitle;
+
+  /// No description provided for @mealSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtitle'**
+  String get mealSubtitle;
+
+  /// No description provided for @ingredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get ingredients;
+
+  /// No description provided for @recipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe'**
+  String get recipe;
+
+  /// No description provided for @mealTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal title (e.g., Oatmeal Cereal)'**
+  String get mealTitleHint;
+
+  /// No description provided for @ingredientsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'List ingredients (optional)'**
+  String get ingredientsHint;
+
+  /// No description provided for @recipeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe instructions (optional)'**
+  String get recipeHint;
+
+  /// No description provided for @breakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get breakfast;
+
+  /// No description provided for @lunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch'**
+  String get lunch;
+
+  /// No description provided for @dinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get dinner;
+
+  /// No description provided for @snack.
+  ///
+  /// In en, this message translates to:
+  /// **'Snack'**
+  String get snack;
+
+  /// No description provided for @mealAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal added successfully'**
+  String get mealAddedSuccess;
+
+  /// No description provided for @mealDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal deleted successfully'**
+  String get mealDeletedSuccess;
+
+  /// No description provided for @markAsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Done'**
+  String get markAsDone;
+
+  /// No description provided for @markAsNotDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Not Done'**
+  String get markAsNotDone;
+
+  /// No description provided for @doneStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'DONE'**
+  String get doneStatus;
+
+  /// No description provided for @noMemoriesYetPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'No memories yet.\nTap the + button or Add Memory tile to add one.'**
+  String get noMemoriesYetPrompt;
+
+  /// No description provided for @uploadFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed: {error}'**
+  String uploadFailedWithError(String error);
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date: {date}'**
+  String dateLabel(String date);
 }
 
 class _AppLocalizationsDelegate
