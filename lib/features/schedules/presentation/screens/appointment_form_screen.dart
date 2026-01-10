@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tifli/core/services/api_service.dart'; // Import ApiService
 import 'package:tifli/core/utils/user_context.dart';
@@ -127,11 +128,12 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.appointment != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: isEditing ? "Edit Appointment" : "New Appointment",
+        title: isEditing ? l10n.editAppointment : l10n.newAppointment,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -142,35 +144,35 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             children: [
               // Title
               _buildTextField(
-                "Title",
+                l10n.title,
                 titleController,
-                validator: (v) => v!.isEmpty ? "Title is required" : null,
+                validator: (v) => v!.isEmpty ? l10n.titleRequired : null,
               ),
               const SizedBox(height: 15),
 
               // Description
               _buildTextField(
-                "Description (Optional)",
+                l10n.descriptionOptional,
                 descriptionController,
                 maxLines: 2,
               ),
               const SizedBox(height: 15),
 
               // Doctor Selection
-              _buildDoctorSelector(),
+              _buildDoctorSelector(l10n),
               const SizedBox(height: 15),
 
               // Date and Time
               Row(
                 children: [
                   Expanded(
-                    child: _buildDatePicker("Date", appointmentDate, (d) {
+                    child: _buildDatePicker(l10n.date, appointmentDate, (d) {
                       setState(() => appointmentDate = d);
                     }),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTimePicker("Time", appointmentTime, (t) {
+                    child: _buildTimePicker(l10n.time, appointmentTime, (t) {
                       setState(() => appointmentTime = t);
                     }),
                   ),
@@ -180,37 +182,38 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
               // Duration
               _buildTextField(
-                "Duration (minutes, optional)",
+                l10n.durationMinutesOptional,
                 durationController,
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 15),
 
               // Location
-              _buildTextField("Location (Optional)", locationController),
+              _buildTextField(l10n.locationOptional, locationController),
               const SizedBox(height: 15),
 
               // Hospital Name
               _buildTextField(
-                "Hospital Name (Optional)",
+                l10n.hospitalNameOptional,
                 hospitalNameController,
               ),
               const SizedBox(height: 15),
 
               // Status
               _buildDropdown(
-                label: "Status",
+                label: l10n.status,
                 value: status,
                 items: statusOptions,
                 onChanged: (val) {
                   setState(() => status = val!);
                 },
+                l10n: l10n,
               ),
               const SizedBox(height: 20),
 
               // Reminder
               SwitchListTile(
-                title: const Text("Enable Reminder"),
+                title: Text(l10n.enableReminder),
                 value: reminderEnabled,
                 onChanged: (val) {
                   setState(() => reminderEnabled = val);
@@ -219,7 +222,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               if (reminderEnabled) ...[
                 const SizedBox(height: 10),
                 _buildTextField(
-                  "Remind me (minutes before)",
+                  l10n.remindMeMinutesBefore,
                   TextEditingController(text: reminderMinutesBefore.toString()),
                   keyboardType: TextInputType.number,
                   onChanged: (val) {
@@ -232,7 +235,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
 
               // Notes
-              _buildTextField("Notes (Optional)", notesController, maxLines: 3),
+              _buildTextField(l10n.notesOptional, notesController, maxLines: 3),
               const SizedBox(height: 30),
 
               // Save Button
@@ -258,7 +261,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                         )
                       : const Icon(Icons.save_outlined, color: Colors.white),
                   label: Text(
-                    isEditing ? "Update Appointment" : "Save Appointment",
+                    isEditing ? l10n.updateAppointment : l10n.saveAppointment,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -272,13 +275,13 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
   // ---------------------- Helper Widgets ---------------------- //
 
-  Widget _buildDoctorSelector() {
+  Widget _buildDoctorSelector(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Doctor (Optional)",
-          style: TextStyle(
+        Text(
+          l10n.doctorOptional,
+          style: const TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.w600,
             fontSize: 14,
@@ -293,7 +296,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   if (state is DoctorsLoaded) {
                     return DropdownButtonFormField<String>(
                       value: selectedDoctorId,
-                      hint: const Text("Select Doctor"),
+                      hint: Text(l10n.selectDoctor),
                       items: state.doctors.map((doctor) {
                         return DropdownMenuItem(
                           value: doctor.id,
@@ -322,7 +325,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.add_circle, color: Color(0xFFD9436B)),
-              tooltip: "Add New Doctor",
+              tooltip: l10n.addNewDoctor,
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -392,7 +395,19 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     required String? value,
     required List<String> items,
     required Function(String?) onChanged,
+    required AppLocalizations l10n,
   }) {
+    // Map status to localized string
+    String getLocalizedStatus(String status) {
+        switch(status) {
+            case 'scheduled': return l10n.statusScheduled;
+            case 'completed': return l10n.statusCompleted;
+            case 'cancelled': return l10n.statusCancelled;
+            case 'missed': return l10n.statusMissed;
+            default: return status.toUpperCase();
+        }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -411,7 +426,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               .map(
                 (item) => DropdownMenuItem(
                   value: item,
-                  child: Text(item.toUpperCase()),
+                  child: Text(getLocalizedStatus(item)),
                 ),
               )
               .toList(),
@@ -512,11 +527,12 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   // ---------------------- Save Appointment ---------------------- //
 
   void _saveAppointment() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     if (appointmentDate == null || appointmentTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select date and time')),
+        SnackBar(content: Text(l10n.pleaseSelectDateAndTime)),
       );
       return;
     }
@@ -526,7 +542,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     if (childState is! ChildSelected) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a baby first')),
+         SnackBar(content: Text(l10n.pleaseSelectBabyFirst)),
       );
       return;
     }
@@ -612,7 +628,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving appointment: $e')));
+        ).showSnackBar(SnackBar(content: Text('Error saving appointment: $e'))); // Keeping original error display for e, but can add localized prefix if needed
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -620,6 +636,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   }
 
   Future<void> _scheduleReminder(Appointment appointment) async {
+    final l10n = AppLocalizations.of(context)!;
     if (!appointment.reminderEnabled || appointment.appointmentDate == null) {
       return;
     }
@@ -641,7 +658,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       final tzScheduledTime = tz.TZDateTime.from(scheduledTime, tz.local);
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId,
-        'Appointment Reminder',
+        l10n.appointmentReminder,
         '${appointment.title} at '
             '${appointment.appointmentDate!.hour.toString().padLeft(2, '0')}:'
             '${appointment.appointmentDate!.minute.toString().padLeft(2, '0')}',

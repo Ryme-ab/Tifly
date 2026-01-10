@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tifli/features/navigation/presentation/state/app_bar_config.dart';
 import 'package:tifli/features/navigation/presentation/screens/drawer.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
+
 
 import '../cubit/gallery_cubit.dart';
 import '../../data/models/gallery_item.dart';
@@ -36,7 +38,7 @@ class _MemoriesPageState extends State<MemoriesPage> {
       // Defer showing a prompt to next frame if needed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No child selected for gallery')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.noChildSelected)),
         );
         Navigator.of(context).pop();
       });
@@ -61,7 +63,7 @@ class _MemoriesPageState extends State<MemoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Provider<AppBarConfig>(
-      create: (_) => AppBarConfig(title: 'Memories'),
+      create: (_) => AppBarConfig(title: AppLocalizations.of(context)!.memories),
       child: Scaffold(
         appBar: const CustomAppBar(),
         drawer: const Tiflidrawer(),
@@ -83,7 +85,7 @@ class _MemoriesPageState extends State<MemoriesPage> {
                 padding: const EdgeInsets.all(24.0),
                 child: Center(
                   child: Text(
-                    'No memories yet.\nTap the + button or Add Memory tile to add one.',
+                    AppLocalizations.of(context)!.noMemoriesYetPrompt,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[700]),
                   ),
@@ -144,16 +146,16 @@ class _MemoriesPageState extends State<MemoriesPage> {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: const Text('Delete memory?'),
-                          content: const Text('This action cannot be undone.'),
+                          title: Text(AppLocalizations.of(context)!.deleteMemory),
+                          content: Text(AppLocalizations.of(context)!.actionCannotBeUndone),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
+                              child: Text(AppLocalizations.of(context)!.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete'),
+                              child: Text(AppLocalizations.of(context)!.delete),
                             ),
                           ],
                         ),
@@ -205,10 +207,10 @@ class _AddTile extends StatelessWidget {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children:  [
               Icon(Icons.add, size: 36, color: Colors.grey),
               SizedBox(height: 8),
-              Text('Add Memory', style: TextStyle(color: Colors.grey)),
+              Text(AppLocalizations.of(context)!.addMemory, style: TextStyle(color: Colors.grey)),
             ],
           ),
         ),
@@ -293,9 +295,9 @@ class _GalleryTile extends StatelessWidget {
                     if (value == 'edit' && onEdit != null) onEdit!();
                     if (value == 'delete' && onDelete != null) onDelete!();
                   },
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'edit', child: Text('Edit')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(value: 'edit', child: Text(AppLocalizations.of(context)!.edit)),
+                    PopupMenuItem(value: 'delete', child: Text(AppLocalizations.of(context)!.delete)),
                   ],
                 ),
               ),

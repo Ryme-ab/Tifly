@@ -121,12 +121,12 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     return Scaffold(
      backgroundColor: AppColors.backgroundLight,
       appBar: CustomAppBar(
-        title: "Medication Tracker",
+        title: AppLocalizations.of(context)!.medicationTracker,
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFE74C3C)),
             onPressed: () => _exportMedicationLogsPDF(context),
-            tooltip: 'Export PDF',
+            tooltip: AppLocalizations.of(context)!.exportPdf,
           ),
         ],
       ),
@@ -136,9 +136,10 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
             if (state is MedicationLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is MedicationError) {
-              return Center(child: Text('Error: ${state.message}'));
+              return Center(child: Text('${AppLocalizations.of(context)!.error}: ${state.message}'));
             } else if (state is MedicationLoaded) {
               final medicines = state.medicines;
+              final l10n = AppLocalizations.of(context)!;
 
               return ListView(
                 padding: const EdgeInsets.all(16),
@@ -147,9 +148,9 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Medications",
-                        style: TextStyle(
+                       Text(
+                        l10n.medications,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -165,10 +166,10 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
                   // Medicines list
                   if (medicines.isEmpty)
-                    const Center(
+                     Center(
                       child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: Text('No medications yet'),
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(l10n.noMedicationsYet),
                       ),
                     )
                   else
@@ -187,12 +188,12 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Medication Summary",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                           Text(
+                            l10n.medicationSummary,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          _miniBarChart(medicines),
+                          _miniBarChart(medicines, context),
                         ],
                       ),
                     ),
@@ -200,7 +201,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               );
             }
 
-            return const Center(child: Text('No data'));
+            return Center(child: Text(AppLocalizations.of(context)!.noDataToDisplay));
           },
         ),
       ),
@@ -220,6 +221,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
   Widget _medicationCard(Medication med, BuildContext context) {
     IconData icon = Icons.medication;
+    final l10n = AppLocalizations.of(context)!;
 
     // Customize icon by medicine name
     final nameLower = med.medicineName.toLowerCase();
@@ -285,7 +287,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                     ),
                     if (med.times.isNotEmpty)
                       Text(
-                        'Scheduled: ${med.times.join(", ")}',
+                        '${l10n.scheduledPrefix}${med.times.join(", ")}',
                         style: const TextStyle(color: Colors.black54),
                       ),
                     Text(
@@ -317,7 +319,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     );
   }
 
-  Widget _miniBarChart(List<Medication> medicines) {
+  Widget _miniBarChart(List<Medication> medicines, BuildContext context) {
     final medCounts = <String, int>{};
 
     for (final med in medicines) {
@@ -329,9 +331,9 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     final barData = medCounts.entries.take(5).toList();
 
     if (barData.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 180,
-        child: Center(child: Text('No data to display')),
+        child: Center(child: Text(AppLocalizations.of(context)!.noDataToDisplay)),
       );
     }
 

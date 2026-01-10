@@ -5,8 +5,6 @@ import 'create_baby_screen_2.dart';
 
 import 'package:tifli/widgets/custom_app_bar.dart';
 
-import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
-
 class AddBabyPage extends StatelessWidget {
   const AddBabyPage({super.key});
 
@@ -35,9 +33,9 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xFFBE185D);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    const primaryColor = Color(0xFFBE185D);
 
     return Scaffold(
       appBar: CustomAppBar(title: "Add Baby"),
@@ -57,11 +55,10 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.black26 : Colors.white,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
-                      if (!isDark)
-                        BoxShadow(
+                      BoxShadow(
                           color: Colors.black.withOpacity(0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
@@ -216,10 +213,10 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: isDark ? Colors.black26 : Colors.white,
+                color: theme.colorScheme.surface,
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    color: theme.colorScheme.outlineVariant,
                   ),
                 ),
               ),
@@ -261,6 +258,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
 
                       final babyId = insertedRows[0]['id'];
 
+                      if (!context.mounted) return;
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -268,6 +266,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
                         ),
                       );
                     } catch (e) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Error adding baby: $e"),
@@ -326,7 +325,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey[700],
+            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -338,7 +337,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+            fillColor: isDark ? Colors.grey[900] : Colors.grey[50],
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
@@ -360,7 +359,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey[700],
+            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -375,11 +374,11 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.calendar_today_outlined,
-                  color: isDark ? Colors.grey[500] : Colors.grey.shade500,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                 ),
                 hintText: hint,
                 filled: true,
-                fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                fillColor: isDark ? Colors.grey[900] : Colors.grey[50],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -405,7 +404,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
         Text(
           label,
           style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey[700],
+            color: isDark ? Colors.grey[300] : Colors.grey.shade700,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -418,7 +417,7 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+            fillColor: isDark ? Colors.grey[900] : Colors.grey[50],
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
@@ -426,3 +425,4 @@ class _AddBabyScreenState extends State<AddBabyScreen> {
     );
   }
 }
+

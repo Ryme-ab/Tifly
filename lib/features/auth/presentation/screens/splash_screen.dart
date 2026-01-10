@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tifli/core/constants/app_colors.dart';
-import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/features/navigation/presentation/screens/main_tab_screen.dart';
 import 'package:tifli/features/profiles/presentation/screens/create_baby_screen.dart';
 import 'package:tifli/features/auth/presentation/screens/onboarding_screen.dart';

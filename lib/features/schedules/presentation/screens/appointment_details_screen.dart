@@ -6,7 +6,6 @@ import 'package:tifli/features/schedules/data/models/doctor_model.dart';
 import 'package:tifli/features/schedules/presentation/cubit/appointments_cubit.dart';
 import 'package:tifli/features/schedules/presentation/cubit/appointments_state.dart';
 import 'package:tifli/features/schedules/presentation/cubit/doctors_cubit.dart';
-import 'package:tifli/features/navigation/app_router.dart';
 import 'package:tifli/features/schedules/presentation/screens/appointment_form_screen.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 

@@ -270,5 +270,173 @@
   "failedToMarkDone": "Failed to mark done",
   "noRouteDefinedFor": "No route defined for",
   "monthView": "Month View",
-  "weekView": "Week View"
+  "weekView": "Week View",
+  "dosage": "Dosage",
+  "pill": "Pill",
+  "ml": "ml",
+  "drugDrop": "Drop",
+  "frequency": "Frequency",
+  "onceADay": "Once a day",
+  "twiceADay": "Twice a day",
+  "threeTimesADay": "Three times a day",
+  "times": "Times",
+  "scheduleDuration": "Duration",
+  "saveSchedule": "Save Schedule",
+  "required": "Required",
+  "pleaseSelectTime": "Please select at least one time",
+  "medicationSummary": "Medication Summary",
+  "scheduledPrefix": "Scheduled: ",
+  "editAppointment": "Edit Appointment",
+  "newAppointment": "New Appointment",
+  "title": "Title",
+  "titleRequired": "Title is required",
+  "descriptionOptional": "Description (Optional)",
+  "doctorOptional": "Doctor (Optional)",
+  "selectDoctor": "Select Doctor",
+  "addNewDoctor": "Add New Doctor",
+  "date": "Date",
+  "time": "Time",
+  "durationMinutesOptional": "Duration (minutes, optional)",
+  "locationOptional": "Location (Optional)",
+  "hospitalNameOptional": "Hospital Name (Optional)",
+  "status": "Status",
+  "statusScheduled": "Scheduled",
+  "statusCompleted": "Completed",
+  "statusCancelled": "Cancelled",
+  "statusMissed": "Missed",
+  "enableReminder": "Enable Reminder",
+  "remindMeMinutesBefore": "Remind me (minutes before)",
+  "notesOptional": "Notes (Optional)",
+  "updateAppointment": "Update Appointment",
+  "saveAppointment": "Save Appointment",
+  "pleaseSelectDateAndTime": "Please select date and time",
+  "appointmentReminder": "Appointment Reminder",
+  "editFoodTracker": "Edit Food Tracker",
+  "foodTracker": "Food Tracker",
+  "feedingName": "Feeding Name",
+  "quantityMl": "Quantity (ml)",
+  "addAnyNotes": "Add any notes...",
+  "updateMeal": "Update Meal",
+  "saveMeal": "Save Meal",
+  "mealUpdatedSuccessfully": "Meal updated successfully",
+  "mealAddedSuccessfully": "Meal added successfully",
+  "breastMilk": "Breast Milk",
+  "formula": "Formula",
+  "solidFood": "Solid Food",
+  "juice": "Juice",
+  "editGrowthLog": "Edit Growth Log",
+  "addGrowthData": "Add Growth Data",
+  "weight": "Weight",
+  "height": "Height",
+  "headCircumference": "Head Circumference",
+  "enter": "Enter",
+  "updateGrowthData": "Update Growth Data",
+  "logGrowthData": "Log Growth Data",
+  "growthLogUpdated": "Growth log updated",
+  "growthDataLoggedSuccessfully": "Growth data logged successfully!",
+  "pleaseEnterValidNumericValues": "Please enter valid numeric values for weight, height and head circumference.",
+  "editSleepLog": "Edit Sleep Log",
+  "addTrackers": "Add Trackers",
+  "chooseTracker": "Choose a tracker",
+  "whenDoesBabySleep": "When does your baby sleep?",
+  "startTime": "Start time",
+  "endTime": "End time",
+  "addSleepNotes": "Add sleep notes...",
+  "sleepQuality": "Sleep Quality",
+  "selectSleepQuality": "Select sleep quality",
+  "qualityNotGood": "Not Good",
+  "qualityGood": "Good",
+  "qualityExcellent": "Excellent",
+  "updateSleepLog": "Update Sleep Log",
+  "logSleepTime": "Log Sleep Time",
+  "sleepLogUpdatedSuccessfully": "Sleep log updated successfully!",
+  "sleepLoggedSuccessfully": "Sleep logged successfully!",
+  "notesCannotBeEmpty": "Notes field cannot be empty! Please add notes.",
+  "sleepLogExists": "This sleep log already exists!",
+  "failedToLogSleep": "Failed to log sleep.",
+  "pleaseSelectBabyFirst": "Please select a baby first",
+
+  "medicineScheduleTitle": "Medicine Schedule",
+  "noMedicinesScheduled": "No medicines scheduled",
+  "noMedicinesForDate": "No medicines for this date",
+  "morning": "Morning",
+  "night": "Night",
+  "weekOf": "Week of",
+
+  "shoppingListTitle": "Shopping List",
+  "searchShoppingItems": "Search shopping items...",
+  "addNewCategory": "Add New Category",
+  "addNewItem": "Add New Item",
+  "categoryName": "Category name",
+  "itemName": "Item name",
+  "details": "Details",
+  "areYouSureDelete": "Are you sure you want to delete \"{title}\"?",
+  "@areYouSureDelete": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+
+  "mealPlannerTitle": "Meal Planner",
+  "plannedMeals": "Planned Meals",
+  "mealsDoneCount": "{done}/{total} done",
+  "@mealsDoneCount": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "noMealsPlanned": "No meals planned for this day",
+  "addFirstMeal": "Add First Meal",
+  "addMeal": "Add Meal",
+  "editMeal": "Edit Meal",
+  "mealType": "Meal Type",
+  "mealTitle": "Title",
+  "mealSubtitle": "Subtitle",
+  "ingredients": "Ingredients",
+  "recipe": "Recipe",
+  "mealTitleHint": "Meal title (e.g., Oatmeal Cereal)",
+  "ingredientsHint": "List ingredients (optional)",
+  "recipeHint": "Recipe instructions (optional)",
+  "breakfast": "Breakfast",
+  "lunch": "Lunch",
+  "dinner": "Dinner",
+  "snack": "Snack",
+  "deleteMeal": "Delete Meal",
+  "areYouSureDeleteMeal": "Are you sure you want to delete \"{title}\"?",
+  "@areYouSureDeleteMeal": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mealAddedSuccess": "Meal added successfully",
+  "mealUpdatedSuccessfully": "Meal updated successfully",
+  "mealDeletedSuccess": "Meal deleted successfully",
+  "pleaseEnterMealTitle": "Please enter a meal title",
+  "markAsDone": "Mark as Done",
+  "markAsNotDone": "Mark as Not Done",
+  "viewRecipe": "View Recipe",
+  "doneStatus": "DONE",
+
+  "noMemoriesYetPrompt": "No memories yet.\nTap the + button or Add Memory tile to add one.",
+  "uploadFailedWithError": "Upload failed: {error}",
+  "@uploadFailedWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dateLabel": "Date: {date}",
+  "@dateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

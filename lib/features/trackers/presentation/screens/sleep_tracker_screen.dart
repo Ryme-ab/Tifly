@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tifli/widgets/calendar.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/core/utils/user_context.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
@@ -40,8 +40,10 @@ class _SleepPageState extends State<SleepPage> {
       ); // ✅ Load existing date
       notesController.text = widget.existingEntry!.description;
       selectedQuality = widget.existingEntry!.quality;
-      
-      final bool qualityExists = qualityOptions.any((q) => q['value'] == selectedQuality);
+
+      final bool qualityExists = qualityOptions.any(
+        (q) => q['value'] == selectedQuality,
+      );
       if (!qualityExists) {
         selectedQuality = null;
       }
@@ -74,21 +76,20 @@ class _SleepPageState extends State<SleepPage> {
   }
 
   Future<void> logSleep() async {
+    final l10n = AppLocalizations.of(context)!;
     final client = SupabaseClientManager().client;
 
     if (notesController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Notes field cannot be empty! Please add notes."),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.notesCannotBeEmpty)));
       return;
     }
 
     if (selectedQuality == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select sleep quality."),
+        SnackBar(
+          content: Text(l10n.selectSleepQuality),
           backgroundColor: Colors.orange,
         ),
       );
@@ -99,17 +100,17 @@ class _SleepPageState extends State<SleepPage> {
 
     // ✅ FIXED: Use selectedDate instead of DateTime.now()
     final startDateTime = DateTime(
-      selectedDate.year,   // ✅ Use selected date
-      selectedDate.month,  // ✅ Use selected date
-      selectedDate.day,    // ✅ Use selected date
+      selectedDate.year, // ✅ Use selected date
+      selectedDate.month, // ✅ Use selected date
+      selectedDate.day, // ✅ Use selected date
       startTime!.hour,
       startTime!.minute,
     );
 
     final endDateTime = DateTime(
-      selectedDate.year,   // ✅ Use selected date
-      selectedDate.month,  // ✅ Use selected date
-      selectedDate.day,    // ✅ Use selected date
+      selectedDate.year, // ✅ Use selected date
+      selectedDate.month, // ✅ Use selected date
+      selectedDate.day, // ✅ Use selected date
       endTime!.hour,
       endTime!.minute,
     );
@@ -121,8 +122,8 @@ class _SleepPageState extends State<SleepPage> {
       final childState = context.read<ChildSelectionCubit>().state;
       if (childState is! ChildSelected) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Please select a baby first"),
+          SnackBar(
+            content: Text(l10n.pleaseSelectBabyFirst),
             backgroundColor: Colors.orange,
           ),
         );
@@ -141,8 +142,8 @@ class _SleepPageState extends State<SleepPage> {
 
       if (duplicateCheck != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("This sleep log already exists!"),
+          SnackBar(
+            content: Text(l10n.sleepLogExists),
             backgroundColor: Colors.orange,
           ),
         );
@@ -152,14 +153,14 @@ class _SleepPageState extends State<SleepPage> {
       final userId = UserContext.getCurrentUserId();
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("User not authenticated"),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.userNotAuthenticated),
             backgroundColor: Colors.orange,
           ),
         );
         return;
       }
-      
+
       if (widget.existingEntry != null) {
         // UPDATE MODE
         final updatedLog = SleepLog(
@@ -177,8 +178,8 @@ class _SleepPageState extends State<SleepPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Sleep log updated successfully!"),
+            SnackBar(
+              content: Text(l10n.sleepLogUpdatedSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
@@ -206,8 +207,8 @@ class _SleepPageState extends State<SleepPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Sleep logged successfully!"),
+            SnackBar(
+              content: Text(l10n.sleepLoggedSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
@@ -223,8 +224,8 @@ class _SleepPageState extends State<SleepPage> {
     } catch (e) {
       print("ERROR logging sleep: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to log sleep."),
+        SnackBar(
+          content: Text(l10n.failedToLogSleep),
           backgroundColor: Colors.red,
         ),
       );
@@ -233,6 +234,7 @@ class _SleepPageState extends State<SleepPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF1FBFE),
       resizeToAvoidBottomInset: true,
@@ -241,7 +243,7 @@ class _SleepPageState extends State<SleepPage> {
         elevation: 1,
         centerTitle: true,
         title: Text(
-          widget.existingEntry != null ? 'Edit Sleep Log' : 'Add Trackers',
+          widget.existingEntry != null ? l10n.editSleepLog : l10n.addTrackers,
           style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
         ),
         actions: [
@@ -265,8 +267,8 @@ class _SleepPageState extends State<SleepPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.showTracker) ...[
-                const Text(
-                  'Choose a tracker',
+                Text(
+                  l10n.chooseTracker,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.black87),
                 ),
@@ -290,8 +292,8 @@ class _SleepPageState extends State<SleepPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'When does your baby sleep?',
+                    Text(
+                      l10n.whenDoesBabySleep,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -301,8 +303,8 @@ class _SleepPageState extends State<SleepPage> {
                     const SizedBox(height: 20),
 
                     // ✅ ADD THIS: Date Picker
-                    const Text(
-                      'Date',
+                    Text(
+                      l10n.date,
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 8),
@@ -322,7 +324,9 @@ class _SleepPageState extends State<SleepPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat('EEEE, MMMM d, yyyy').format(selectedDate),
+                              DateFormat(
+                                'EEEE, MMMM d, yyyy',
+                              ).format(selectedDate),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -342,6 +346,8 @@ class _SleepPageState extends State<SleepPage> {
 
                     // Time Pickers
                     TimePickerRow(
+                      startLabel: l10n.startTime,
+                      endLabel: l10n.endTime,
                       initialStartTime: startTime,
                       initialEndTime: endTime,
                       onStartChanged: (time) {
@@ -354,8 +360,8 @@ class _SleepPageState extends State<SleepPage> {
                     const SizedBox(height: 20),
 
                     // Notes
-                    const Text(
-                      'Notes',
+                    Text(
+                      l10n.notesOptional,
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 6),
@@ -363,7 +369,7 @@ class _SleepPageState extends State<SleepPage> {
                       controller: notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Add sleep notes...',
+                        hintText: l10n.addSleepNotes,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -375,8 +381,8 @@ class _SleepPageState extends State<SleepPage> {
                     const SizedBox(height: 20),
 
                     // Quality Dropdown
-                    const Text(
-                      'Sleep Quality',
+                    Text(
+                      l10n.sleepQuality,
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 6),
@@ -391,8 +397,8 @@ class _SleepPageState extends State<SleepPage> {
                         child: DropdownButton<String>(
                           value: selectedQuality,
                           isExpanded: true,
-                          hint: const Text(
-                            'Select sleep quality',
+                          hint: Text(
+                            l10n.selectSleepQuality,
                             style: TextStyle(color: Colors.grey),
                           ),
                           items: qualityOptions.map((option) {
@@ -409,7 +415,12 @@ class _SleepPageState extends State<SleepPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  Text(option['label']),
+                                  Text(
+                                    _getLocalizedQualityLabel(
+                                      option['value'],
+                                      l10n,
+                                    ),
+                                  ),
                                 ],
                               ),
                             );
@@ -443,8 +454,8 @@ class _SleepPageState extends State<SleepPage> {
                         ),
                         label: Text(
                           widget.existingEntry != null
-                              ? 'Update Sleep Log'
-                              : 'Log Sleep Time',
+                              ? l10n.updateSleepLog
+                              : l10n.logSleepTime,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -461,6 +472,19 @@ class _SleepPageState extends State<SleepPage> {
         ),
       ),
     );
+  }
+}
+
+String _getLocalizedQualityLabel(String value, AppLocalizations l10n) {
+  switch (value) {
+    case 'not_good':
+      return l10n.qualityNotGood;
+    case 'good':
+      return l10n.qualityGood;
+    case 'excellent':
+      return l10n.qualityExcellent;
+    default:
+      return value;
   }
 }
 
@@ -517,6 +541,8 @@ class TimePickerRow extends StatefulWidget {
   final Function(TimeOfDay) onEndChanged;
   final TimeOfDay? initialStartTime;
   final TimeOfDay? initialEndTime;
+  final String startLabel;
+  final String endLabel;
 
   const TimePickerRow({
     super.key,
@@ -524,6 +550,8 @@ class TimePickerRow extends StatefulWidget {
     required this.onEndChanged,
     this.initialStartTime,
     this.initialEndTime,
+    required this.startLabel,
+    required this.endLabel,
   });
 
   @override
@@ -546,7 +574,7 @@ class _TimePickerRowState extends State<TimePickerRow> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildTimeColumn("Start time", startTime, () async {
+        _buildTimeColumn(widget.startLabel, startTime, () async {
           final picked = await showTimePicker(
             context: context,
             initialTime: startTime,
@@ -556,7 +584,7 @@ class _TimePickerRowState extends State<TimePickerRow> {
             widget.onStartChanged(picked);
           }
         }),
-        _buildTimeColumn("End time", endTime, () async {
+        _buildTimeColumn(widget.endLabel, endTime, () async {
           final picked = await showTimePicker(
             context: context,
             initialTime: endTime,
