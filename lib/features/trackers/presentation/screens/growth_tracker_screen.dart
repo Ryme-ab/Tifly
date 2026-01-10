@@ -162,7 +162,8 @@ class _GrowthPageState extends State<GrowthPage> {
     required String? selectedUnit,
     required TextEditingController controller,
     required ValueChanged<String?> onUnitChanged,
-    required List<String> units, // Add units parameter
+    required List<String> units,
+    Key? fieldKey,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,6 +178,7 @@ class _GrowthPageState extends State<GrowthPage> {
             Flexible(
               flex: 3,
               child: TextField(
+                key: fieldKey,
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: '${AppLocalizations.of(context)!.enter} $label',
@@ -273,7 +275,8 @@ class _GrowthPageState extends State<GrowthPage> {
                       controller: weightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitWeight = v),
-                      units: ['kg', 'lb'],
+                      units: const ['kg', 'lb'],
+                      fieldKey: const Key('weight_field'),
                     ),
                     const SizedBox(height: 16),
 
@@ -284,7 +287,8 @@ class _GrowthPageState extends State<GrowthPage> {
                       controller: heightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitHeight = v),
-                      units: ['cm', 'in'],
+                      units: const ['cm', 'in'],
+                      fieldKey: const Key('height_field'),
                     ),
                     const SizedBox(height: 16),
 
@@ -295,7 +299,8 @@ class _GrowthPageState extends State<GrowthPage> {
                       controller: headCircumferenceController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitHeadCircumference = v),
-                      units: ['cm', 'in'],
+                      units: const ['cm', 'in'],
+                      fieldKey: const Key('head_circumference_field'),
                     ),
                     const SizedBox(height: 20),
 
@@ -322,6 +327,7 @@ class _GrowthPageState extends State<GrowthPage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton.icon(
+                        key: const Key('save_growth_button'),
                         onPressed: _save,
                         icon: const Icon(Icons.child_care, color: Colors.white),
                         label: Text(
