@@ -4,11 +4,33 @@ import 'auth_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:tifli/core/services/notification_service.dart';
 
+/// Cubit for managing authentication state
+/// Uses dependency injection for testability
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository repository;
+  final SupabaseClient? _supabaseClient;
+  final NotificationService? _notificationService;
 
-  AuthCubit(this.repository) : super(AuthInitial());
+  /// Constructor with optional dependencies for testing
+  /// In production, dependencies default to singleton instances
+  /// In tests, mock dependencies can be injected
+  AuthCubit(
+    this.repository, {
+    SupabaseClient? supabaseClient,
+    NotificationService? notificationService,
+  })  : _supabaseClient = supabaseClient,
+        _notificationService = notificationService,
+        super(AuthInitial());
 
+  /// Get the Supabase client (real or mock)
+  SupabaseClient get _client => _supabaseClient ?? Supabase.instance.client;
+
+  /// Get the notification service (real or mock)
+  NotificationService get _notifService =>
+      _notificationService ?? NotificationService.instance;
+
+  /// Handles user login
+  /// Emits AuthLoading, then AuthSuccess or AuthError
   Future<void> login(String email, String password) async {
     emit(AuthLoading());
 
@@ -16,12 +38,12 @@ class AuthCubit extends Cubit<AuthState> {
 
     if (result == null) {
       // ✅ Get Supabase userId
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = _client.auth.currentUser;
       final userId = user?.id;
 
       if (userId != null) {
         // ✅ Save FCM token for this user
-        await NotificationService.instance.initFCM(userId: userId);
+        await _notifService.initFCM(userId: userId);
       }
 
       emit(AuthSuccess());
@@ -30,17 +52,21 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  /// Handles user signup
+  /// Emits AuthLoading, then AuthSuccess or AuthError
   Future<void> signUp(String email, String password) async {
     emit(AuthLoading());
 
     final result = await repository.signUp(email, password);
 
     if (result == null) {
-      final user = Supabase.instance.client.auth.currentUser;
+      // ✅ Get Supabase userId after successful signup
+      final user = _client.auth.currentUser;
       final userId = user?.id;
 
       if (userId != null) {
-        await NotificationService.instance.initFCM(userId: userId);
+        // ✅ Initialize FCM for the new user
+        await _notifService.initFCM(userId: userId);
       }
 
       emit(AuthSuccess());
