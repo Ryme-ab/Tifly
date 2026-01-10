@@ -14,6 +14,8 @@ import 'package:tifli/features/logs/presentation/screens/sleeping_logs_screen.da
 import 'package:tifli/features/profiles/presentation/screens/my_babies.dart';
 import 'package:tifli/features/schedules/presentation/screens/checklist_screen.dart';
 import 'package:tifli/core/widgets/language_selector.dart';
+import 'package:tifli/features/help_about/presentation/screens/help_screen.dart';
+import 'package:tifli/features/help_about/presentation/screens/about_screen.dart';
 
 class Tiflidrawer extends StatelessWidget {
   static const Color primary = Color(0xFFBA224D);
@@ -188,8 +190,20 @@ class Tiflidrawer extends StatelessWidget {
 
                   menuItem(
                     icon: Icons.help_outline,
-                    title: l10n.helpAndAbout,
-                    onTap: () => Navigator.pushNamed(context, "/help"),
+                    title: "Help & Support",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HelpScreen()),
+                    ),
+                  ),
+
+                  menuItem(
+                    icon: Icons.info_outline,
+                    title: "About",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AboutScreen()),
+                    ),
                   ),
 
                   menuItem(
@@ -215,7 +229,6 @@ class Tiflidrawer extends StatelessWidget {
       ),
     );
   }
-
   // MENU ITEM
   Widget menuItem({
     required IconData icon,
