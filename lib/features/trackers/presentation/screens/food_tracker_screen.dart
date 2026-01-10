@@ -1,16 +1,18 @@
+// lib/features/trackers/presentation/screens/food_tracker_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tifli/features/trackers/data/models/meal.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
-import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
-import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
-import 'package:tifli/features/trackers/presentation/screens/growth_tracker_screen.dart';
 import '../cubit/meal_cubit.dart';
-import 'package:tifli/features/trackers/data/models/meal.dart'; // Adjust this import to your MealEntry/Model
+import 'sleep_tracker_screen.dart';
+import 'growth_tracker_screen.dart';
+import '../widgets/tracker_button.dart';
 
 class FoodTrackerScreen extends StatefulWidget {
   final bool showTracker;
-  final Meal? existingEntry; // Optional entry for editing
+  final Meal? existingEntry;
 
   const FoodTrackerScreen({
     super.key,
@@ -27,6 +29,8 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
   late int _quantity;
   late TimeOfDay _selectedTime;
   late String _notes;
+  late DateTime _selectedDate;
+  late TextEditingController _notesController;
 
   final List<String> _feedingOptions = [
     "Breast Milk",
@@ -35,57 +39,46 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
     "Juice",
   ];
 
-  final Color primary = const Color(0xFFA41639);
-
   @override
   void initState() {
     super.initState();
 
-    // If editing, pre-fill the form
     if (widget.existingEntry != null) {
       _selectedFeeding = widget.existingEntry!.mealType;
-      if (!_feedingOptions.contains(_selectedFeeding)) {
-         // If the loaded value isn't in our list, add it temporarily so it displays correctly
-         _feedingOptions.add(_selectedFeeding);
-      }
-      
+      if (!_feedingOptions.contains(_selectedFeeding))
+        _feedingOptions.add(_selectedFeeding);
       _quantity = widget.existingEntry!.amount;
       _selectedTime = TimeOfDay(
         hour: widget.existingEntry!.mealTime.hour,
         minute: widget.existingEntry!.mealTime.minute,
       );
       _notes = widget.existingEntry!.items;
+      _selectedDate = DateTime(
+        widget.existingEntry!.mealTime.year,
+        widget.existingEntry!.mealTime.month,
+        widget.existingEntry!.mealTime.day,
+      );
     } else {
       _selectedFeeding = _feedingOptions.first;
-      _quantity = 14;
+      _quantity = 120; // Default reasonable amount
       _selectedTime = const TimeOfDay(hour: 8, minute: 30);
       _notes = "";
+      _selectedDate = DateTime.now();
     }
+
+    _notesController = TextEditingController(text: _notes);
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFA41639),
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            timePickerTheme: TimePickerThemeData(
-              backgroundColor: Colors.white,
-              hourMinuteTextColor: Color(0xFFA41639),
-              dayPeriodTextColor: Color(0xFFA41639),
-              dialHandColor: Color(0xFFA41639),
-              dialBackgroundColor: Color(0xFFF9ECEE),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) setState(() => _selectedTime = picked);
   }
@@ -98,78 +91,105 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
   }
 
   Future<void> _saveFoodTracker() async {
-    final now = DateTime.now();
     final mealTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
       _selectedTime.hour,
       _selectedTime.minute,
     );
 
+    // Get selected child ID
     final childState = context.read<ChildSelectionCubit>().state;
     if (childState is! ChildSelected) {
-      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a baby first")),
+        SnackBar(
+          content: Text(l10n.pleaseSelectBabyFirst),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
     final childId = childState.childId;
 
-    if (widget.existingEntry != null) {
-      // EDIT MODE
-      await context.read<MealCubit>().updateMeal(
-        id: widget.existingEntry!.id,
-        childId: childId,
-        mealTime: mealTime,
-        mealType: _selectedFeeding,
-        items: _notes.isNotEmpty ? _notes : _selectedFeeding,
-        amount: _quantity,
-        status: 'completed',
-      );
+    try {
+      final l10n = AppLocalizations.of(context)!;
+      if (widget.existingEntry != null) {
+        // Update existing meal
+        await context.read<MealCubit>().updateMeal(
+          id: widget.existingEntry!.id,
+          childId: childId,
+          mealTime: mealTime,
+          mealType: _selectedFeeding,
+          items: _notesController.text.isNotEmpty
+              ? _notesController.text
+              : _selectedFeeding,
+          amount: _quantity,
+          status: 'completed',
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Meal updated successfully"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      // CREATE MODE
-      await context.read<MealCubit>().addMeal(
-        childId: childId,
-        mealTime: mealTime,
-        mealType: _selectedFeeding,
-        items: _notes.isNotEmpty ? _notes : _selectedFeeding,
-        amount: _quantity,
-        status: 'completed',
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.mealUpdatedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        // Add new meal
+        await context.read<MealCubit>().addMeal(
+          childId: childId,
+          mealTime: mealTime,
+          mealType: _selectedFeeding,
+          items: _notesController.text.isNotEmpty
+              ? _notesController.text
+              : _selectedFeeding,
+          amount: _quantity,
+          status: 'completed',
+        );
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.mealAddedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      // ✅ Refresh parent list immediately
+      context.read<MealCubit>().loadMeals(childId);
+
+      if (!mounted) return;
+      Navigator.pop(context, true); // return true to parent
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Meal added successfully"),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: Colors.red,
         ),
       );
     }
-
-    if (!mounted) return;
-    if (!mounted) return;
-    Navigator.pop(context, widget.existingEntry != null ? true : null); // Return something to indicate change
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6FAF5),
+      backgroundColor: const Color.fromARGB(
+        116,
+        255,
+        243,
+        224,
+      ), // Matched SleepPage background
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
         title: Text(
-          widget.existingEntry != null ? "Edit Food Tracker" : "Food Tracker",
+          widget.existingEntry != null
+              ? l10n.editFoodTracker
+              : l10n.foodTracker,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             color: Colors.black,
@@ -184,10 +204,17 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.showTracker) ...[
-                TrackerButtonsRow(currentPage: 'food'),
+                const TrackerButtonsRow(currentPage: 'food'),
                 const SizedBox(height: 20),
               ],
-              const SmallWeekCalendar(),
+
+              SmallWeekCalendar(
+                selectedDate: _selectedDate,
+                onDateSelected: (date) {
+                  setState(() => _selectedDate = date);
+                },
+              ),
+
               const SizedBox(height: 20),
 
               Container(
@@ -197,23 +224,27 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7FBF8),
+                  color: const Color.fromARGB(91, 255, 243, 224),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Feeding Type
-                    const Text(
-                      "Feeding Name",
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    Text(
+                      l10n.feedingName,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black26),
-                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                        ), // Lighter border
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButton<String>(
                         value: _selectedFeeding,
@@ -231,7 +262,9 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(option),
+                                    Text(
+                                      _getLocalizedFeedingOption(option, l10n),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -243,25 +276,30 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Quantity and Time
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
                         Text(
-                          "Quantity (ml)",
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          l10n.quantityMl,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
                         ),
                         Text(
-                          "Time",
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          l10n.time,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Quantity Counter
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
@@ -277,7 +315,7 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    if (_quantity > 0) _quantity--;
+                                    if (_quantity > 0) _quantity -= 10;
                                   });
                                 },
                               ),
@@ -298,7 +336,6 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                             ],
                           ),
                         ),
-                        // Time Picker
                         GestureDetector(
                           onTap: _pickTime,
                           child: Container(
@@ -322,30 +359,30 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
 
-                    // Notes
-                    const Text(
-                      'Notes',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    const SizedBox(height: 20),
+                    Text(
+                      l10n.notesOptional,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
+                      controller: _notesController,
                       maxLines: 3,
-                      controller: TextEditingController(text: _notes),
                       decoration: InputDecoration(
-                        hintText: 'Add any notes...',
+                        hintText: l10n.addAnyNotes,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                         isDense: true,
                         contentPadding: const EdgeInsets.all(10),
                       ),
-                      onChanged: (value) => _notes = value,
                     ),
                     const SizedBox(height: 30),
 
-                    // Save Button
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -354,8 +391,8 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
                         icon: const Icon(Icons.fastfood, color: Colors.white),
                         label: Text(
                           widget.existingEntry != null
-                              ? 'Update Meal'
-                              : 'Save Meal',
+                              ? l10n.updateMeal
+                              : l10n.saveMeal,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -379,9 +416,24 @@ class _FoodTrackerScreenState extends State<FoodTrackerScreen> {
       ),
     );
   }
+
+  String _getLocalizedFeedingOption(String option, AppLocalizations l10n) {
+    switch (option) {
+      case "Breast Milk":
+        return l10n.breastMilk;
+      case "Formula":
+        return l10n.formula;
+      case "Solid Food":
+        return l10n.solidFood;
+      case "Juice":
+        return l10n.juice;
+      default:
+        return option;
+    }
+  }
 }
 
-// TrackerButtonsRow stays unchanged
+// Tracker buttons row
 class TrackerButtonsRow extends StatelessWidget {
   final String currentPage;
   const TrackerButtonsRow({super.key, required this.currentPage});

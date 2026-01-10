@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/trackers/presentation/screens/food_tracker_screen.dart';
 import 'package:tifli/features/trackers/presentation/screens/sleep_tracker_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/calendar.dart';
 import 'package:tifli/core/state/child_selection_cubit.dart';
 import 'package:tifli/features/trackers/presentation/widgets/tracker_button.dart';
 import 'package:tifli/features/trackers/presentation/cubit/growth_cubit.dart';
 import 'package:tifli/features/logs/data/models/growth_logs_model.dart';
 import 'package:tifli/features/navigation/app_router.dart';
+import 'package:tifli/widgets/custom_app_bar.dart';
+
 
 class GrowthPage extends StatefulWidget {
   final bool showTracker;
@@ -24,11 +27,12 @@ class GrowthPage extends StatefulWidget {
 class _GrowthPageState extends State<GrowthPage> {
   String? selectedUnitWeight = 'kg';
   String? selectedUnitHeight = 'cm';
-  String? selectedUnitBmi = 'kg/m²';
+  String? selectedUnitHeadCircumference = 'cm';
 
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-  final TextEditingController bmiController = TextEditingController();
+  final TextEditingController headCircumferenceController =
+      TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
@@ -43,7 +47,7 @@ class _GrowthPageState extends State<GrowthPage> {
       final e = widget.existingLog!;
       weightController.text = e.weight.toString();
       heightController.text = e.height.toString();
-      bmiController.text = e.headCircumference.toString();
+      headCircumferenceController.text = e.headCircumference.toString();
       notesController.text = e.notes ?? '';
       _selectedDate = e.date;
       // units keep defaults (kg/cm), change if you store units in model
@@ -54,32 +58,25 @@ class _GrowthPageState extends State<GrowthPage> {
   void dispose() {
     weightController.dispose();
     heightController.dispose();
-    bmiController.dispose();
+    headCircumferenceController.dispose();
     notesController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) setState(() => _selectedDate = picked);
-  }
-
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     final weight = double.tryParse(weightController.text.trim());
     final height = double.tryParse(heightController.text.trim());
-    final bmi = double.tryParse(bmiController.text.trim());
+    final headCircumference = double.tryParse(
+      headCircumferenceController.text.trim(),
+    );
     final notes = notesController.text.trim();
 
-    if (weight == null || height == null || bmi == null) {
+    if (weight == null || height == null || headCircumference == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Please enter valid numeric values for weight, height and BMI.',
+            l10n.pleaseEnterValidNumericValues,
           ),
           backgroundColor: Colors.orange,
         ),
@@ -91,8 +88,8 @@ class _GrowthPageState extends State<GrowthPage> {
     final childState = context.read<ChildSelectionCubit>().state;
     if (childState is! ChildSelected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a baby first.'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectBabyFirst),
           backgroundColor: Colors.orange,
         ),
       );
@@ -109,7 +106,7 @@ class _GrowthPageState extends State<GrowthPage> {
           date: _selectedDate,
           height: height,
           weight: weight,
-          headCircumference: bmi,
+          headCircumference: headCircumference,
           notes: notes.isEmpty ? existing.notes : notes,
           // keep createdAt as existing.createdAt
         );
@@ -118,8 +115,8 @@ class _GrowthPageState extends State<GrowthPage> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Growth log updated'),
+          SnackBar(
+            content: Text(l10n.growthLogUpdated),
             backgroundColor: Colors.green,
           ),
         );
@@ -133,14 +130,14 @@ class _GrowthPageState extends State<GrowthPage> {
           date: _selectedDate,
           height: height,
           weight: weight,
-          headCircumference: bmi,
+          headCircumference: headCircumference,
           notes: notes.isEmpty ? null : notes,
         );
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Growth data logged successfully!'),
+          SnackBar(
+            content: Text(l10n.growthDataLoggedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -165,6 +162,7 @@ class _GrowthPageState extends State<GrowthPage> {
     required String? selectedUnit,
     required TextEditingController controller,
     required ValueChanged<String?> onUnitChanged,
+    required List<String> units, // Add units parameter
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +179,7 @@ class _GrowthPageState extends State<GrowthPage> {
               child: TextField(
                 controller: controller,
                 decoration: InputDecoration(
-                  hintText: 'Enter $label',
+                  hintText: '${AppLocalizations.of(context)!.enter} $label',
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 12,
@@ -197,8 +195,9 @@ class _GrowthPageState extends State<GrowthPage> {
               ),
             ),
             const SizedBox(width: 10),
-            Flexible(
-              flex: 1,
+            SizedBox(
+              width: 80, 
+              height: 50,
               child: InputDecorator(
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(
@@ -212,9 +211,8 @@ class _GrowthPageState extends State<GrowthPage> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    isExpanded: true,
                     value: selectedUnit,
-                    items: _unitsForLabel(label)
+                    items: units
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                         .toList(),
                     onChanged: onUnitChanged,
@@ -228,49 +226,16 @@ class _GrowthPageState extends State<GrowthPage> {
     );
   }
 
-  List<String> _unitsForLabel(String label) {
-    switch (label) {
-      case 'Weight':
-        return ['kg', 'lb'];
-      case 'Height':
-        return ['cm', 'in'];
-      case 'BMI':
-        return ['kg/m²'];
-      default:
-        return [''];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAF5),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: Text(
-          widget.existingLog != null ? 'Edit Growth Log' : 'Add Growth Data',
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundImage: AssetImage(
-                'assets/images/parent_placeholder.jpg',
-              ),
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: widget.existingLog != null
+            ? l10n.editGrowthLog
+            : l10n.addGrowthData,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -283,7 +248,10 @@ class _GrowthPageState extends State<GrowthPage> {
                 TrackerButtonsRow(currentPage: 'growth'),
                 const SizedBox(height: 20),
               ],
-              const SmallWeekCalendar(),
+              SmallWeekCalendar(
+                selectedDate: _selectedDate,
+                onDateSelected: (date) => setState(() => _selectedDate = date),
+              ),
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,
@@ -298,80 +266,49 @@ class _GrowthPageState extends State<GrowthPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Date
-                    const Text(
-                      'Date',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 6),
-                    GestureDetector(
-                      onTap: _pickDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const Icon(
-                              Icons.calendar_month,
-                              color: Colors.black54,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
                     // Weight
                     _buildMeasurementField(
-                      label: 'Weight',
+                      label: l10n.weight,
                       selectedUnit: selectedUnitWeight,
                       controller: weightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitWeight = v),
+                      units: ['kg', 'lb'],
                     ),
                     const SizedBox(height: 16),
 
                     // Height
                     _buildMeasurementField(
-                      label: 'Height',
+                      label: l10n.height,
                       selectedUnit: selectedUnitHeight,
                       controller: heightController,
                       onUnitChanged: (v) =>
                           setState(() => selectedUnitHeight = v),
+                      units: ['cm', 'in'],
                     ),
                     const SizedBox(height: 16),
 
-                    // BMI / Head circumference field (we keep BMI label to match your UI)
+                    // Head Circumference field
                     _buildMeasurementField(
-                      label: 'BMI',
-                      selectedUnit: selectedUnitBmi,
-                      controller: bmiController,
-                      onUnitChanged: (v) => setState(() => selectedUnitBmi = v),
+                      label: l10n.headCircumference,
+                      selectedUnit: selectedUnitHeadCircumference,
+                      controller: headCircumferenceController,
+                      onUnitChanged: (v) =>
+                          setState(() => selectedUnitHeadCircumference = v),
+                      units: ['cm', 'in'],
                     ),
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Notes',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    Text(
+                      l10n.notesOptional,
+                      style: const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Add any notes...',
+                        hintText: l10n.addAnyNotes,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -389,8 +326,8 @@ class _GrowthPageState extends State<GrowthPage> {
                         icon: const Icon(Icons.child_care, color: Colors.white),
                         label: Text(
                           widget.existingLog != null
-                              ? 'Update Growth Data'
-                              : 'Log Growth Data',
+                              ? l10n.updateGrowthData
+                              : l10n.logGrowthData,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -414,9 +351,8 @@ class _GrowthPageState extends State<GrowthPage> {
       ),
     );
   }
-}
+} // Minimal TrackerButtonsRow - you already had this in your original file; included for completeness
 
-// Minimal TrackerButtonsRow - you already had this in your original file; included for completeness
 class TrackerButtonsRow extends StatelessWidget {
   final String currentPage;
   const TrackerButtonsRow({super.key, required this.currentPage});

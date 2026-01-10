@@ -6,13 +6,14 @@ import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/widgets/hovercard.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/l10n/app_localizations.dart';
+
 class TrackersMenuScreen extends StatelessWidget {
   const TrackersMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: CustomAppBar(title: l10n.track),
       backgroundColor: AppColors.backgroundLight,

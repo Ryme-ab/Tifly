@@ -40,6 +40,17 @@ class LanguageSelector extends StatelessWidget {
             ],
           ),
         ),
+        PopupMenuItem<String>(
+          value: 'ar',
+          child: Row(
+            children: [
+              if (currentLocale.languageCode == 'ar')
+                Icon(Icons.check, color: Theme.of(context).primaryColor),
+              if (currentLocale.languageCode == 'ar') const SizedBox(width: 8),
+              Text(l10n.arabic),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -1,78 +1,153 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
+import 'package:tifli/features/schedules/data/data_sources/medicine_schedule_data_source.dart';
+import 'package:tifli/features/schedules/data/models/medicine_model.dart';
+import 'package:tifli/features/schedules/domain/repositories/medicine_schedule_repository.dart';
+import 'package:tifli/features/schedules/presentation/cubit/medicine_schedule_cubit.dart';
+import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 
-class MedicineScreen extends StatefulWidget {
+
+class MedicineScreen extends StatelessWidget {
   const MedicineScreen({super.key});
 
   @override
-  State<MedicineScreen> createState() => _MedicineScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => MedicineScheduleCubit(
+        repository: MedicineScheduleRepository(
+          dataSource: MedicineScheduleDataSource(
+            client: Supabase.instance.client,
+          ),
+        ),
+      ),
+      child: const _MedicineScreenBody(),
+    );
+  }
 }
 
-class _MedicineScreenState extends State<MedicineScreen> {
+class _MedicineScreenBody extends StatefulWidget {
+  const _MedicineScreenBody();
+
+  @override
+  State<_MedicineScreenBody> createState() => _MedicineScreenBodyState();
+}
+
+class _MedicineScreenBodyState extends State<_MedicineScreenBody> {
   DateTime selectedDate = DateTime.now();
 
-  // in-memory medicine data with image path
-  List<Map<String, dynamic>> morningMedicines = [
-    {"name": "Omega 3", "image": "assets/omega.png", "taken": false},
-    {"name": "Vitamin D", "image": "assets/vitamin_d.png", "taken": true},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchSchedules();
+  }
 
-  List<Map<String, dynamic>> nightMedicines = [
-    {"name": "Zinc", "image": "assets/zinc.png", "taken": false},
-  ];
+  void _fetchSchedules() {
+    final childState = context.read<ChildSelectionCubit>().state;
+    if (childState is ChildSelected) {
+      context.read<MedicineScheduleCubit>().loadSchedules(childState.childId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xfff5f4f8),
-      appBar: const CustomAppBar(title: 'Medicine Schedule'),
+      appBar: CustomAppBar(title: l10n.medicineScheduleTitle),
       body: SafeArea(
         child: Column(
           children: [
             _buildWeekSelector(),
             const SizedBox(height: 16),
-
-            // Scrollable medicine lists
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  const Text(
-                    "Morning",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  ...morningMedicines.map(
-                    (m) => _medicineCard(m, isMorning: true),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Night",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  ...nightMedicines.map(
-                    (m) => _medicineCard(m, isMorning: false),
-                  ),
-                  const SizedBox(height: 40),
-                ],
+              child: BlocBuilder<MedicineScheduleCubit, MedicineScheduleState>(
+                builder: (context, state) {
+                   if (state is MedicineScheduleLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is MedicineScheduleError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  } else if (state is MedicineScheduleLoaded) {
+                    if (state.schedules.isEmpty) {
+                      return Center(child: Text(AppLocalizations.of(context)!.noMedicinesScheduled));
+                    }
+
+                    final morningMedicines = <MedicineSchedule>[];
+                    final nightMedicines = <MedicineSchedule>[];
+
+                    for (var s in state.schedules) {
+                       // Check if selectedDate is within range
+                       if (selectedDate.isBefore(s.startDate) || selectedDate.isAfter(s.endDate)) {
+                         continue; 
+                       }
+                      
+                       if (s.times.isNotEmpty) {
+                         final timeParts = s.times.first.split(':');
+                         final hour = int.tryParse(timeParts[0]) ?? 8;
+                         if (hour < 12) {
+                           morningMedicines.add(s);
+                         } else {
+                           nightMedicines.add(s);
+                         }
+                       } else {
+                         morningMedicines.add(s); // Default
+                       }
+                    }
+
+                    return ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        if (morningMedicines.isNotEmpty) ...[
+                           Text(
+                            AppLocalizations.of(context)!.morning,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          ...morningMedicines.map((m) => _medicineCard(m, isMorning: true, context: context)),
+                           const SizedBox(height: 16),
+                        ],
+                        
+                        if (nightMedicines.isNotEmpty) ...[
+                           Text(
+                            AppLocalizations.of(context)!.night,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          ...nightMedicines.map((m) => _medicineCard(m, isMorning: false, context: context)),
+                        ],
+
+                        if (morningMedicines.isEmpty && nightMedicines.isEmpty)
+                            Center(child: Text(AppLocalizations.of(context)!.noMedicinesForDate)),
+
+                        const SizedBox(height: 40),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
             ),
           ],
         ),
       ),
-
-      // Floating Add Button
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffb03a57),
-        onPressed: _dummyAddMedicine,
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MedicineSchedulePage()),
+          );
+          if (mounted) _fetchSchedules(); // Refresh after return
+        },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // ✅ WEEK SELECTOR (simple functional calendar-like bar)
   Widget _buildWeekSelector() {
     final startOfWeek = selectedDate.subtract(
       Duration(days: selectedDate.weekday % 7),
@@ -93,7 +168,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
         child: Column(
           children: [
             Text(
-              "Week of ${DateFormat('d MMM').format(weekDays.first)}",
+              "${AppLocalizations.of(context)!.weekOf} ${DateFormat('d MMM').format(weekDays.first)}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -149,15 +224,15 @@ class _MedicineScreenState extends State<MedicineScreen> {
     );
   }
 
-  // ✅ Medicine card builder (image, checkbox, swipe-to-delete)
   Widget _medicineCard(
-    Map<String, dynamic> medicine, {
+    MedicineSchedule medicine, {
     required bool isMorning,
+    required BuildContext context,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Dismissible(
-        key: Key(medicine['name'] + medicine.hashCode.toString()),
+        key: Key(medicine.id),
         direction: DismissDirection.endToStart,
         background: Container(
           decoration: BoxDecoration(
@@ -169,13 +244,11 @@ class _MedicineScreenState extends State<MedicineScreen> {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
-          setState(() {
-            if (isMorning) {
-              morningMedicines.remove(medicine);
-            } else {
-              nightMedicines.remove(medicine);
+           // Delete logic
+           final childState = context.read<ChildSelectionCubit>().state;
+            if (childState is ChildSelected) {
+              context.read<MedicineScheduleCubit>().deleteSchedule(medicine.id, childState.childId);
             }
-          });
         },
         child: Container(
           decoration: BoxDecoration(
@@ -187,7 +260,6 @@ class _MedicineScreenState extends State<MedicineScreen> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // image
               Container(
                 height: 44,
                 width: 44,
@@ -195,15 +267,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: (medicine['image'] != null)
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          medicine['image'],
-                          fit: BoxFit.contain,
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                child: const Icon(Icons.medication, color: Colors.pinkAccent),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -211,34 +275,25 @@ class _MedicineScreenState extends State<MedicineScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      medicine['name'],
+                      medicine.medicineName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      "1 capsule after breakfast",
-                      style: TextStyle(color: Colors.pinkAccent),
+                    Text(
+                      "${medicine.dosageAmount} ${medicine.dosageUnit}, ${medicine.frequency}",
+                      style: const TextStyle(color: Colors.pinkAccent),
                     ),
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    medicine['taken'] = !(medicine['taken'] as bool);
-                  });
-                },
-                child: Icon(
-                  (medicine['taken'] as bool)
-                      ? Icons.check_box
-                      : Icons.check_box_outline_blank,
-                  color: (medicine['taken'] as bool)
-                      ? Colors.pinkAccent
-                      : Colors.grey.shade500,
-                ),
+              // Checkbox logic would need tracking logic in a separate table or local state
+              // For now, simplify to just display
+              Icon(
+                  Icons.check_box_outline_blank,
+                   color: Colors.grey.shade500,
               ),
             ],
           ),
@@ -246,15 +301,5 @@ class _MedicineScreenState extends State<MedicineScreen> {
       ),
     );
   }
-
-  // dummy add button (for demonstration)
-  void _dummyAddMedicine() {
-    setState(() {
-      morningMedicines.insert(0, {
-        "name": "New Med ${DateTime.now().second}",
-        "image": "assets/omega.png",
-        "taken": false,
-      });
-    });
-  }
 }
+

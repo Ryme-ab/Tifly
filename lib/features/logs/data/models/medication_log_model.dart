@@ -1,120 +1,99 @@
 class Medication {
   final String id;
-  final String userId;
   final String babyId;
   final String medicineName;
-  final int dosage;
-  final String durationUnit; // 'days', 'weeks', 'months'
+  final int dosageAmount;
+  final String dosageUnit;
+  final String frequency;
+  final List<String> times;
   final int durationValue;
-  final String frequencyType; // e.g., 'Everyday', 'Twice a day'
-  final String? appearanceColor; // optional
-  final String? timeOfMedication; // HH:mm:ss
-  final int? frequencyPerDay;
-  final int? intervalHours;
-  final String? intervalStartTime; // HH:mm:ss
+  final String durationUnit;
   final String? notes;
+  final DateTime startDate;
+  final DateTime endDate;
   final DateTime createdAt;
-  final DateTime updatedAt;
 
   Medication({
     required this.id,
-    required this.userId,
     required this.babyId,
     required this.medicineName,
-    required this.dosage,
-    required this.durationUnit,
+    required this.dosageAmount,
+    required this.dosageUnit,
+    required this.frequency,
+    required this.times,
     required this.durationValue,
-    required this.frequencyType,
-    this.appearanceColor,
-    this.timeOfMedication,
-    this.frequencyPerDay,
-    this.intervalHours,
-    this.intervalStartTime,
+    required this.durationUnit,
     this.notes,
+    required this.startDate,
+    required this.endDate,
     required this.createdAt,
-    required this.updatedAt,
   });
 
   factory Medication.fromJson(Map<String, dynamic> json) {
     return Medication(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      babyId: json['baby_id'] ?? '',
-      medicineName: json['medicine_name'] ?? '',
-      dosage: json['dosage'] ?? 1,
-      durationUnit: json['duration_unit'] ?? 'days',
-      durationValue: json['duration_value'] ?? 1,
-      frequencyType: json['frequency_type'] ?? 'Everyday',
-      appearanceColor: json['appearance_color'],
-      timeOfMedication: json['time_of_medication'],
-      frequencyPerDay: json['frequency_per_day'],
-      intervalHours: json['interval_hours'],
-      intervalStartTime: json['interval_start_time'],
-      notes: json['notes'],
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : DateTime.now(),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
+      id: json['id'] as String,
+      babyId: json['baby_id'] as String,
+      medicineName: json['medicine_name'] as String,
+      dosageAmount: json['dosage_amount'] as int,
+      dosageUnit: json['dosage_unit'] as String,
+      frequency: json['frequency'] as String,
+      times: json['times'] != null ? List<String>.from(json['times']) : [],
+      durationValue: json['duration_value'] as int,
+      durationUnit: json['duration_unit'] as String,
+      notes: json['notes'] as String?,
+      startDate: DateTime.parse(json['start_date'] as String),
+      endDate: DateTime.parse(json['end_date'] as String),
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at'] as String) 
           : DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'user_id': userId,
       'baby_id': babyId,
       'medicine_name': medicineName,
-      'dosage': dosage,
-      'duration_unit': durationUnit,
+      'dosage_amount': dosageAmount,
+      'dosage_unit': dosageUnit,
+      'frequency': frequency,
+      'times': times,
       'duration_value': durationValue,
-      'frequency_type': frequencyType,
-      'appearance_color': appearanceColor,
-      'time_of_medication': timeOfMedication,
-      'frequency_per_day': frequencyPerDay,
-      'interval_hours': intervalHours,
-      'interval_start_time': intervalStartTime,
+      'duration_unit': durationUnit,
       'notes': notes,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'start_date': startDate.toIso8601String(),
+      'end_date': endDate.toIso8601String(),
     };
   }
 
   Medication copyWith({
     String? id,
-    String? userId,
     String? babyId,
     String? medicineName,
-    int? dosage,
-    String? durationUnit,
+    int? dosageAmount,
+    String? dosageUnit,
+    String? frequency,
+    List<String>? times,
     int? durationValue,
-    String? frequencyType,
-    String? appearanceColor,
-    String? timeOfMedication,
-    int? frequencyPerDay,
-    int? intervalHours,
-    String? intervalStartTime,
+    String? durationUnit,
     String? notes,
+    DateTime? startDate,
+    DateTime? endDate,
     DateTime? createdAt,
-    DateTime? updatedAt,
   }) {
     return Medication(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       babyId: babyId ?? this.babyId,
       medicineName: medicineName ?? this.medicineName,
-      dosage: dosage ?? this.dosage,
-      durationUnit: durationUnit ?? this.durationUnit,
+      dosageAmount: dosageAmount ?? this.dosageAmount,
+      dosageUnit: dosageUnit ?? this.dosageUnit,
+      frequency: frequency ?? this.frequency,
+      times: times ?? this.times,
       durationValue: durationValue ?? this.durationValue,
-      frequencyType: frequencyType ?? this.frequencyType,
-      appearanceColor: appearanceColor ?? this.appearanceColor,
-      timeOfMedication: timeOfMedication ?? this.timeOfMedication,
-      frequencyPerDay: frequencyPerDay ?? this.frequencyPerDay,
-      intervalHours: intervalHours ?? this.intervalHours,
-      intervalStartTime: intervalStartTime ?? this.intervalStartTime,
+      durationUnit: durationUnit ?? this.durationUnit,
       notes: notes ?? this.notes,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

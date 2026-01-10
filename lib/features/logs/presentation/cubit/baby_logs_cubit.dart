@@ -7,14 +7,23 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
   final BabyLogsRepository repo;
   String? currentChildId;
   LogType? currentFilter;
+  DateTime? currentDate;
+  DateTime? currentStartDate;
+  DateTime? currentEndDate;
+  String? currentTime; // format "HH:mm"
 
   BabyLogsCubit({required BabyLogsRepository repository})
-    : repo = repository,
-      super(BabyLogsInitial());
+      : repo = repository,
+        super(BabyLogsInitial());
 
+  // Load all logs for a child
   Future<void> loadAllLogs(String childId) async {
     currentChildId = childId;
     currentFilter = null;
+    currentDate = null;
+    currentStartDate = null;
+    currentEndDate = null;
+    currentTime = null;
     emit(BabyLogsLoading());
     try {
       final logs = await repo.getAllLogs(childId);
@@ -24,6 +33,7 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
     }
   }
 
+  // Load logs by type only
   Future<void> loadLogsByType(String childId, LogType type) async {
     currentChildId = childId;
     currentFilter = type;
@@ -36,13 +46,54 @@ class BabyLogsCubit extends Cubit<BabyLogsState> {
     }
   }
 
+  // Apply filter by type, date, and/or time
+  Future<void> applyFilter({
+    LogType? type,
+    DateTime? date,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? time,
+  }) async {
+    if (currentChildId == null) return;
+    currentFilter = type;
+    currentDate = date;
+    currentStartDate = startDate;
+    currentEndDate = endDate;
+    currentTime = time;
+
+    emit(BabyLogsLoading());
+    try {
+      final logs = await repo.dataSource.getFilteredLogs(
+        childId: currentChildId!,
+        type: type,
+        date: date,
+        startDate: startDate,
+        endDate: endDate,
+        time: time,
+      );
+      emit(BabyLogsLoaded(logs));
+    } catch (e) {
+      emit(BabyLogsError(e.toString()));
+    }
+  }
+
+  // Refresh logs with current filters
   Future<void> refresh() async {
     if (currentChildId != null) {
-      if (currentFilter != null) {
-        await loadLogsByType(currentChildId!, currentFilter!);
-      } else {
-        await loadAllLogs(currentChildId!);
-      }
+      await applyFilter(
+        type: currentFilter,
+        date: currentDate,
+        startDate: currentStartDate,
+        endDate: currentEndDate,
+        time: currentTime,
+      );
+    }
+  }
+
+  // Clear all filters
+  void clearFilters() {
+    if (currentChildId != null) {
+      loadAllLogs(currentChildId!);
     }
   }
 }

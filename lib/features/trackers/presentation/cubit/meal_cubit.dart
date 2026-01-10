@@ -166,4 +166,6 @@ class MealCubit extends Cubit<MealState> {
       );
     }
   }
+
+  void loadMeals(String childId) {}
 }

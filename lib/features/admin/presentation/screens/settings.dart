@@ -55,7 +55,11 @@ class SettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: 15),
 
-            _SettingItem(icon: Icons.color_lens, label: l10n.theme, onTap: () {}),
+            _SettingItem(
+              icon: Icons.color_lens,
+              label: l10n.theme,
+              onTap: () {},
+            ),
             const SizedBox(height: 15),
 
             _SettingItem(

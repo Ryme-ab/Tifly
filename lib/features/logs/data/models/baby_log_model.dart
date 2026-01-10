@@ -8,6 +8,8 @@ class BabyLog {
   final String details;
   final Map<String, dynamic> metadata;
 
+  var note;
+
   BabyLog({
     required this.id,
     required this.type,

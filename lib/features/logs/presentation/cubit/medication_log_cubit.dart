@@ -29,19 +29,15 @@ class MedicationLogCubit extends Cubit<MedicationState> {
 
   Future<void> loadMedicines() async {
     try {
-      final userId = supabase.auth.currentUser?.id;
       final childState = childSelectionCubit.state;
 
-      if (userId == null || childState is! ChildSelected) {
-        emit(MedicationError('No user or child selected'));
+      if (childState is! ChildSelected) {
+        emit(MedicationError('No child selected'));
         return;
       }
 
       emit(MedicationLoading());
-      final medicines = await repository.getMedicines(
-        userId,
-        childState.childId,
-      );
+      final medicines = await repository.getMedicines(childState.childId);
       emit(MedicationLoaded(medicines));
     } catch (e) {
       emit(MedicationError(e.toString()));
@@ -50,9 +46,6 @@ class MedicationLogCubit extends Cubit<MedicationState> {
 
   Future<void> addMedicine(Medication medicine) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
-
       await repository.addMedicine(medicine);
       await loadMedicines();
     } catch (e) {
@@ -62,10 +55,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
 
   Future<void> updateMedicine(String id, Medication medicine) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
-
-      await repository.updateMedicine(id, userId, medicine);
+      await repository.updateMedicine(id, medicine);
       await loadMedicines();
     } catch (e) {
       emit(MedicationError(e.toString()));
@@ -74,10 +64,7 @@ class MedicationLogCubit extends Cubit<MedicationState> {
 
   Future<void> deleteMedicine(String id) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
-
-      await repository.deleteMedicine(id, userId);
+      await repository.deleteMedicine(id);
       await loadMedicines();
     } catch (e) {
       emit(MedicationError(e.toString()));

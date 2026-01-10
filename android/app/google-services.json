@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "615972119406",
+    "project_id": "tifly-ae48f",
+    "storage_bucket": "tifly-ae48f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:615972119406:android:fc2bc2e3a6b048a5dd577f",
+        "android_client_info": {
+          "package_name": "com.example.tifli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDWjn2zM2s38tRixEti4FXiU1qkdJrD78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
