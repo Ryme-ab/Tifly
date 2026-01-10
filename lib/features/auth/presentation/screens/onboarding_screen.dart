@@ -164,7 +164,7 @@ class _OnboardPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(image, width: 260),
-          const SizedBox(height: 40),
+          const SizedBox(height: 15),
           Text(
             title,
             textAlign: TextAlign.center,

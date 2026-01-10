@@ -5,23 +5,18 @@ class MealRepository {
   Future<List<Meal>> getMealLogs(String childId) async {
     try {
       print('🔍 Fetching meals for child: $childId');
-
-      // Get user ID from auth
       final userId = SupabaseClientManager().client.auth.currentUser?.id;
       if (userId == null) {
         print('❌ User not authenticated');
         return [];
       }
-
       final response = await SupabaseClientManager().client
           .from('meals')
           .select('*')
           .eq('child_id', childId)
           .eq('user_id', userId)
           .order('meal_time', ascending: false);
-
       print('✅ Found ${response.length} meals in database');
-
       final List<Meal> mealLogs = [];
       for (final item in response) {
         mealLogs.add(Meal.fromJson(item));
@@ -29,6 +24,49 @@ class MealRepository {
       return mealLogs;
     } catch (e) {
       print('❌ Error fetching meal logs: $e');
+      return [];
+    }
+  }
+
+  Future<List<Meal>> filterMeals({
+    required String childId,
+    DateTime? date,
+    String? time,
+    String? category,
+  }) async {
+    try {
+      print('🔍 Filtering meals for child: $childId');
+      final userId = SupabaseClientManager().client.auth.currentUser?.id;
+      if (userId == null) {
+        print('❌ User not authenticated');
+        return [];
+      }
+      final response = await SupabaseClientManager().client
+          .from('meals')
+          .select('*')
+          .eq('child_id', childId)
+          .eq('user_id', userId)
+          .order('meal_time', ascending: false);
+      print('✅ Found ${response.length} meals in database');
+      final List<Meal> filteredMeals = [];
+      for (final item in response) {
+        final meal = Meal.fromJson(item);
+        final matchesDate =
+            date == null ||
+            (meal.mealTime.year == date.year &&
+                meal.mealTime.month == date.month &&
+                meal.mealTime.day == date.day);
+        final matchesTime =
+            time == null ||
+            meal.mealTime.toIso8601String().substring(11, 16) == time;
+        final matchesCategory = category == null || meal.mealType == category;
+        if (matchesDate && matchesTime && matchesCategory) {
+          filteredMeals.add(meal);
+        }
+      }
+      return filteredMeals;
+    } catch (e) {
+      print('❌ Error filtering meal logs: $e');
       return [];
     }
   }
@@ -134,13 +172,16 @@ class MealRepository {
       print('   Update data: $updateData');
 
       // Execute update
+      final userId = SupabaseClientManager().client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
       await SupabaseClientManager().client
           .from('meals')
           .update(updateData)
           .eq('id', meal.id)
           .eq('child_id', meal.childId)
-          .eq('user_id', SupabaseClientManager().client.auth.currentUser?.id)
-;
+          .eq('user_id', userId);
 
       print('✅ Meal updated successfully! ID: ${meal.id}');
     } catch (e) {

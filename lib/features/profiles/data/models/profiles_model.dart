@@ -29,6 +29,7 @@ class UserProfileModel {
       'full_name': fullName,
       'email': email,
       'phone': phone,
+
       'avatar_url': avatarUrl,
     };
   }

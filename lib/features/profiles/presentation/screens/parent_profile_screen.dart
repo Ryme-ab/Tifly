@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tifli/features/profiles/presentation/cubit/profiles_cubit.dart';
 import 'package:tifli/features/profiles/presentation/cubit/profiles_state.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
-import 'package:tifli/core/constants/app_colors.dart';
-import 'package:tifli/core/constants/app_fonts.dart';
 import 'package:tifli/core/constants/app_assets.dart';
 import 'package:tifli/features/navigation/app_router.dart';
 
@@ -17,21 +15,14 @@ class ParentProfileScreen extends StatefulWidget {
 }
 
 class _ParentProfileScreenState extends State<ParentProfileScreen> {
-  // === Account Preferences ===
-  bool enableNotifications = true;
-  bool dailySummaryEmails = false;
-  bool shareActivityData = true;
-  bool darkMode = false;
-
   // === User Data Controllers ===
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  // === Edit States ===
-  bool _isEditingName = false;
-  bool _isEditingEmail = false;
-  bool _isEditingPhone = false;
+  // === Edit State ===
+  // Global edit mode for simpler UX
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -48,30 +39,59 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     super.dispose();
   }
 
-  void _updateProfile() {
+  void _enableEdit() {
+    setState(() {
+      _isEditing = true;
+    });
+  }
+
+  void _cancelEdit(ProfilesLoaded state) {
+    setState(() {
+      _isEditing = false;
+      // Revert changes
+      _nameController.text = state.profile.fullName;
+      _emailController.text = state.profile.email;
+      _phoneController.text = state.profile.phone;
+    });
+  }
+
+  void _saveProfile() {
     context.read<ProfilesCubit>().updateProfile(
-          fullName: _nameController.text,
-          email: _emailController.text,
-          phone: _phoneController.text,
-        );
+      fullName: _nameController.text,
+      email: _emailController.text,
+      phone: _phoneController.text,
+    );
+    setState(() {
+      _isEditing = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Theme shortcuts
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      appBar: const CustomAppBar(title: "Parent Profile"),
-      backgroundColor: AppColors.backgroundLight,
+      appBar: CustomAppBar(
+        title: "Parent Profile",
+        actions: [
+          // Edit/Save toggle in AppBar OR we can keep it in body
+          if (!_isEditing)
+            IconButton(
+              icon: Icon(Icons.edit, color: theme.appBarTheme.iconTheme?.color),
+              onPressed: _enableEdit,
+            ),
+        ],
+      ),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: BlocConsumer<ProfilesCubit, ProfilesState>(
         listener: (context, state) {
           if (state is ProfilesLoaded) {
-            // Only update controllers if not editing to avoid overwriting user input
-            if (!_isEditingName) {
+            // Only update controllers if NOT editing (initially or after save)
+            if (!_isEditing) {
               _nameController.text = state.profile.fullName;
-            }
-            if (!_isEditingEmail) {
               _emailController.text = state.profile.email;
-            }
-            if (!_isEditingPhone) {
               _phoneController.text = state.profile.phone;
             }
           } else if (state is ProfilesError) {
@@ -85,173 +105,167 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Even if error, we might show the form (empty or previously loaded)
-          // For simplicty, let's show form if loaded or error (assuming error handles empty state gracefully or shows empty form)
-          // Ideally, handle initial loading vs refresh loading
+          // Use loaded state or fallback to controllers if we have data there
+          // (Handle case where ProfilesCubit might be initial or error but we want to show UI)
           
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // === Profile Header ===
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(16),
+                    color: colorScheme.surfaceVariant.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        radius: 36,
-                        backgroundImage: AssetImage(AppAssets.babyMom),
-                         // TODO: Use NetworkImage if state.profile.avatarUrl is available
-                        backgroundColor: AppColors.surfaceLight,
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundImage: (state is ProfilesLoaded &&
+                                    state.profile.avatarUrl != null &&
+                                    state.profile.avatarUrl!.isNotEmpty)
+                                ? NetworkImage(state.profile.avatarUrl!)
+                                    as ImageProvider
+                                : AssetImage(AppAssets.babyMom),
+                            backgroundColor: colorScheme.surface,
+                          ),
+                          if (_isEditing)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  size: 16,
+                                  color: colorScheme.onPrimary,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Text(
-                        _nameController.text.isNotEmpty ? _nameController.text : "Loading...",
-                        style: AppFonts.heading2.copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimaryLight,
+                        _nameController.text.isNotEmpty
+                            ? _nameController.text
+                            : "User Name",
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _emailController.text,
-                        style: AppFonts.small.copyWith(
-                          color: AppColors.textSecondaryLight,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.textTheme.bodySmall?.color,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
-
-                // === Personal Information ===
-                _buildSectionTitle("Personal Information"),
-                const SizedBox(height: 8),
-                _buildEditableField(
-                  "Full Name",
-                  _nameController,
-                  _isEditingName,
-                  onEditTap: () {
-                    setState(() {
-                      if (_isEditingName) {
-                         // Save when toggling off
-                        _updateProfile();
-                      }
-                      _isEditingName = !_isEditingName;
-                    });
-                  },
-                ),
-                _buildEditableField(
-                  "Email Address",
-                  _emailController,
-                  _isEditingEmail,
-                  onEditTap: () {
-                     setState(() {
-                      if (_isEditingEmail) {
-                        _updateProfile();
-                      }
-                      _isEditingEmail = !_isEditingEmail;
-                    });
-                  },
-                ),
-                _buildEditableField(
-                  "Phone Number",
-                  _phoneController,
-                  _isEditingPhone,
-                  onEditTap: () {
-                    setState(() {
-                      if (_isEditingPhone) {
-                        _updateProfile();
-                      }
-                      _isEditingPhone = !_isEditingPhone;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // === Account Preferences ===
-                _buildSectionTitle("Account Preferences"),
-                const SizedBox(height: 8),
-                _buildToggle(
-                  "Enable Notifications",
-                  enableNotifications,
-                  (value) => setState(() => enableNotifications = value),
-                ),
-                _buildToggle(
-                  "Daily Summary Emails",
-                  dailySummaryEmails,
-                  (value) => setState(() => dailySummaryEmails = value),
-                ),
-                _buildToggle(
-                  "Share Activity Data",
-                  shareActivityData,
-                  (value) => setState(() => shareActivityData = value),
-                ),
-                _buildToggle(
-                  "Dark Mode (Coming Soon)",
-                  darkMode,
-                  (value) => setState(() => darkMode = value),
-                  enabled: false,
-                ),
-
                 const SizedBox(height: 24),
 
-                // === Buttons ===
-                // button to check babies list (light variant)
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(
-                      context,
-                    ).pushNamed(AppRoutes.myBabies);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.10),
-                    foregroundColor: AppColors.primary,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    "Check your babies list",
-                    style: AppFonts.body.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                // === Personal Information ===
+                _buildSectionTitle(context, "Personal Information"),
+                const SizedBox(height: 16),
+                
+                _buildTextField(
+                  context,
+                  label: "Full Name",
+                  controller: _nameController,
+                  icon: Icons.person_outline,
+                  enabled: _isEditing,
                 ),
-
                 const SizedBox(height: 12),
-
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<ProfilesCubit>().signOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.surfaceLight,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    "Logout",
-                    style: AppFonts.body.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.surfaceLight,
-                    ),
-                  ),
+                _buildTextField(
+                  context,
+                  label: "Email Address",
+                  controller: _emailController,
+                  icon: Icons.email_outlined,
+                  enabled: _isEditing, // Email usually read-only or requires re-auth? Let's allow edit for now.
                 ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  context,
+                  label: "Phone Number",
+                  controller: _phoneController,
+                  icon: Icons.phone_outlined,
+                  enabled: _isEditing,
+                ),
+
+                const SizedBox(height: 32),
+
+                // === Action Buttons ===
+                if (_isEditing && state is ProfilesLoaded) ...[
+                   Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _cancelEdit(state),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("Cancel"),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _saveProfile,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text("Save Changes"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  // Normal View Buttons
+                  _buildMenuButton(
+                    context,
+                    title: "Check your babies list",
+                    icon: Icons.child_care,
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.myBabies),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMenuButton(
+                    context,
+                    title: "Logout",
+                    icon: Icons.logout,
+                    isDestructive: true,
+                    onTap: () {
+                      context.read<ProfilesCubit>().signOut();
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.login,
+                        (route) => false,
+                      );
+                    },
+                  ),
+                ],
               ],
             ),
           );
@@ -262,67 +276,95 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
 
   // === Helper Widgets ===
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         title,
-        style: AppFonts.heading2.copyWith(
-          fontSize: 16,
-          color: AppColors.textPrimaryLight,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );
   }
 
-  Widget _buildEditableField(
-    String label,
-    TextEditingController controller,
-    bool isEditing, {
-    required VoidCallback onEditTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: !isEditing,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: AppFonts.small.copyWith(
-            color: AppColors.textSecondaryLight,
-          ),
-          suffixIcon: IconButton(
-            icon: Icon(
-              isEditing ? Icons.check_circle : Icons.edit,
-              color: isEditing ? AppColors.success : AppColors.iconLight,
-            ),
-            onPressed: onEditTap,
-          ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          filled: true,
-          fillColor: AppColors.surfaceLight,
-        ),
-        style: AppFonts.body.copyWith(
-          fontSize: 15,
-          color: AppColors.textPrimaryLight,
-        ),
-        cursorColor: AppColors.primary,
-      ),
-    );
-  }
-
-  Widget _buildToggle(
-    String title,
-    bool value,
-    Function(bool) onChanged, {
+  Widget _buildTextField(
+    BuildContext context, {
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
     bool enabled = true,
   }) {
-    return SwitchListTile(
-      title: Text(title, style: AppFonts.body),
-      value: value,
-      onChanged: enabled ? onChanged : null,
-      activeThumbColor: AppColors.primary,
-      contentPadding: EdgeInsets.zero,
+    final theme = Theme.of(context);
+    
+    return TextField(
+      controller: controller,
+      readOnly: !enabled,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: theme.iconTheme.color?.withOpacity(0.7)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.dividerColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.dividerColor.withOpacity(0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.colorScheme.primary),
+        ),
+        filled: true,
+        fillColor: enabled 
+            ? theme.colorScheme.surface 
+            : theme.colorScheme.surfaceVariant.withOpacity(0.2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+      style: theme.textTheme.bodyLarge,
+    );
+  }
+
+  Widget _buildMenuButton(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    final color = isDestructive ? colorScheme.error : colorScheme.primary;
+    
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDestructive 
+            ? colorScheme.errorContainer 
+            : colorScheme.primaryContainer.withOpacity(0.4),
+        foregroundColor: isDestructive ? colorScheme.error : colorScheme.onSurface,
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: 12),
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

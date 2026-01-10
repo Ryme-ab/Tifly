@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/features/schedules/presentation/screens/add_medicine_screen.dart';
+import 'package:tifli/l10n/app_localizations.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_cubit.dart';
 import 'package:tifli/features/logs/presentation/cubit/medication_log_state.dart';
 import 'package:tifli/features/logs/data/models/medication_log_model.dart';
+import 'package:tifli/core/state/child_selection_cubit.dart';
 // For test child ID
 
 class MedicationsScreen extends StatefulWidget {
@@ -28,20 +33,113 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     });
   }
 
+  Future<void> _exportMedicationLogsPDF(BuildContext context) async {
+    final state = context.read<MedicationLogCubit>().state;
+    if (state is! MedicationLoaded) return;
+
+    final logs = state.medicines;
+    final l10n = AppLocalizations.of(context)!;
+    if (logs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.noLogsToExport)),
+      );
+      return;
+    }
+
+    try {
+      final pdf = pw.Document();
+      final childState = context.read<ChildSelectionCubit>().state;
+      String childName = 'Baby';
+      if (childState is ChildSelected) {
+        childName = childState.childName;
+      }
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+          build: (context) => [
+            pw.Header(
+              level: 0,
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(l10n.medicationLogsReport, style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold, color: PdfColors.red700)),
+                  pw.SizedBox(height: 8),
+                  pw.Text('${l10n.child}: $childName', style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800)),
+                  pw.Text('${l10n.generated}: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                  pw.Divider(thickness: 2),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('${l10n.totalLogs}: ${logs.length}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 16),
+            pw.Table.fromTextArray(
+              headers: ['Date', 'Medicine', 'Doctor', 'Dose', 'Notes'],
+              data: logs.map((log) {
+                return [
+                  DateFormat('MMM dd, yyyy').format(log.createdAt),
+                  log.medicineName,
+                  '-',
+                  '${log.dosageAmount} ${log.dosageUnit}',
+                  log.notes?.isEmpty ?? true ? '-' : log.notes!,
+                ];
+              }).toList(),
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+              headerDecoration: const pw.BoxDecoration(color: PdfColors.red500),
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.all(8),
+            ),
+          ],
+        ),
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdf.save(),
+        name: 'medication_logs_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
+      );
+
+      if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.pdfExportedSuccessfully), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.errorExportingPdf}: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
      backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(title: "Medication Tracker"),
+      appBar: CustomAppBar(
+        title: AppLocalizations.of(context)!.medicationTracker,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFE74C3C)),
+            onPressed: () => _exportMedicationLogsPDF(context),
+            tooltip: AppLocalizations.of(context)!.exportPdf,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: BlocBuilder<MedicationLogCubit, MedicationState>(
           builder: (context, state) {
             if (state is MedicationLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is MedicationError) {
-              return Center(child: Text('Error: ${state.message}'));
+              return Center(child: Text('${AppLocalizations.of(context)!.error}: ${state.message}'));
             } else if (state is MedicationLoaded) {
               final medicines = state.medicines;
+              final l10n = AppLocalizations.of(context)!;
 
               return ListView(
                 padding: const EdgeInsets.all(16),
@@ -50,9 +148,9 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Medications",
-                        style: TextStyle(
+                       Text(
+                        l10n.medications,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -68,10 +166,10 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
                   // Medicines list
                   if (medicines.isEmpty)
-                    const Center(
+                     Center(
                       child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: Text('No medications yet'),
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(l10n.noMedicationsYet),
                       ),
                     )
                   else
@@ -90,12 +188,12 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Medication Summary",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                           Text(
+                            l10n.medicationSummary,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          _miniBarChart(medicines),
+                          _miniBarChart(medicines, context),
                         ],
                       ),
                     ),
@@ -103,7 +201,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               );
             }
 
-            return const Center(child: Text('No data'));
+            return Center(child: Text(AppLocalizations.of(context)!.noDataToDisplay));
           },
         ),
       ),
@@ -113,7 +211,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const MedicineApp()),
+            MaterialPageRoute(builder: (_) => const MedicineSchedulePage()),
           );
         },
         child: const Icon(Icons.add),
@@ -123,6 +221,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
   Widget _medicationCard(Medication med, BuildContext context) {
     IconData icon = Icons.medication;
+    final l10n = AppLocalizations.of(context)!;
 
     // Customize icon by medicine name
     final nameLower = med.medicineName.toLowerCase();
@@ -186,13 +285,15 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                       med.medicineName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    if (med.timeOfMedication != null)
+                    if (med.times.isNotEmpty)
                       Text(
-                        DateFormat(
-                          'hh:mm a',
-                        ).format(DateTime.parse(med.timeOfMedication!)),
+                        '${l10n.scheduledPrefix}${med.times.join(", ")}',
                         style: const TextStyle(color: Colors.black54),
                       ),
+                    Text(
+                      '${med.dosageAmount} ${med.dosageUnit} • ${med.frequency}',
+                      style: const TextStyle(color: Colors.black54, fontSize: 12),
+                    ),
                     if (med.notes != null && med.notes!.isNotEmpty)
                       Text(
                         med.notes!,
@@ -218,7 +319,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     );
   }
 
-  Widget _miniBarChart(List<Medication> medicines) {
+  Widget _miniBarChart(List<Medication> medicines, BuildContext context) {
     final medCounts = <String, int>{};
 
     for (final med in medicines) {
@@ -230,9 +331,9 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     final barData = medCounts.entries.take(5).toList();
 
     if (barData.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 180,
-        child: Center(child: Text('No data to display')),
+        child: Center(child: Text(AppLocalizations.of(context)!.noDataToDisplay)),
       );
     }
 

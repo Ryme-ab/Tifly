@@ -3,9 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:tifli/core/constants/app_colors.dart';
 import 'package:tifli/core/constants/app_fonts.dart';
+
 import 'package:tifli/core/state/child_selection_cubit.dart';
+
 import 'package:tifli/features/profiles/domain/entities/emergency_card_entity.dart';
 import 'package:tifli/features/profiles/presentation/cubit/emergency_card_cubit.dart';
 import 'package:tifli/widgets/custom_app_bar.dart';
@@ -168,9 +173,12 @@ class EmergencyCardScreen extends StatelessWidget {
         children: [
           Icon(Icons.lock_outline, color: Colors.red, size: 20),
           SizedBox(width: 12),
-          Text(
-            "Emergency View – Read Only",
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          Expanded(
+            child: Text(
+              "Emergency View – Read Only",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -216,7 +224,12 @@ class EmergencyCardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                Text(
+                  value,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
               ],
             ),
           ),
@@ -237,7 +250,13 @@ class EmergencyCardScreen extends StatelessWidget {
         children: [
           const Icon(Icons.bloodtype, color: AppColors.primary, size: 18),
           const SizedBox(width: 4),
-          Text("Blood Type: $bloodType", style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          Flexible(
+            child: Text(
+              "Blood Type: $bloodType",
+              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -261,6 +280,12 @@ class EmergencyCardScreen extends StatelessWidget {
             Colors.blue,
             () => _launchCaller(card.medicalContacts.doctorPhone ?? ""),
           ),
+          _buildHighContrastButton(
+            Icons.picture_as_pdf,
+            "PDF Export",
+            Colors.red,
+            () => _exportToPdf(context, card),
+          ),
            _buildHighContrastButton(
             Icons.share,
             "Share",
@@ -273,19 +298,27 @@ class EmergencyCardScreen extends StatelessWidget {
   }
 
   Widget _buildHighContrastButton(IconData icon, String label, Color color, VoidCallback onPressed) {
-    return InkWell(
-      onTap: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Icon(icon, color: Colors.white, size: 28),
-          ),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-        ],
+    return Expanded(
+      child: InkWell(
+        onTap: onPressed,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: Icon(icon, color: Colors.white, size: 28),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -305,5 +338,260 @@ class EmergencyCardScreen extends StatelessWidget {
         "Allergies: ${card.allergies.join(', ')}\n"
         "Primary Contact: ${card.emergencyContacts.primaryName} (${card.emergencyContacts.primaryPhone})";
     Share.share(text);
+  }
+
+  Future<void> _exportToPdf(BuildContext context, EmergencyCard card) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              ),
+              SizedBox(width: 12),
+              Text('Generating Emergency Card PDF...'),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      final pdf = pw.Document();
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+          build: (context) => [
+            // Header with Emergency Banner
+            pw.Container(
+              width: double.infinity,
+              padding: const pw.EdgeInsets.all(16),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.red,
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text(
+                    '🚨 EMERGENCY MEDICAL CARD 🚨',
+                    style: pw.TextStyle(
+                      fontSize: 28,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.white,
+                    ),
+                  ),
+                  pw.SizedBox(height: 8),
+                  pw.Text(
+                    'Keep this document accessible at all times',
+                    style: const pw.TextStyle(
+                      fontSize: 12,
+                      color: PdfColors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 24),
+
+            // Child Information
+            _buildPdfSection(
+              'CHILD INFORMATION',
+              [
+                _buildPdfRow('Full Name', card.fullName),
+                _buildPdfRow('Date of Birth', DateFormat('MMMM dd, yyyy').format(card.dateOfBirth)),
+                _buildPdfRow('Blood Type', card.bloodType, isHighlight: true),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // Medical Information
+            _buildPdfSection(
+              'MEDICAL INFORMATION',
+              [
+                if (card.allergies.isNotEmpty)
+                  _buildPdfRow('Allergies', card.allergies.join(', '), isWarning: true),
+                if (card.chronicConditions != null && card.chronicConditions!.isNotEmpty)
+                  _buildPdfRow('Chronic Conditions', card.chronicConditions!),
+                if (card.medications.isNotEmpty)
+                  _buildPdfRow(
+                    'Current Medications',
+                    card.medications.map((m) => '${m.name} (${m.dosage})').join(', '),
+                  ),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // Emergency Contacts
+            _buildPdfSection(
+              'EMERGENCY CONTACTS',
+              [
+                _buildPdfRow(
+                  'Primary Contact',
+                  '${card.emergencyContacts.primaryName}\n${card.emergencyContacts.primaryPhone}',
+                  isHighlight: true,
+                ),
+                if (card.emergencyContacts.secondaryName != null)
+                  _buildPdfRow(
+                    'Secondary Contact',
+                    '${card.emergencyContacts.secondaryName}\n${card.emergencyContacts.secondaryPhone}',
+                  ),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // Medical Contacts
+            _buildPdfSection(
+              'MEDICAL CONTACTS',
+              [
+                if (card.medicalContacts.doctorName != null)
+                  _buildPdfRow(
+                    'Doctor',
+                    '${card.medicalContacts.doctorName}\n${card.medicalContacts.doctorPhone ?? "N/A"}',
+                  ),
+                if (card.medicalContacts.hospitalName != null)
+                  _buildPdfRow('Hospital', card.medicalContacts.hospitalName!),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // Additional Information
+            if (card.vaccinationSummary != null || card.medicalNotes != null)
+              _buildPdfSection(
+                'ADDITIONAL INFORMATION',
+                [
+                  if (card.vaccinationSummary != null)
+                    _buildPdfRow('Vaccinations', card.vaccinationSummary!),
+                  if (card.medicalNotes != null)
+                    _buildPdfRow('Medical Notes', card.medicalNotes!),
+                ],
+              ),
+
+            pw.SizedBox(height: 30),
+
+            // Footer
+            pw.Container(
+              padding: const pw.EdgeInsets.all(12),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.grey200,
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              child: pw.Text(
+                'Generated: ${DateFormat('MMMM dd, yyyy hh:mm a').format(DateTime.now())}',
+                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdf.save(),
+        name: 'emergency_card_${card.fullName.replaceAll(' ', '_')}_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
+      );
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Emergency Card PDF generated successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error generating PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  pw.Widget _buildPdfSection(String title, List<pw.Widget> children) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          title,
+          style: pw.TextStyle(
+            fontSize: 18,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.blue900,
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Container(
+          width: double.infinity,
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.grey400),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPdfRow(String label, String value, {bool isHighlight = false, bool isWarning = false}) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 6),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            label,
+            style: pw.TextStyle(
+              fontSize: 11,
+              fontWeight: pw.FontWeight.bold,
+              color: isWarning ? PdfColors.red : PdfColors.grey700,
+            ),
+          ),
+          pw.SizedBox(height: 2),
+          pw.Container(
+            padding: isHighlight || isWarning
+                ? const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+                : null,
+            decoration: isHighlight
+                ? pw.BoxDecoration(
+                    color: PdfColors.blue100,
+                    borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+                  )
+                : isWarning
+                    ? pw.BoxDecoration(
+                        color: PdfColors.red100,
+                        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+                      )
+                    : null,
+            child: pw.Text(
+              value,
+              style: pw.TextStyle(
+                fontSize: 13,
+                fontWeight: isHighlight || isWarning ? pw.FontWeight.bold : pw.FontWeight.normal,
+                color: isWarning ? PdfColors.red900 : PdfColors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
